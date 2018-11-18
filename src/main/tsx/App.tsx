@@ -15,14 +15,9 @@ export class App extends React.Component<{}, AppState> {
     }
 
     componentDidMount() {
-        //  client({ method: 'GET', path: '/api/detailedCostClusters' }).done(response => {
-        //     console.log(response.entity);
-        // });
+
         createClient().fetchArray("/api/detailedCostClusters", DetailedCostClusterModel)
-        .then( r => {  this.setState({ detailedClusters: r })});
-        //    Client({ method: 'GET', path: '/api/detailedCostClusters' }).done(response => {
-        //         this.setState({ detailedClusters: response.entity._embedded.detailedCostClusters });
-        //     });
+            .then(r => { this.setState({ detailedClusters: r }) });
     }
 
     render() {
