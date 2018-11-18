@@ -1,10 +1,10 @@
 import { HalProperty, HalResource } from "hal-rest-client";
 export class DetailedCostClusterModel extends HalResource {
 
-    @HalProperty("name")
+    @HalProperty()
     public name: string;
 
-    @HalProperty("cluster")
+    @HalProperty()
     public cluster: string;
 
 }

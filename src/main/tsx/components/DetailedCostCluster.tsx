@@ -30,8 +30,7 @@ export const DetailedCostCluster: React.FunctionComponent<DetailedCostClusterPro
                                 <TableCell>{row.name}</TableCell>
                             </TableRow>
                         );
-                    })
-
+                        })
                     }
                 </TableBody>
 
