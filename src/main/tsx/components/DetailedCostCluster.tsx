@@ -13,10 +13,10 @@ import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
-import { Paper, TableBody, Button, TextField } from "@material-ui/core";
-import * as rest from "rest";
-import * as mime from "rest/interceptor/mime";
-
+import { Paper, TableBody, Button, TextField } from '@material-ui/core';
+import * as rest from 'rest';
+import * as mime from 'rest/interceptor/mime';
+import { Redirect, Router } from 'react-router-dom';
 
 export interface DetailedCostClusterProps {
     detailedClusters: DetailedCostClusterModel[];
@@ -26,6 +26,9 @@ export interface DetailedCostClusterState {
     open: boolean;
     selectedCluster: string;
     clusters: string[];
+    newDetailedClusterName: string;
+    nameMissing: boolean;
+    clusterMissing: boolean;
 }
 
 export class DetailedCostCluster extends React.Component<DetailedCostClusterProps, DetailedCostClusterState> {
@@ -36,13 +39,46 @@ export class DetailedCostCluster extends React.Component<DetailedCostClusterProp
             selectedCluster: "",
             open: false,
             clusters: [],
+            newDetailedClusterName: "",
+            nameMissing: false,
+            clusterMissing: false,
         };
     }
 
-    componentDidMount() {
 
+
+    componentDidMount() {
         let client = rest.wrap(mime);
         client({ path: "/api/clusters" }).then(r => { this.setState({ clusters: r.entity }) });
+    }
+
+    createNewAndReload(event: React.FormEvent) {
+
+        let nameMissing = this.state.newDetailedClusterName === "";
+        let clusterMissing = this.state.selectedCluster === "";
+        let anythingMissing = nameMissing || clusterMissing;
+        if (anythingMissing === true) {
+            this.setState({ nameMissing: nameMissing, clusterMissing: clusterMissing });
+            event.preventDefault();
+        }
+        else {
+
+            let client = rest.wrap(mime);
+            client({
+                path: "/api/detailedCostClusters",
+                method: "POST",
+                entity: { "cluster": this.state.selectedCluster, "name": this.state.newDetailedClusterName },
+                headers: { 'Content-Type': 'application/json' }
+            }).done(response => {
+                if (response.status.code === 409) {
+                    alert("Error occurred: " + response.entity.message);
+                }
+                else {
+                    this.setState({ open: false });
+                    location.reload();
+                }
+            });
+        }
     }
 
 
@@ -50,47 +86,51 @@ export class DetailedCostCluster extends React.Component<DetailedCostClusterProp
         this.setState({ open: false });
     }
 
-    handleOpen = () => {
+    handleOpen() {
         this.setState({ open: true });
     }
 
-    handleChange(event:any): void {
+    handleChange(event: any): void {
         this.setState({ selectedCluster: event.target.value });
     }
     render() {
+
         return (
             <Paper>
-                <Button color="primary" onClick={this.handleOpen}>Create New</Button>
+                <Button color="primary" onClick={() => { this.handleOpen() }}>Create New</Button>
                 <Dialog
                     disableBackdropClick
                     disableEscapeKeyDown
                     open={this.state.open}
-                    onClose={this.handleClose}>
+                    onClose={() => { this.handleClose() }}>
                     <DialogTitle>Create new detailed cluster</DialogTitle>
                     <DialogContent>
-                        <form >
-                            <FormControl >
+                        <form onSubmit={e => { this.createNewAndReload(e) }}>
+                            <FormControl>
                                 <InputLabel htmlFor="age-simple">Cluster</InputLabel>
                                 <Select
                                     value={this.state.selectedCluster}
+                                    error={this.state.clusterMissing}
                                     onChange={e => this.handleChange(e)}
                                     input={<Input id="age-simple" />}>
                                     {
                                         this.state.clusters.map(c => {
-                                            return (<MenuItem value={c}>{c}</MenuItem>);
+                                            return (<MenuItem value={c} key={c}>{c}</MenuItem>);
                                         })
                                     }
                                 </Select>
-                                <TextField label="Name"></TextField>
+                                <TextField label="Name"
+                                    onChange={e => { this.setState({ newDetailedClusterName: e.target.value }) }}
+                                    error={this.state.nameMissing}
+                                    required></TextField>
                             </FormControl>
                         </form>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={this.handleClose} color="primary">Cancel</Button>
-                        <Button onClick={this.handleClose} color="primary">Ok</Button>
+                        <Button onClick={e => { this.createNewAndReload(e) }} color="primary">Ok</Button>
+                        <Button onClick={() => { this.handleClose() }} color="primary">Cancel</Button>
                     </DialogActions>
                 </Dialog>
-
 
                 <Button color="primary">Save</Button>
                 <Table>
