@@ -1,5 +1,5 @@
 import { HalProperty, HalResource } from "hal-rest-client";
-export class DetailedCostClusterModel extends HalResource {
+export default class DetailedCostClusterModel extends HalResource {
 
     @HalProperty()
     public name: string;
