@@ -1,44 +1,21 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { createClient } from "hal-rest-client";
+import Main from "./components/Main";
+import Notfound from "./components/Notfound";
+import CostItems from "./components/CostItems";
+import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
 
-import { DetailedCostCluster } from "./components/DetailedCostCluster";
-import { DetailedCostClusterModel } from "./model/DetailedCostClusterModel";
-import { MuiThemeProvider, createMuiTheme, Theme } from '@material-ui/core/styles';
-import purple from '@material-ui/core/colors/purple';
-
-export interface AppState {
-    detailedClusters: DetailedCostClusterModel[];
-}
-export class App extends React.Component<{}, AppState> {
-
-    readonly state: AppState = {
-        detailedClusters: []
-    }
-
-    componentDidMount() {
-
-        createClient().fetchArray("/api/detailedCostClusters", DetailedCostClusterModel)
-            .then(r => { this.setState({ detailedClusters: r }) });
-    }
-
-    theme: Theme = createMuiTheme({
-        palette: {
-            primary: purple,
-            secondary: {
-                main: '#f44336',
-            },
-        },
-        typography: {
-            useNextVariants: true,
-        },
-    });
-
+export class App extends React.Component<{}, {}> {
     render() {
         return (
-            <MuiThemeProvider theme={this.theme}>
-                <DetailedCostCluster detailedClusters={this.state.detailedClusters} />
-            </MuiThemeProvider>);
+            <Router>
+                <Switch>
+                    <Route exact path="/" component={Main} />
+                    <Route path="/items" component={CostItems} />
+                    <Route component={Notfound} />
+                </Switch>
+            </Router>
+        );
     }
 }
 
