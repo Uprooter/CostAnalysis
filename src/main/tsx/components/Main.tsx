@@ -1,7 +1,9 @@
 import * as React from "react";
-import { createClient } from "hal-rest-client";
-import DetailedCostCluster from "./DetailedCostCluster";
-import DetailedCostClusterModel from "../model/DetailedCostClusterModel";
+import * as rest from 'rest';
+import * as mime from 'rest/interceptor/mime';
+import DetailedCostClusters from "../containers/DetailedCostClusters";
+import { AddDetailedClusterAction } from "../actions/actions";
+import DetailedCostClusterModel from "../models/DetailedCostClusterModel";
 import { MuiThemeProvider, createMuiTheme, Theme } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -20,21 +22,26 @@ import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
 
-export interface MainState {
-    detailedClusters: DetailedCostClusterModel[];
-    navigationOpen: boolean;
-}
-export default class Main extends React.Component<{}, MainState> {
 
-    readonly state: MainState = {
-        detailedClusters: [],
-        navigationOpen: false
-    }
+
+export interface MainProps {
+    onAddDetailedCluster: (newDetailedCluster: DetailedCostClusterModel) => AddDetailedClusterAction;
+}
+export default class Main extends React.Component<MainProps, {}> {
 
     componentDidMount() {
 
-        createClient().fetchArray("/api/detailedCostClusters", DetailedCostClusterModel)
-            .then(r => { this.setState({ detailedClusters: r }) });
+        this.getEmbeddedArray("/api/detailedCostClusters");
+    }
+
+    getEmbeddedArray(path: string) {
+        let client = rest.wrap(mime);
+
+        client({ path: path }).then(r => {
+            for (let entry of r.entity._embedded.detailedCostClusters) {
+                this.props.onAddDetailedCluster(entry);
+            }
+        });
     }
 
     theme: Theme = createMuiTheme({
@@ -55,8 +62,8 @@ export default class Main extends React.Component<{}, MainState> {
 
 
         return (
-            <MuiThemeProvider theme={this.theme}>               
-                <AppBar position="static">
+            <MuiThemeProvider theme={this.theme}>
+                {/* <AppBar position="static">
                     <Toolbar>
                         <IconButton color="inherit" aria-label="Menu" onClick={() => { this.setState({ navigationOpen: true }) }}>
                             <MenuIcon />
@@ -86,8 +93,8 @@ export default class Main extends React.Component<{}, MainState> {
                             </ListItem>
                         ))}
                     </List>
-                </Drawer>
-                <DetailedCostCluster detailedClusters={this.state.detailedClusters} />
+                </Drawer> */}
+                <DetailedCostClusters />
             </MuiThemeProvider>
         );
     }

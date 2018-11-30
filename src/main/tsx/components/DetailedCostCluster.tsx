@@ -1,5 +1,5 @@
 import * as React from "react";
-import DetailedCostClusterModel from "../model/DetailedCostClusterModel";
+import DetailedCostClusterModel from "../models/DetailedCostClusterModel";
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
@@ -14,6 +14,7 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import { Paper, TableBody, Button, TextField } from '@material-ui/core';
+
 import * as rest from 'rest';
 import * as mime from 'rest/interceptor/mime';
 
@@ -47,8 +48,12 @@ export default class DetailedCostCluster extends React.Component<DetailedCostClu
 
 
     componentDidMount() {
-        let client = rest.wrap(mime);
-        client({ path: "/api/clusters" }).then(r => { this.setState({ clusters: r.entity }) });
+        // let client = rest.wrap(mime);
+        // client({ path: "/api/clusters" }).then(r => { this.setState({ clusters: r.entity }) });
+
+        //  let client = rest.wrap(mime);
+        // client({ path: "/api/clusters" }).then(r => { 
+        //     this.props.onAddDetailedCluster });
     }
 
     createNewAndReload(event: React.FormEvent) {
