@@ -1,5 +1,5 @@
 import * as React from "react";
-import { DetailedCostClusterModel } from "../model/DetailedCostClusterModel";
+import DetailedCostClusterModel from "../models/DetailedCostClusterModel";
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
@@ -14,9 +14,9 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import { Paper, TableBody, Button, TextField } from '@material-ui/core';
+
 import * as rest from 'rest';
 import * as mime from 'rest/interceptor/mime';
-import { Redirect, Router } from 'react-router-dom';
 
 export interface DetailedCostClusterProps {
     detailedClusters: DetailedCostClusterModel[];
@@ -31,7 +31,7 @@ export interface DetailedCostClusterState {
     clusterMissing: boolean;
 }
 
-export class DetailedCostCluster extends React.Component<DetailedCostClusterProps, DetailedCostClusterState> {
+export default class DetailedCostCluster extends React.Component<DetailedCostClusterProps, DetailedCostClusterState> {
 
     constructor(props: DetailedCostClusterProps) {
         super(props)
@@ -48,8 +48,12 @@ export class DetailedCostCluster extends React.Component<DetailedCostClusterProp
 
 
     componentDidMount() {
-        let client = rest.wrap(mime);
-        client({ path: "/api/clusters" }).then(r => { this.setState({ clusters: r.entity }) });
+        // let client = rest.wrap(mime);
+        // client({ path: "/api/clusters" }).then(r => { this.setState({ clusters: r.entity }) });
+
+        //  let client = rest.wrap(mime);
+        // client({ path: "/api/clusters" }).then(r => { 
+        //     this.props.onAddDetailedCluster });
     }
 
     createNewAndReload(event: React.FormEvent) {
