@@ -45,8 +45,6 @@ export default class DetailedCostCluster extends React.Component<DetailedCostClu
         };
     }
 
-
-
     componentDidMount() {
         // let client = rest.wrap(mime);
         // client({ path: "/api/clusters" }).then(r => { this.setState({ clusters: r.entity }) });
