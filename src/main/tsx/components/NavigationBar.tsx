@@ -23,6 +23,10 @@ interface NavigationProps {
 }
 export default class NavigationBar extends React.Component<NavigationProps, {}> {
 
+    goTo(page: string) {
+        location.pathname = "/" + page;
+    }
+
     render() {
 
         return (
@@ -41,18 +45,18 @@ export default class NavigationBar extends React.Component<NavigationProps, {}> 
                 </AppBar>
                 <Drawer open={this.props.navigationOpen} onClose={() => { this.props.onTriggerNavigationBar(false) }}>
                     <List>
-                        <ListItem button key={"overview"}>
+                        <ListItem button key={"overview"} onClick={() => { this.goTo("") }}>
                             <ListItemIcon><ListIcon /></ListItemIcon>
                             <ListItemText primary={"Übersicht"} />
                         </ListItem>
-                        <ListItem button key={"overview"}>
+                        <ListItem button key={"upload"} onClick={() => { this.goTo("upload") }}>
                             <ListItemIcon><InboxIcon /></ListItemIcon>
                             <ListItemText primary={"Hochladen"} />
                         </ListItem>
                     </List>
                     <Divider />
                     <List>
-                        <ListItem button key={"adminDetailedClusters"}>
+                        <ListItem button key={"adminDetailedClusters"} onClick={() => { this.goTo("detailedclusters") }}>
                             <ListItemIcon><BuildIcon /></ListItemIcon>
                             <ListItemText primary={"Pflege Detail Typen"} />
                         </ListItem>

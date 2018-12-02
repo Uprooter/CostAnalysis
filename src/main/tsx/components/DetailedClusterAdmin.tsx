@@ -2,17 +2,14 @@ import * as React from "react";
 import * as rest from 'rest';
 import * as mime from 'rest/interceptor/mime';
 import DetailedCostClusters from "../containers/DetailedCostClusters";
-import NavigationBar from "../containers/NavigationBar";
 import { AddDetailedClusterAction } from "../actions/actions";
 import DetailedCostClusterModel from "../models/DetailedCostClusterModel";
-import { MuiThemeProvider, createMuiTheme, Theme } from '@material-ui/core/styles';
 
 
-
-export interface MainProps {
+export interface DetailedClusterAdminProps {
     onAddDetailedCluster: (newDetailedCluster: DetailedCostClusterModel) => AddDetailedClusterAction;
 }
-export default class Main extends React.Component<MainProps, {}> {
+export default class DetailedClusterAdmin extends React.Component<DetailedClusterAdminProps, {}> {
 
     componentDidMount() {
 
@@ -29,26 +26,10 @@ export default class Main extends React.Component<MainProps, {}> {
         });
     }
 
-    theme: Theme = createMuiTheme({
-        palette: {
-            primary: { main: '#2196f3', },
-            secondary: {
-                main: '#f44336',
-            },
-        },
-        typography: {
-            useNextVariants: true,
-        },
-    });
 
     render() {
-
-
         return (
-            <MuiThemeProvider theme={this.theme}>
-                <NavigationBar />
-                <DetailedCostClusters />
-            </MuiThemeProvider>
+            <DetailedCostClusters />
         );
     }
 }
