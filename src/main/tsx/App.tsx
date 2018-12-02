@@ -1,10 +1,10 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Provider } from "react-redux";
-import DetailedClusterAdmin from "./components/DetailedClusterAdmin";
+import DetailedClusterAdmin from "./containers/DetailedClusterAdmin";
 import Notfound from "./components/Notfound";
-import Upload from "./components/Upload";
-import CostOverview from "./components/CostOverview";
+import Upload from "./containers/Upload";
+import CostOverview from "./containers/CostOverview";
 import { Route, Switch } from "react-router";
 import { createStore, applyMiddleware, compose } from "redux";
 import reducer from "./reducers";
@@ -14,21 +14,13 @@ import Page from "./utils/pages";
 import { ConnectedRouter, routerMiddleware } from 'connected-react-router';
 import { createBrowserHistory } from 'history';
 
-
 export class App extends React.Component<{}, {}> {
-
-    //store = createStore(reducer, initialState, applyMiddleware(logger));
 
     history = createBrowserHistory();
     composeEnhancer: typeof compose = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
     store = createStore(
         reducer(this.history),
-        this.composeEnhancer(
-            applyMiddleware(
-                routerMiddleware(this.history),
-            ),
-        ),
-    )
+        this.composeEnhancer(applyMiddleware(routerMiddleware(this.history))));
 
     theme: Theme = createMuiTheme({
         palette: {

@@ -1,9 +1,17 @@
 import * as React from "react";
-export default class Upload extends React.Component<{}, {}> {
-     render() {
+import { NavigatioPageUpdateAction } from "../actions/actions";
+import Page from "../utils/pages";
 
-        return (<div>
-            Here is upload
-        </div>);
-     }
+interface UploadProps {
+    updatePageName: (newName: string) => NavigatioPageUpdateAction;
+}
+export default class Upload extends React.Component<UploadProps, {}> {
+
+    componentDidMount() {
+        this.props.updatePageName(Page.UPLOAD.name)
+    }
+
+    render() {
+        return (<div>Here is upload</div>);
+    }
 }

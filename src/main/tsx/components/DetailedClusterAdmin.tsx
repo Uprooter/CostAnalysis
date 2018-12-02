@@ -2,17 +2,20 @@ import * as React from "react";
 import * as rest from 'rest';
 import * as mime from 'rest/interceptor/mime';
 import DetailedCostClusters from "../containers/DetailedCostClusters";
-import { AddDetailedClusterAction } from "../actions/actions";
+import { AddDetailedClusterAction, NavigatioPageUpdateAction } from "../actions/actions";
 import DetailedCostClusterModel from "../models/DetailedCostClusterModel";
+import Page from "../utils/pages";
 
 
 export interface DetailedClusterAdminProps {
     onAddDetailedCluster: (newDetailedCluster: DetailedCostClusterModel) => AddDetailedClusterAction;
+    updatePageName: (newName: string) => NavigatioPageUpdateAction;
 }
 export default class DetailedClusterAdmin extends React.Component<DetailedClusterAdminProps, {}> {
 
     componentDidMount() {
 
+        this.props.updatePageName(Page.ADMIN_DETAILED_CLUSTERS.name);
         this.getEmbeddedArray("/api/detailedCostClusters");
     }
 
