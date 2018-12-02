@@ -9,7 +9,7 @@ export const initialState: State = {
     detailedClusters: []
 }
 
-export function reducer(state: State = initialState, action: Action) {
+export function reducer(state: State = initialState, action: Action):State {
     switch (action.type) {
         case ActionTypes.ADD_DETAILED_CLUSTER:
             return {

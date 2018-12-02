@@ -2,7 +2,7 @@ import { connect } from 'react-redux'
 import { State } from '../reducers'
 import { getDetailedClusters } from '../selectors/detailedClusters'
 import { addDetailedCluster } from '../actions/actions'
-import Main from '../components/Main'
+import DetailedClusterAdmin from '../components/DetailedClusterAdmin'
 
 // get my required props out of the state
 const mapStateToProps = (state: State) => ({
@@ -13,4 +13,4 @@ const mapDispatchToProps = {
   onAddDetailedCluster: addDetailedCluster
 }
 
-export default connect<any, any, any>(mapStateToProps, mapDispatchToProps)(Main)
+export default connect<any, any, any>(mapStateToProps, mapDispatchToProps)(DetailedClusterAdmin)
