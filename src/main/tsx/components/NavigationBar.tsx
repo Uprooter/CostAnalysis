@@ -15,20 +15,25 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import BuildIcon from '@material-ui/icons/Build';
-import { NavigationAction } from "../actions/actions";
+import { NavigationAction, NavigatioPageUpdateAction } from "../actions/actions";
+import Page from "../utils/pages";
 
 interface NavigationProps {
     navigationOpen: boolean;
+    pageName: string;
     onTriggerNavigationBar: (open: boolean) => NavigationAction;
+    updatePageName: (newName: string) => NavigatioPageUpdateAction;
+    push: (path: string) => any;
 }
 export default class NavigationBar extends React.Component<NavigationProps, {}> {
 
-    goTo(page: string) {
-        location.pathname = "/" + page;
+    goTo(page: Page) {
+        this.props.updatePageName(page.name);
+        this.props.push(page.pathName);
+        this.props.onTriggerNavigationBar(false);
     }
 
     render() {
-
         return (
             <div>
                 <AppBar position="static" >
@@ -36,31 +41,28 @@ export default class NavigationBar extends React.Component<NavigationProps, {}> 
                         <IconButton color="inherit" aria-label="Menu" onClick={() => { this.props.onTriggerNavigationBar(true) }}>
                             <MenuIcon />
                         </IconButton>
-                        <Typography variant="h6" color="inherit" noWrap>
-                            Kostenübersicht
-                        </Typography>
+                        <Typography variant="h6" color="inherit" noWrap>{this.props.pageName}</Typography>
                         <SearchIcon />
                         <InputBase placeholder="Search…" />
                     </Toolbar>
                 </AppBar>
                 <Drawer open={this.props.navigationOpen} onClose={() => { this.props.onTriggerNavigationBar(false) }}>
                     <List>
-                        <ListItem button key={"overview"} onClick={() => { this.goTo("") }}>
+                        <ListItem button key={"overview"} onClick={() => { this.goTo(Page.ROOT) }}>
                             <ListItemIcon><ListIcon /></ListItemIcon>
-                            <ListItemText primary={"Übersicht"} />
+                            <ListItemText primary={Page.ROOT.name} />
                         </ListItem>
-                        <ListItem button key={"upload"} onClick={() => { this.goTo("upload") }}>
+                        <ListItem button key={"upload"} onClick={() => { this.goTo(Page.UPLOAD) }}>
                             <ListItemIcon><InboxIcon /></ListItemIcon>
-                            <ListItemText primary={"Hochladen"} />
+                            <ListItemText primary={Page.UPLOAD.name} />
                         </ListItem>
                     </List>
                     <Divider />
                     <List>
-                        <ListItem button key={"adminDetailedClusters"} onClick={() => { this.goTo("detailedclusters") }}>
+                        <ListItem button key={"adminDetailedClusters"} onClick={() => { this.goTo(Page.ADMIN_DETAILED_CLUSTERS) }}>
                             <ListItemIcon><BuildIcon /></ListItemIcon>
-                            <ListItemText primary={"Pflege Detail Typen"} />
+                            <ListItemText primary={Page.ADMIN_DETAILED_CLUSTERS.name} />
                         </ListItem>
-
                     </List>
                 </Drawer>
             </div>

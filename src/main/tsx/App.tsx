@@ -5,52 +5,62 @@ import DetailedClusterAdmin from "./components/DetailedClusterAdmin";
 import Notfound from "./components/Notfound";
 import Upload from "./components/Upload";
 import CostOverview from "./components/CostOverview";
-import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
-import logger from "redux-logger";
-import { createStore, applyMiddleware } from "redux";
-import { reducer, initialState } from "./reducers";
+import { Route, Switch } from "react-router";
+import { createStore, applyMiddleware, compose } from "redux";
+import reducer from "./reducers";
 import { MuiThemeProvider, createMuiTheme, Theme } from '@material-ui/core/styles';
 import NavigationBar from "./containers/NavigationBar";
+import Page from "./utils/pages";
+import { ConnectedRouter, routerMiddleware } from 'connected-react-router';
+import { createBrowserHistory } from 'history';
 
-//the logger logs old and new state
-const store = createStore(reducer, initialState, applyMiddleware(logger));
 
 export class App extends React.Component<{}, {}> {
 
+    //store = createStore(reducer, initialState, applyMiddleware(logger));
+
+    history = createBrowserHistory();
+    composeEnhancer: typeof compose = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+    store = createStore(
+        reducer(this.history),
+        this.composeEnhancer(
+            applyMiddleware(
+                routerMiddleware(this.history),
+            ),
+        ),
+    )
+
+    theme: Theme = createMuiTheme({
+        palette: {
+            primary: { main: '#2196f3', },
+            secondary: {
+                main: '#f44336',
+            },
+        },
+        typography: {
+            useNextVariants: true,
+        },
+    });
+
     render() {
         return (
-            <Router>
-                <Switch>
-                    <Route exact path="/" component={CostOverview} />
-                    <Route path="/upload" component={Upload} />
-                    <Route path="/detailedclusters" component={DetailedClusterAdmin} />
-                    <Route path="/error" component={Notfound} />
-                    <Route component={Notfound} />
-                </Switch>
-            </Router>
+            <Provider store={this.store}>
+                <MuiThemeProvider theme={this.theme}>
+                    <NavigationBar />
+                    <ConnectedRouter history={this.history}>
+                        <Switch>
+                            <Route exact path={Page.ROOT.pathName} component={CostOverview} />
+                            <Route path={Page.UPLOAD.pathName} component={Upload} />
+                            <Route path={Page.ADMIN_DETAILED_CLUSTERS.pathName} component={DetailedClusterAdmin} />
+                            <Route path="/error" component={Notfound} />
+                            <Route component={Notfound} />
+                        </Switch>
+                    </ConnectedRouter>
+                </MuiThemeProvider>
+            </Provider>
         );
     }
-
-
 }
 
-export const theme: Theme = createMuiTheme({
-    palette: {
-        primary: { main: '#2196f3', },
-        secondary: {
-            main: '#f44336',
-        },
-    },
-    typography: {
-        useNextVariants: true,
-    },
-});
 
-ReactDOM.render(
-    <Provider store={store}>
-        <MuiThemeProvider theme={theme}>
-            <NavigationBar />
-            <App />
-        </MuiThemeProvider>
-    </Provider>,
-    document.getElementById('app'));
+ReactDOM.render(<App />, document.getElementById('app'));

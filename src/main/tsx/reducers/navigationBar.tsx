@@ -4,14 +4,13 @@ export interface State {
 }
 
 export const initialState: State = {
-    open: false
+    open: false,
 }
 
-export function reducer(state: State = initialState, action: Action) {
+export function reducer(state: State = initialState, action: Action): State {
     switch (action.type) {
         case ActionTypes.NAVIGATION_OPEN:
-            return {open:action.payload}
-
+            return { open: action.openStatus }
         default:
             return state
     }

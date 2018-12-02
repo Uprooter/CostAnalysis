@@ -1,18 +1,23 @@
 import * as fromDetailedClusters from "./detailedCostCluster";
-import * as navigation from "./navigation";
+import * as navigationBar from "./navigationBar";
+import * as navigationPage from "./navigationPage";
 import { combineReducers } from "redux";
+import { connectRouter, RouterState } from 'connected-react-router';
+import { History } from 'history';
 
 export interface State {
     detailedClusters: fromDetailedClusters.State,
-    navigationOpen: navigation.State
+    navigationBar: navigationBar.State,
+    navigationPage: navigationPage.State,
+    router: RouterState;
+
 }
 
-export const initialState: State = {
-    detailedClusters: fromDetailedClusters.initialState,
-    navigationOpen: navigation.initialState
-}
-
-export const reducer = combineReducers<State>({
+const reducer = (history: History) => combineReducers<State>({
+    router: connectRouter(history),
     detailedClusters: fromDetailedClusters.reducer,
-    navigationOpen: navigation.reducer
+    navigationBar: navigationBar.reducer,
+    navigationPage: navigationPage.reducer
 })
+
+export default reducer
