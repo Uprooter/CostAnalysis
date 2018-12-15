@@ -65,6 +65,15 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>1.5</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -100,7 +109,7 @@
 						<configuration>
 							<arguments>install</arguments>
 						</configuration>
-					</execution>				
+					</execution>
 				</executions>
 			</plugin>
 		</plugins>
