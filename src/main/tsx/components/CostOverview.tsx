@@ -14,7 +14,7 @@ export default class CostOverview extends React.Component<CostOverviewProps, {}>
     render() {
 
         return (
-            <div>Hi here ist cost overview</div>
+            <div>Hi here ist cost overview2</div>
         );
     }
 }

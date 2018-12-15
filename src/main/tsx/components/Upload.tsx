@@ -12,6 +12,6 @@ export default class Upload extends React.Component<UploadProps, {}> {
     }
 
     render() {
-        return (<div>Here is upload</div>);
+        return (<div>Here is upload2</div>);
     }
 }
