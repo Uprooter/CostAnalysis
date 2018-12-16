@@ -1,11 +1,15 @@
 import { connect } from 'react-redux'
+import { State } from '../reducers'
 import CostOverview from '../components/CostOverview'
-import { updatePageName } from '../actions/actions'
+import { updatePageName,addCostItems } from '../actions/actions'
+import { getDetailedClusters } from '../selectors/costItems'
 
-const mapStateToProps = () => ({
+const mapStateToProps = (state: State) => ({
+  costItems: getCostItems(state)
 })
 const mapDispatchToProps = {
-  updatePageName: updatePageName
+  updatePageName: updatePageName,
+   addCostItems: addCostItems
 }
 
 export default connect<any, any, any>(mapStateToProps, mapDispatchToProps)(CostOverview)

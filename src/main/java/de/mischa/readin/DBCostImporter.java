@@ -19,7 +19,9 @@ import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 
+@Component
 public class DBCostImporter {
 
 	private static final String DATE_COLUMN_NAME = "Buchungstag";
