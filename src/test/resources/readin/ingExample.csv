@@ -1,0 +1,15 @@
+Umsatzanzeige;Datei erstellt am: 11.11.2040 19:14
+;Letztes Update: aktuell
+
+IBAN;1111 11 1111
+Kontoname;Girokonto
+Bank;123
+Kunde;Max Mustermann
+Zeitraum;01.08.2040 - 31.08.2040
+
+In der CSV-Datei finden Sie alle bereits gebuchten Umsätze. Die vorgemerkten Umsätze werden nicht aufgenommen, auch wenn sie in Ihrem Internetbanking angezeigt werden.
+
+Buchung;Valuta;Auftraggeber/Empfänger;Buchungstext;Verwendungszweck;Betrag;Währung
+31.08.2040;31.08.2040;dasd;Lastschrift;Test1111;-155,52;EUR
+31.08.2040;31.08.2040;asd;Lastschrift;Test1111;-239,66;EUR
+asddas

@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import de.mischa.model.CostCluster;
 import de.mischa.model.DetailedCostCluster;
 import de.mischa.readin.CostItemImporterService;
+import de.mischa.readin.ImportType;
 import de.mischa.repository.CostItemRepository;
 import de.mischa.repository.DetailedCostClusterRepository;
 
@@ -30,7 +31,12 @@ public class CostAnalysisApplication {
 			detailedClusterRep.save(new DetailedCostCluster(CostCluster.ALLGEMEIN, "Einkauf"));
 			detailedClusterRep.save(new DetailedCostCluster(CostCluster.UNTERHALTUNG, "Netflix"));
 
-			importer.getItems("C:\\Users\\Mischa\\Downloads\\Kontoumsaetze_670_568523500_20181117_101907.csv")
+			importer.getItems(ImportType.DB,
+					"C:\\Users\\Mischa\\Downloads\\Kontoumsaetze_670_568523500_20181117_101907.csv")
+					.forEach(costItem -> costRep.save(costItem));
+			
+			importer.getItems(ImportType.ING,
+					"C:\\Users\\Mischa\\Downloads\\Umsatzanzeige_DE39500105175422178243_20180916.csv")
 					.forEach(costItem -> costRep.save(costItem));
 
 		};

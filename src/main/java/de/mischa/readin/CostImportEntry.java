@@ -1,12 +1,10 @@
 package de.mischa.readin;
 
 import java.util.Date;
-
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-public class DBCostEntry {
+public class CostImportEntry {
 	private Date date;
 	private String recipient;
 	private String purpose;
@@ -17,7 +15,7 @@ public class DBCostEntry {
 		return this.getDate() + " " + this.getRecipient() + " " + this.getPurpose() + " " + this.getAmount();
 	}
 
-	public DBCostEntry(Date date, String recipient, String purpose, double amount) {
+	public CostImportEntry(Date date, String recipient, String purpose, double amount) {
 		this.date = date;
 		this.recipient = recipient;
 		this.purpose = purpose;
