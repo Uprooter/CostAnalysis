@@ -1,15 +1,27 @@
 import DetailedCostClusterModel from "./DetailedCostClusterModel";
+import RecipientModel from "./RecipientModel";
+import { HalProperty, HalResource } from "hal-rest-client";
 
-export default class CostItemModel {
+export default class CostItemModel extends HalResource {
 
-    public amount: number;
+    @HalProperty()
+    amount: number;
 
+    @HalProperty("detailedCluster", DetailedCostClusterModel)
+    detailedCluster: DetailedCostClusterModel;
 
-    public cluster: DetailedCostClusterModel;
+    @HalProperty("recipient", RecipientModel)
+    recipient: RecipientModel;
 
-    constructor(amount: number, cluster: DetailedCostClusterModel) {
-        this.amount = name;
-        this.cluster = cluster;
-    }
+    @HalProperty()
+    owner: string;
 
+    @HalProperty()
+    type: string;
+
+    @HalProperty()
+    purpose: string;
+
+    @HalProperty()
+    creationDate: Date;
 }

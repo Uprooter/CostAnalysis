@@ -2,7 +2,7 @@ import { connect } from 'react-redux'
 import { State } from '../reducers'
 import CostOverview from '../components/CostOverview'
 import { updatePageName,addCostItems } from '../actions/actions'
-import { getDetailedClusters } from '../selectors/costItems'
+import { getCostItems } from '../selectors/costItems'
 
 const mapStateToProps = (state: State) => ({
   costItems: getCostItems(state)

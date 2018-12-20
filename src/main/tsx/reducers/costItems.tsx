@@ -4,8 +4,7 @@ export interface State {
     costItems: CostItemModel[]
 }
 
-export const initialState: State = {
-    //detailedClusters: [{ name: "Test1", cluster: "Cluster1" }, { name: "Test2", cluster: "Cluster2" }]
+export const initialState: State = {    
     costItems: []
 }
 
@@ -14,7 +13,7 @@ export function reducer(state: State = initialState, action: Action):State {
         case ActionTypes.ADD_ITEMS:
             return {
                 ...state,
-                costItems: [...state.costItems, ...action.payload]
+                costItems: [...action.payload]
             }
 
         default:

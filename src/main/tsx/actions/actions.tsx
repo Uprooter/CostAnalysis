@@ -42,4 +42,4 @@ export function updatePageName(newName: string): NavigatioPageUpdateAction {
     }
 }
 
-export type Action = AddDetailedClusterAction | NavigationAction | NavigatioPageUpdateAction|AddCostItemsAction;
+export type Action = AddDetailedClusterAction | NavigationAction | NavigatioPageUpdateAction | AddCostItemsAction;
