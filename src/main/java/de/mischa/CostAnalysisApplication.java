@@ -9,30 +9,30 @@ import org.springframework.context.annotation.Bean;
 
 import de.mischa.model.CostCluster;
 import de.mischa.model.DetailedCostCluster;
+import de.mischa.readin.CostItemImporterService;
+import de.mischa.repository.CostItemRepository;
 import de.mischa.repository.DetailedCostClusterRepository;
 
 @SpringBootApplication
 public class CostAnalysisApplication {
 
 	private static final Logger logger = LoggerFactory.getLogger(CostAnalysisApplication.class);
-	
+
 	public static void main(String[] args) {
 		SpringApplication.run(CostAnalysisApplication.class, args);
 	}
-	
+
 	@Bean
-	public CommandLineRunner demo(DetailedCostClusterRepository rep)
-	{
-		return (args) ->{
-			
-			rep.save(new DetailedCostCluster(CostCluster.UNTERHALTUNG, "New"));
-			rep.save(new DetailedCostCluster(CostCluster.UNTERHALTUNG, "New2"));
-			
-			for(DetailedCostCluster cluster : rep.findAll())
-			{
-				logger.info(cluster.getName());
-			}			
-			
+	public CommandLineRunner demo(DetailedCostClusterRepository detailedClusterRep, CostItemRepository costRep,
+			CostItemImporterService importer) {
+		return (args) -> {
+
+			detailedClusterRep.save(new DetailedCostCluster(CostCluster.ALLGEMEIN, "Einkauf"));
+			detailedClusterRep.save(new DetailedCostCluster(CostCluster.UNTERHALTUNG, "Netflix"));
+
+			importer.getItems("C:\\Users\\Mischa\\Downloads\\Kontoumsaetze_670_568523500_20181117_101907.csv")
+					.forEach(costItem -> costRep.save(costItem));
+
 		};
 	}
 }

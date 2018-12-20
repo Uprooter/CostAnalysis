@@ -1,14 +1,11 @@
 
-export default class DetailedCostClusterModel {
+import { HalProperty, HalResource } from "hal-rest-client";
 
+export default class DetailedCostClusterModel extends HalResource {
+
+    @HalProperty()
     public name: string;
 
-
+    @HalProperty()
     public cluster: string;
-
-    constructor(name: string, cluster: string) {
-        this.name = name;
-        this.cluster = cluster;
-    }
-
 }

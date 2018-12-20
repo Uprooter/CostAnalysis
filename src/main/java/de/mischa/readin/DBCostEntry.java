@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
 public class DBCostEntry {
 	private Date date;
 	private String recipient;
@@ -16,5 +15,12 @@ public class DBCostEntry {
 	@Override
 	public String toString() {
 		return this.getDate() + " " + this.getRecipient() + " " + this.getPurpose() + " " + this.getAmount();
+	}
+
+	public DBCostEntry(Date date, String recipient, String purpose, double amount) {
+		this.date = date;
+		this.recipient = recipient;
+		this.purpose = purpose;
+		this.amount = amount;
 	}
 }

@@ -7,8 +7,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import lombok.Data;
+
 @Entity
 @Table(name = "DETAILED_COST_CLUSTER")
+@Data
 public class DetailedCostCluster {
 
 	@Id
@@ -20,10 +23,9 @@ public class DetailedCostCluster {
 
 	@Column(unique = true, nullable = false)
 	private String name;
-	
-	public DetailedCostCluster()
-	{
-		
+
+	public DetailedCostCluster() {
+
 	}
 
 	public DetailedCostCluster(CostCluster cluster, String name) {
@@ -31,29 +33,4 @@ public class DetailedCostCluster {
 		this.cluster = cluster;
 		this.name = name;
 	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public CostCluster getCluster() {
-		return cluster;
-	}
-
-	public void setCluster(CostCluster cluster) {
-		this.cluster = cluster;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
 }
