@@ -29,7 +29,7 @@ public enum CostCluster {
 
 	URLAUB,
 
-	VERPEFLEGUNG,
+	VERPFLEGUNG,
 
 	VERSICHERUNG
 

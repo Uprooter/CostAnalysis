@@ -9,15 +9,15 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.mischa.readin.ing.INGCostImporter;
+import de.mischa.readin.db.DBCostReader;
 
-public class INGCostImporterTests {
+public class DBCostReaderTests {
 	@Test
 	public void testImporter() throws FileNotFoundException, IOException {
-		List<CostImportEntry> entries = new INGCostImporter().read("src/test/resources/readin/ingExample.csv");
+		List<CostImportEntry> entries = new DBCostReader().read("src/test/resources/readin/dbExample.csv");
 		Assert.assertThat(entries.size(), is(2));
-		Assert.assertThat(entries.get(0).getAmount(), is(-155.52));
-		Assert.assertThat(entries.get(1).getAmount(), is(-239.66));
+		Assert.assertThat(entries.get(0).getAmount(), is(-117.0));
+		Assert.assertThat(entries.get(1).getAmount(), is(-9.99));
 	}
 
 }

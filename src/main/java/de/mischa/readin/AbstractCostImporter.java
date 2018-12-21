@@ -28,7 +28,11 @@ public class AbstractCostImporter {
 
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
 	private ImportConfig config;
-
+	
+	public AbstractCostImporter()
+	{
+		
+	}
 	public AbstractCostImporter(ImportConfig config) {
 		this.config = config;
 	}

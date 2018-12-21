@@ -8,7 +8,7 @@ import de.mischa.readin.AbstractCostImporter;
 import de.mischa.readin.ImportConfig;
 
 @Component
-public class INGCostImporter extends AbstractCostImporter {
+public class INGCostReader extends AbstractCostImporter {
 
 	private static final String DATE_COLUMN_NAME = "Buchung";
 	private static final String RECIPIENT_COLUMN_NAME = "Auftraggeber/Empfänger";
@@ -18,7 +18,7 @@ public class INGCostImporter extends AbstractCostImporter {
 			PURPOSE_COLUMN_NAME, AMOUNT_NEG_COLUMN_NAME, "Währung" };
 	private static final int SKIP_LINES = 11;
 
-	public INGCostImporter() {
+	public INGCostReader() {
 		super(new ImportConfig(COLUMN_NAMES, DATE_COLUMN_NAME, RECIPIENT_COLUMN_NAME, PURPOSE_COLUMN_NAME,
 				AMOUNT_NEG_COLUMN_NAME, "None", SKIP_LINES));
 	}

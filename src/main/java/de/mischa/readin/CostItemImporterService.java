@@ -13,8 +13,8 @@ import de.mischa.model.CostItem;
 import de.mischa.model.CostOwner;
 import de.mischa.model.CostRecipient;
 import de.mischa.model.DetailedCostCluster;
-import de.mischa.readin.db.DBCostImporter;
-import de.mischa.readin.ing.INGCostImporter;
+import de.mischa.readin.db.DBCostReader;
+import de.mischa.readin.ing.INGCostReader;
 import de.mischa.repository.CostRecipientRepository;
 import de.mischa.rules.CostClusterRule;
 import de.mischa.rules.CostTypeRule;
@@ -24,9 +24,9 @@ public class CostItemImporterService {
 	private Logger logger = LoggerFactory.getLogger(CostItemImporterService.class);
 
 	@Autowired
-	private DBCostImporter dbImporter;
+	private DBCostReader dbImporter;
 	@Autowired
-	private INGCostImporter ingImporter;
+	private INGCostReader ingImporter;
 	@Autowired
 	private CostRecipientRepository recipientRep;
 	@Autowired
