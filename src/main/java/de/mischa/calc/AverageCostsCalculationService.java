@@ -1,15 +1,19 @@
 package de.mischa.calc;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.mischa.CostAnalysisApplication;
 import de.mischa.model.AverageCostModel;
 import de.mischa.model.CostCluster;
 import de.mischa.model.CostItem;
@@ -19,6 +23,8 @@ import de.mischa.repository.CostItemRepository;
 
 @Service
 public class AverageCostsCalculationService {
+	
+	private static final Logger logger = LoggerFactory.getLogger(AverageCostsCalculationService.class);
 
 	@Autowired
 	private CostItemRepository costItemRep;
@@ -37,20 +43,20 @@ public class AverageCostsCalculationService {
 
 	AverageCostModel calculateResult(List<CostItem> relevantItems) {
 		AverageCostModel result = new AverageCostModel();
-		result.setFixedCostsMischa(this.calculateMonthlyAverage(relevantItems, CostOwner.MISCHA, CostType.FEST));
-		result.setFixedCostsGesa(this.calculateMonthlyAverage(relevantItems, CostOwner.GESA, CostType.FEST));
-		result.setTotalAverageFixedCosts(result.getFixedCostsGesa() + result.getFixedCostsMischa());
+//		result.setFixedCostsMischa(this.calculateMonthlyAverage(relevantItems, CostOwner.MISCHA, CostType.FEST));
+//		result.setFixedCostsGesa(this.calculateMonthlyAverage(relevantItems, CostOwner.GESA, CostType.FEST));
+//		result.setTotalAverageFixedCosts(result.getFixedCostsGesa() + result.getFixedCostsMischa());
 
 		result.setFlexCostsMischa(this.calculateMonthlyAverage(relevantItems, CostOwner.MISCHA, CostType.FLEXIBEL));
-		result.setFlexCostsGesa(this.calculateMonthlyAverage(relevantItems, CostOwner.GESA, CostType.FLEXIBEL));
-		result.setTotalAverageFlexCosts(result.getFlexCostsGesa() + result.getFlexCostsMischa());
-
-		result.setTotalAverageMischa(result.getFixedCostsMischa() + result.getFlexCostsMischa());
-		result.setTotalAverageGesa(result.getFixedCostsGesa() + result.getFlexCostsGesa());
-
-		result.setDiffMischa(this.calculateDiff(relevantItems, CostOwner.MISCHA));
-		result.setDiffGesa(this.calculateDiff(relevantItems, CostOwner.GESA));
-		result.setTotalDiff(result.getDiffGesa() + result.getDiffMischa());
+//		result.setFlexCostsGesa(this.calculateMonthlyAverage(relevantItems, CostOwner.GESA, CostType.FLEXIBEL));
+//		result.setTotalAverageFlexCosts(result.getFlexCostsGesa() + result.getFlexCostsMischa());
+//
+//		result.setTotalAverageMischa(result.getFixedCostsMischa() + result.getFlexCostsMischa());
+//		result.setTotalAverageGesa(result.getFixedCostsGesa() + result.getFlexCostsGesa());
+//
+//		result.setDiffMischa(this.calculateDiff(relevantItems, CostOwner.MISCHA));
+//		result.setDiffGesa(this.calculateDiff(relevantItems, CostOwner.GESA));
+//		result.setTotalDiff(result.getDiffGesa() + result.getDiffMischa());
 		return result;
 	}
 
@@ -77,6 +83,8 @@ public class AverageCostsCalculationService {
 				.collect(Collectors.toList());
 
 		Map<String, Double> monthlySums = getMonthlySums(costTypeItems);
+		
+		monthlySums.entrySet().stream().forEach(e -> logger.info(String.valueOf(e.getKey())+" "+String.valueOf(e.getValue())));
 
 		return monthlySums.entrySet().stream().mapToDouble(e -> e.getValue()).average().orElse(0);
 	}
@@ -84,8 +92,10 @@ public class AverageCostsCalculationService {
 	Map<String, Double> getMonthlySums(List<CostItem> costTypeItems) {
 		Map<String, Double> monthlySums = new HashMap<>();
 		for (CostItem item : costTypeItems) {
-			int month = LocalDate.ofEpochDay(item.getCreationDate().getTime()).getMonthValue();
-			int year = LocalDate.ofEpochDay(item.getCreationDate().getTime()).getYear();
+			
+			LocalDate localDate = item.getCreationDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+			int year  = localDate.getYear();
+			int month = localDate.getMonthValue();			
 			String monthYear = month + "" + year;
 			if (monthlySums.containsKey(monthYear)) {
 				Double oldValue = monthlySums.get(monthYear);

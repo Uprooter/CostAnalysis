@@ -19,5 +19,4 @@ public class INGCostReaderTests {
 		Assert.assertThat(entries.get(0).getAmount(), is(-155.52));
 		Assert.assertThat(entries.get(1).getAmount(), is(-239.66));
 	}
-
 }

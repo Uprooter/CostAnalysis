@@ -42,11 +42,11 @@ public class InitialCostItemImporterService {
 		CostItem item = new CostItem();
 		item.setAmount(e.getAmount());
 		item.setCreationDate(e.getDate());
-		item.setOwner(item.getOwner());
+		item.setOwner(e.getOwner());
 		item.setPurpose(e.getPurpose());
 		item.setRecipient(this.findOrCreateRecipient(e.getRecipient()));
-		item.setType(item.getType());
-		item.setDetailedCluster(this.findOrDetailedCluster(e.getCluster(), e.getDetailedClustes()));
+		item.setType(e.getType());
+		item.setDetailedCluster(this.findOrDetailedCluster(e.getCluster(), e.getDetailedCluster()));
 		costItemRep.save(item);
 	}
 
@@ -56,7 +56,7 @@ public class InitialCostItemImporterService {
 			detailedCluster = new DetailedCostCluster();
 			detailedCluster.setName(detailedClusterName);
 			detailedCluster.setCluster(cluster);
-			detailedCluster = this.detailedClusterRep.save(detailedCluster);
+			return this.detailedClusterRep.save(detailedCluster);
 		}
 		return detailedCluster;
 	}
