@@ -46,23 +46,23 @@ public class AverageCostsCalculationServiceTests {
 	@Test
 	public void testResult() {
 		List<CostItem> costTypeItems = new ArrayList<CostItem>();
-		costTypeItems.add(this.createCostItems(LocalDate.of(2018, 9, 1), 100.0, CostOwner.MISCHA, CostType.GEHALT));
-		costTypeItems.add(this.createCostItems(LocalDate.of(2018, 10, 1), 100.0, CostOwner.MISCHA, CostType.GEHALT));
+		costTypeItems.add(this.createCostItem(LocalDate.of(2018, 9, 1), 100.0, CostOwner.MISCHA, CostType.GEHALT));
+		costTypeItems.add(this.createCostItem(LocalDate.of(2018, 10, 1), 100.0, CostOwner.MISCHA, CostType.GEHALT));
 
-		costTypeItems.add(this.createCostItems(LocalDate.of(2018, 9, 1), -100.0, CostOwner.MISCHA, CostType.FEST));
-		costTypeItems.add(this.createCostItems(LocalDate.of(2018, 10, 1), -200.0, CostOwner.MISCHA, CostType.FEST));
+		costTypeItems.add(this.createCostItem(LocalDate.of(2018, 9, 1), -100.0, CostOwner.MISCHA, CostType.FEST));
+		costTypeItems.add(this.createCostItem(LocalDate.of(2018, 10, 1), -200.0, CostOwner.MISCHA, CostType.FEST));
 
-		costTypeItems.add(this.createCostItems(LocalDate.of(2018, 9, 1), -100.0, CostOwner.MISCHA, CostType.FLEXIBEL));
-		costTypeItems.add(this.createCostItems(LocalDate.of(2018, 10, 1), -50.0, CostOwner.MISCHA, CostType.FLEXIBEL));
+		costTypeItems.add(this.createCostItem(LocalDate.of(2018, 9, 1), -100.0, CostOwner.MISCHA, CostType.FLEXIBEL));
+		costTypeItems.add(this.createCostItem(LocalDate.of(2018, 10, 1), -50.0, CostOwner.MISCHA, CostType.FLEXIBEL));
 
-		costTypeItems.add(this.createCostItems(LocalDate.of(2018, 9, 1), 300.0, CostOwner.GESA, CostType.GEHALT));
-		costTypeItems.add(this.createCostItems(LocalDate.of(2018, 10, 1), 300.0, CostOwner.GESA, CostType.GEHALT));
+		costTypeItems.add(this.createCostItem(LocalDate.of(2018, 9, 1), 300.0, CostOwner.GESA, CostType.GEHALT));
+		costTypeItems.add(this.createCostItem(LocalDate.of(2018, 10, 1), 300.0, CostOwner.GESA, CostType.GEHALT));
 
-		costTypeItems.add(this.createCostItems(LocalDate.of(2018, 9, 1), -50.0, CostOwner.GESA, CostType.FEST));
-		costTypeItems.add(this.createCostItems(LocalDate.of(2018, 10, 1), -25.0, CostOwner.GESA, CostType.FEST));
+		costTypeItems.add(this.createCostItem(LocalDate.of(2018, 9, 1), -50.0, CostOwner.GESA, CostType.FEST));
+		costTypeItems.add(this.createCostItem(LocalDate.of(2018, 10, 1), -25.0, CostOwner.GESA, CostType.FEST));
 
-		costTypeItems.add(this.createCostItems(LocalDate.of(2018, 9, 1), -100.0, CostOwner.GESA, CostType.FLEXIBEL));
-		costTypeItems.add(this.createCostItems(LocalDate.of(2018, 10, 1), -120.0, CostOwner.GESA, CostType.FLEXIBEL));
+		costTypeItems.add(this.createCostItem(LocalDate.of(2018, 9, 1), -100.0, CostOwner.GESA, CostType.FLEXIBEL));
+		costTypeItems.add(this.createCostItem(LocalDate.of(2018, 10, 1), -120.0, CostOwner.GESA, CostType.FLEXIBEL));
 
 		AverageCostModel calculateResult = new AverageCostsCalculationService().calculateResult(costTypeItems);
 		Assert.assertThat(calculateResult.getFixedCostsMischa(), is(-150.0));
@@ -80,7 +80,7 @@ public class AverageCostsCalculationServiceTests {
 		Assert.assertThat(calculateResult.getTotalDiff(), is(55.0));
 	}
 
-	private CostItem createCostItems(LocalDate localDate, double amount, CostOwner owner, CostType type) {
+	private CostItem createCostItem(LocalDate localDate, double amount, CostOwner owner, CostType type) {
 		CostItem item = new CostItem();
 		item.setCreationDate(new Date(localDate.toEpochDay()));
 		item.setAmount(amount);
@@ -90,7 +90,7 @@ public class AverageCostsCalculationServiceTests {
 	}
 
 	private CostItem createCostItems(LocalDate localDate, double amount) {
-		return this.createCostItems(localDate, amount, CostOwner.MISCHA, CostType.FEST);
+		return this.createCostItem(localDate, amount, CostOwner.MISCHA, CostType.FEST);
 	}
 
 }

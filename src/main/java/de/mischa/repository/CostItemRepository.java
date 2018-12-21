@@ -11,7 +11,7 @@ import de.mischa.model.CostItem;
 
 public interface CostItemRepository extends CrudRepository<CostItem, Long> {
 
-	@Query("SELECT c FROM CostItem c WHERE c.creationDate between :from and :to and d.cluster")
+	@Query("SELECT c FROM CostItem c WHERE c.creationDate between :from and :to")
 	List<CostItem> findRelevant(@Param("from") Date from, @Param("to") Date to);
 
 }
