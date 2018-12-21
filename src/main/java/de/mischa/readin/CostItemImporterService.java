@@ -7,7 +7,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import de.mischa.model.CostItem;
 import de.mischa.model.CostOwner;
@@ -19,7 +19,7 @@ import de.mischa.repository.CostRecipientRepository;
 import de.mischa.rules.CostClusterRule;
 import de.mischa.rules.CostTypeRule;
 
-@Component
+@Service
 public class CostItemImporterService {
 	private Logger logger = LoggerFactory.getLogger(CostItemImporterService.class);
 
