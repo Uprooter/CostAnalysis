@@ -3,6 +3,7 @@ package de.mischa.calc;
 import static org.hamcrest.CoreMatchers.is;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -69,12 +70,12 @@ public class AverageCostsCalculationServiceTests {
 		Assert.assertThat(calculateResult.getFlexCostsMischa(), is(-75.0));
 		Assert.assertThat(calculateResult.getTotalAverageMischa(), is(-225.0));
 		Assert.assertThat(calculateResult.getDiffMischa(), is(-250.0));
-		
+
 		Assert.assertThat(calculateResult.getFixedCostsGesa(), is(-37.5));
 		Assert.assertThat(calculateResult.getFlexCostsGesa(), is(-110.0));
 		Assert.assertThat(calculateResult.getTotalAverageGesa(), is(-147.5));
 		Assert.assertThat(calculateResult.getDiffGesa(), is(305.0));
-		
+
 		Assert.assertThat(calculateResult.getTotalAverageFixedCosts(), is(-187.5));
 		Assert.assertThat(calculateResult.getTotalAverageFlexCosts(), is(-185.0));
 		Assert.assertThat(calculateResult.getTotalDiff(), is(55.0));
@@ -82,7 +83,7 @@ public class AverageCostsCalculationServiceTests {
 
 	private CostItem createCostItem(LocalDate localDate, double amount, CostOwner owner, CostType type) {
 		CostItem item = new CostItem();
-		item.setCreationDate(new Date(localDate.toEpochDay()));
+		item.setCreationDate(Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
 		item.setAmount(amount);
 		item.setOwner(owner);
 		item.setType(type);
@@ -92,5 +93,34 @@ public class AverageCostsCalculationServiceTests {
 	private CostItem createCostItems(LocalDate localDate, double amount) {
 		return this.createCostItem(localDate, amount, CostOwner.MISCHA, CostType.FEST);
 	}
+
+//	@Test
+//	public void testReal() throws FileNotFoundException, IOException {
+//		AverageCostModel calculateResult = new AverageCostsCalculationService().calculateResult(
+//				this.convertFrom(new InitialCostReader().read("src/test/resources/readin/initImport.csv")));
+//		
+//		Assertions.assertThat(calculateResult.getFlexCostsMischa()).isEqualTo(-3271.16);
+//	}
+//
+//	private List<CostItem> convertFrom(List<InitialCostImportEntry> initEntries) {
+//		List<CostItem> result = new ArrayList<CostItem>();
+//		initEntries.forEach(e -> {
+//			CostItem item = new CostItem();
+//			item.setAmount(e.getAmount());
+//			item.setCreationDate(e.getDate());
+//			item.setOwner(e.getOwner());
+//			item.setPurpose(e.getPurpose());
+//			CostRecipient r = new CostRecipient();
+//			r.setName(e.getRecipient());
+//			item.setRecipient(r);
+//			item.setType(e.getType());
+//			DetailedCostCluster dCluster = new DetailedCostCluster();
+//			dCluster.setName(e.getDetailedCluster());
+//			dCluster.setCluster(e.getCluster());
+//			result.add(item);
+//		});
+//
+//		return result;
+//	}
 
 }

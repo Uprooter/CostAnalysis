@@ -51,7 +51,8 @@ public class InitialCostItemImporterService {
 	}
 
 	private DetailedCostCluster findOrDetailedCluster(CostCluster cluster, String detailedClusterName) {
-		DetailedCostCluster detailedCluster = this.detailedClusterRep.findByName(detailedClusterName);
+		DetailedCostCluster detailedCluster = this.detailedClusterRep.findByNameAndCluster(detailedClusterName,
+				cluster);
 		if (detailedCluster == null) {
 			detailedCluster = new DetailedCostCluster();
 			detailedCluster.setName(detailedClusterName);

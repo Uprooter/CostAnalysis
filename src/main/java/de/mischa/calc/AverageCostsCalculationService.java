@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import de.mischa.CostAnalysisApplication;
 import de.mischa.model.AverageCostModel;
 import de.mischa.model.CostCluster;
 import de.mischa.model.CostItem;
@@ -23,7 +22,7 @@ import de.mischa.repository.CostItemRepository;
 
 @Service
 public class AverageCostsCalculationService {
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(AverageCostsCalculationService.class);
 
 	@Autowired
@@ -33,9 +32,9 @@ public class AverageCostsCalculationService {
 
 		List<CostItem> relevantItems = this.costItemRep.findRelevant(from, to);
 		if (!includeOthers) {
-			relevantItems = relevantItems.stream()
-					.filter(i -> i.getDetailedCluster().getCluster() != CostCluster.SONSTIGES)
-					.collect(Collectors.toList());
+			return this.calculateResult(
+					relevantItems.stream().filter(i -> i.getDetailedCluster().getCluster() != CostCluster.SONSTIGES)
+							.collect(Collectors.toList()));
 		}
 
 		return calculateResult(relevantItems);
@@ -43,20 +42,20 @@ public class AverageCostsCalculationService {
 
 	AverageCostModel calculateResult(List<CostItem> relevantItems) {
 		AverageCostModel result = new AverageCostModel();
-//		result.setFixedCostsMischa(this.calculateMonthlyAverage(relevantItems, CostOwner.MISCHA, CostType.FEST));
-//		result.setFixedCostsGesa(this.calculateMonthlyAverage(relevantItems, CostOwner.GESA, CostType.FEST));
-//		result.setTotalAverageFixedCosts(result.getFixedCostsGesa() + result.getFixedCostsMischa());
+		result.setFixedCostsMischa(this.calculateMonthlyAverage(relevantItems, CostOwner.MISCHA, CostType.FEST));
+		result.setFixedCostsGesa(this.calculateMonthlyAverage(relevantItems, CostOwner.GESA, CostType.FEST));
+		result.setTotalAverageFixedCosts(result.getFixedCostsGesa() + result.getFixedCostsMischa());
 
 		result.setFlexCostsMischa(this.calculateMonthlyAverage(relevantItems, CostOwner.MISCHA, CostType.FLEXIBEL));
-//		result.setFlexCostsGesa(this.calculateMonthlyAverage(relevantItems, CostOwner.GESA, CostType.FLEXIBEL));
-//		result.setTotalAverageFlexCosts(result.getFlexCostsGesa() + result.getFlexCostsMischa());
-//
-//		result.setTotalAverageMischa(result.getFixedCostsMischa() + result.getFlexCostsMischa());
-//		result.setTotalAverageGesa(result.getFixedCostsGesa() + result.getFlexCostsGesa());
-//
-//		result.setDiffMischa(this.calculateDiff(relevantItems, CostOwner.MISCHA));
-//		result.setDiffGesa(this.calculateDiff(relevantItems, CostOwner.GESA));
-//		result.setTotalDiff(result.getDiffGesa() + result.getDiffMischa());
+		result.setFlexCostsGesa(this.calculateMonthlyAverage(relevantItems, CostOwner.GESA, CostType.FLEXIBEL));
+		result.setTotalAverageFlexCosts(result.getFlexCostsGesa() + result.getFlexCostsMischa());
+
+		result.setTotalAverageMischa(result.getFixedCostsMischa() + result.getFlexCostsMischa());
+		result.setTotalAverageGesa(result.getFixedCostsGesa() + result.getFlexCostsGesa());
+
+		result.setDiffMischa(this.calculateDiff(relevantItems, CostOwner.MISCHA));
+		result.setDiffGesa(this.calculateDiff(relevantItems, CostOwner.GESA));
+		result.setTotalDiff(result.getDiffGesa() + result.getDiffMischa());
 		return result;
 	}
 
@@ -65,7 +64,7 @@ public class AverageCostsCalculationService {
 
 		double earnings = relevantItems.stream()//
 				.filter(i -> i.getOwner() == owner)//
-				.filter(i -> i.getAmount() > 0)//
+				.filter(i -> i.getType() == CostType.GEHALT)//
 				.mapToDouble(i -> i.getAmount()).sum();
 		return earnings + costs;
 	}
@@ -73,7 +72,7 @@ public class AverageCostsCalculationService {
 	private List<CostItem> getCostsOnly(List<CostItem> relevantItems, CostOwner owner) {
 		return relevantItems.stream()//
 				.filter(i -> i.getOwner() == owner)//
-				.filter(i -> i.getAmount() < 0)//
+				.filter(i -> i.getType() != CostType.GEHALT)//
 				.collect(Collectors.toList());
 	}
 
@@ -83,19 +82,18 @@ public class AverageCostsCalculationService {
 				.collect(Collectors.toList());
 
 		Map<String, Double> monthlySums = getMonthlySums(costTypeItems);
-		
-		monthlySums.entrySet().stream().forEach(e -> logger.info(String.valueOf(e.getKey())+" "+String.valueOf(e.getValue())));
-
+		// monthlySums.entrySet().stream().forEach(e -> logger.info(e.getKey() + " " +
+		// e.getValue()));
 		return monthlySums.entrySet().stream().mapToDouble(e -> e.getValue()).average().orElse(0);
 	}
 
 	Map<String, Double> getMonthlySums(List<CostItem> costTypeItems) {
 		Map<String, Double> monthlySums = new HashMap<>();
 		for (CostItem item : costTypeItems) {
-			
+
 			LocalDate localDate = item.getCreationDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-			int year  = localDate.getYear();
-			int month = localDate.getMonthValue();			
+			int year = localDate.getYear();
+			int month = localDate.getMonthValue();
 			String monthYear = month + "" + year;
 			if (monthlySums.containsKey(monthYear)) {
 				Double oldValue = monthlySums.get(monthYear);
