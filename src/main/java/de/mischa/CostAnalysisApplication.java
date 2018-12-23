@@ -23,18 +23,7 @@ public class CostAnalysisApplication {
 	public CommandLineRunner demo(CostItemRepository costRep, InitialCostItemImporterService initialImporter) {
 		return (args) -> {
 
-//			detailedClusterRep.save(new DetailedCostCluster(CostCluster.ALLGEMEIN, "Einkauf"));
-//			detailedClusterRep.save(new DetailedCostCluster(CostCluster.UNTERHALTUNG, "Netflix"));
-//
-//			importer.getItems(ImportType.DB,
-//					"C:\\Users\\Mischa\\Downloads\\Kontoumsaetze_670_568523500_20181117_101907.csv")
-//					.forEach(costItem -> costRep.save(costItem));
-//			
-//			importer.getItems(ImportType.ING,
-//					"C:\\Users\\Mischa\\Downloads\\Umsatzanzeige_DE39500105175422178243_20180916.csv")
-//					.forEach(costItem -> costRep.save(costItem));
-
-			initialImporter.createItems("C:\\Users\\Mischa\\Qsync\\Haushalt\\All.csv");
+			//initialImporter.createItems("All.csv");
 			logger.info(String.valueOf(costRep.findAll().size()));
 
 		};
