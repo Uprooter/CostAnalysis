@@ -2,6 +2,6 @@ import { State } from '../reducers'
 import { createSelector } from 'reselect'
 
 
-const getCostItemsState = ((state: State) => state.costItems)
+const getAverageCostState = ((state: State) => state.averageCosts)
 
-export const getCostItems= createSelector([getCostItemsState], s => s.costItems)
+export const getAverageCost = createSelector([getAverageCostState], s => s.averageCosts)

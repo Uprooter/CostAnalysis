@@ -23,7 +23,7 @@ public class CostAnalysisApplication {
 	public CommandLineRunner demo(CostItemRepository costRep, InitialCostItemImporterService initialImporter) {
 		return (args) -> {
 
-			//initialImporter.createItems("All.csv");
+			initialImporter.createItems("C:\\Users\\Mischa\\Qsync\\Haushalt\\All.csv");
 			logger.info(String.valueOf(costRep.findAll().size()));
 
 		};
