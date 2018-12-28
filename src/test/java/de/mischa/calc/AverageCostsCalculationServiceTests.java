@@ -39,7 +39,7 @@ public class AverageCostsCalculationServiceTests {
 		costTypeItems.add(this.createCostItems(LocalDate.of(2018, 10, 1), -200.0));
 		costTypeItems.add(this.createCostItems(LocalDate.of(2019, 9, 1), -150.0));
 
-		double monthlyAverage = new AverageCostsCalculationService().calculateMonthlyAverage(costTypeItems,
+		double monthlyAverage = new AverageCostsCalculationService().calculateMonthlyCostAverage(costTypeItems,
 				CostOwner.MISCHA, CostType.FEST);
 		Assert.assertThat(monthlyAverage, is(-150.0));
 	}
@@ -47,6 +47,8 @@ public class AverageCostsCalculationServiceTests {
 	@Test
 	public void testResult() {
 		List<CostItem> costTypeItems = new ArrayList<CostItem>();
+		
+		// --- Mischa---
 		costTypeItems.add(this.createCostItem(LocalDate.of(2018, 9, 1), 100.0, CostOwner.MISCHA, CostType.GEHALT));
 		costTypeItems.add(this.createCostItem(LocalDate.of(2018, 10, 1), 100.0, CostOwner.MISCHA, CostType.GEHALT));
 
@@ -56,6 +58,7 @@ public class AverageCostsCalculationServiceTests {
 		costTypeItems.add(this.createCostItem(LocalDate.of(2018, 9, 1), -100.0, CostOwner.MISCHA, CostType.FLEXIBEL));
 		costTypeItems.add(this.createCostItem(LocalDate.of(2018, 10, 1), -50.0, CostOwner.MISCHA, CostType.FLEXIBEL));
 
+		// --- Gesa---
 		costTypeItems.add(this.createCostItem(LocalDate.of(2018, 9, 1), 300.0, CostOwner.GESA, CostType.GEHALT));
 		costTypeItems.add(this.createCostItem(LocalDate.of(2018, 10, 1), 300.0, CostOwner.GESA, CostType.GEHALT));
 
@@ -69,16 +72,18 @@ public class AverageCostsCalculationServiceTests {
 		Assert.assertThat(calculateResult.getFixedCostsMischa(), is(-150.0));
 		Assert.assertThat(calculateResult.getFlexCostsMischa(), is(-75.0));
 		Assert.assertThat(calculateResult.getTotalAverageMischa(), is(-225.0));
-		Assert.assertThat(calculateResult.getDiffMischa(), is(-250.0));
+		Assert.assertThat(calculateResult.getAverageSavingsMischa(),is(-125.0));
+		Assert.assertThat(calculateResult.getAbsoluteDiffMischa(), is(-250.0));
 
 		Assert.assertThat(calculateResult.getFixedCostsGesa(), is(-37.5));
 		Assert.assertThat(calculateResult.getFlexCostsGesa(), is(-110.0));
 		Assert.assertThat(calculateResult.getTotalAverageGesa(), is(-147.5));
-		Assert.assertThat(calculateResult.getDiffGesa(), is(305.0));
+		Assert.assertThat(calculateResult.getAverageSavingsGesa(),is(152.5));
+		Assert.assertThat(calculateResult.getAbsoluteDiffGesa(), is(305.0));
 
 		Assert.assertThat(calculateResult.getTotalAverageFixedCosts(), is(-187.5));
 		Assert.assertThat(calculateResult.getTotalAverageFlexCosts(), is(-185.0));
-		Assert.assertThat(calculateResult.getTotalDiff(), is(55.0));
+		Assert.assertThat(calculateResult.getAbsoluteTotalDiff(), is(55.0));
 	}
 
 	private CostItem createCostItem(LocalDate localDate, double amount, CostOwner owner, CostType type) {
