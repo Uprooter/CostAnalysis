@@ -1,13 +1,11 @@
 import * as React from "react";
 import { NavigatioPageUpdateAction, AddCostItemsAction, UpdateAverageCostsAction } from "../actions/actions";
 import Page from "../utils/pages";
+import { getDateString, getDashDateString, getOneYearBefore } from "../utils/dates";
 import CostItemModel from "../models/CostItemModel";
+import AverageCostTable from "./AverageCostTable";
 import AverageCostResult from "../models/AverageCostResult";
-import { DatePicker, MuiPickersUtilsProvider } from 'material-ui-pickers';
-import 'date-fns';
-import DateFnsUtils from '@date-io/date-fns';
-import { FormControlLabel, Button, Switch, Paper, Typography, FormGroup, Table, TableHead, TableRow, TableCell, TableBody, Grid } from '@material-ui/core';
-import { withStyles } from '@material-ui/core/styles';
+import { FormControlLabel, Button, Switch, Paper, Typography, FormGroup, Grid, TextField } from '@material-ui/core';
 import * as rest from 'rest';
 import * as mime from 'rest/interceptor/mime';
 
@@ -18,100 +16,79 @@ interface CostOverviewProps {
     costItems: CostItemModel[];
     averageCosts: AverageCostResult;
 }
-export default class CostOverview extends React.Component<CostOverviewProps, {}> {
+interface CostOverviewState {
+    fromDate: Date;
+    toDate: Date;
+    includeOthers: boolean;
+}
+export default class CostOverview extends React.Component<CostOverviewProps, CostOverviewState> {
+
+    state = {
+        fromDate: getOneYearBefore(new Date()),
+        toDate: new Date(),
+        includeOthers: false,
+    }
 
     componentDidMount() {
         this.props.updatePageName(Page.ROOT.name);
+        this.loadAverageCosts();
     }
 
     loadAverageCosts() {
         let client = rest.wrap(mime);
-        client({ path: "/api/averageCosts?from=01.01.2018&to=30.09.2018&includeOthers=false" }).then(r => {
+        client({
+            path: "/api/averageCosts?from=" + getDateString(this.state.fromDate)
+                + "&to=" + getDateString(this.state.toDate)
+                + "&includeOthers=" + this.state.includeOthers
+        }).then(r => {
             this.props.updateAverageCostResult(r.entity);
         });
     }
 
-
-    TotalTableRow = withStyles(theme => ({
-        root: {
-            backgroundColor: "#81BEF7",
-            color: theme.palette.common.white,
+    handleDateChange(newDate: Date, dateField: string) {
+        if (dateField === "fromDate") {
+            // Updating state happens async -> need to pass function which shall use the new value
+            this.setState({ fromDate: newDate }, () => this.loadAverageCosts());
         }
-    }))(TableRow);
-
-    TotalTableCell = withStyles(theme => ({
-        root: {
-            backgroundColor: "#81BEF7",
+        else {
+            this.setState({ toDate: newDate }, () => this.loadAverageCosts());
         }
-    }))(TableCell);
+    }
 
-    TotalSumTableCell = withStyles(theme => ({
-        root: {
-            backgroundColor: "#0174DF",
-            color: theme.palette.common.white,
-        }
-    }))(TableCell);
+    handleIncludeOthersChange(include: boolean) {
+        this.setState({ includeOthers: include }, () => this.loadAverageCosts());
+    }
 
     render() {
-
         return (
             <Paper elevation={1}>
                 <Typography variant="h5" component="h3">
                     Zusammenfassung (monatlicher Durchschnitt)
                 </Typography>
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                    <Grid container justify="space-around">
-                        <DatePicker margin="normal" label="Von" value={new Date("2018-11-11")} onChange={() => { }} />
-                        <DatePicker margin="normal" label="Bis" value={new Date("2018-12-11")} onChange={() => { }} />
-                        <FormGroup row>
-                            <FormControlLabel
-                                control={
-                                    <Switch checked={false} onChange={(event) => { }} />
-                                }
-                                label="mit Sonstiges"
-                            /></FormGroup>
-                        <Button variant="contained" color="primary" onClick={() => { this.loadAverageCosts() }}>Laden</Button>
-                    </Grid>
+                <Grid container justify="space-around">
+                    <TextField id="fromDate" label="Von" type="date" defaultValue={getDashDateString(this.state.fromDate)}
+                        InputLabelProps={{
+                            shrink: true,
+                        }} onChange={e => { this.handleDateChange(new Date(e.target.value), "fromDate") }}
+                    />
+                    <TextField id="fromDate" label="Bis" type="date" defaultValue={getDashDateString(this.state.toDate)}
+                        InputLabelProps={{
+                            shrink: true,
+                        }} onChange={e => { this.handleDateChange(new Date(e.target.value), "toDate") }}
+                    />
 
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell></TableCell>
-                                <TableCell>Mischa</TableCell>
-                                <TableCell>Gesa</TableCell>
-                                <this.TotalTableCell>Summe</this.TotalTableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            <TableRow key="fixed">
-                                <TableCell>Feste Ausgabe</TableCell>
-                                <TableCell>{this.props.averageCosts.fixedCostsMischa}</TableCell>
-                                <TableCell>{this.props.averageCosts.fixedCostsGesa}</TableCell>
-                                <this.TotalTableCell>{this.props.averageCosts.totalAverageFixedCosts}</this.TotalTableCell>
-                            </TableRow>
-                            <TableRow key="flexible">
-                                <TableCell>Flexible Ausgabe</TableCell>
-                                <TableCell>{this.props.averageCosts.flexCostsMischa}</TableCell>
-                                <TableCell>{this.props.averageCosts.flexCostsGesa}</TableCell>
-                                <this.TotalTableCell>{this.props.averageCosts.totalAverageFlexCosts}</this.TotalTableCell>
-                            </TableRow>
-                            <TableRow key="saved">
-                                <TableCell>Gespart</TableCell>
-                                <TableCell>{this.props.averageCosts.diffMischa}</TableCell>
-                                <TableCell>{this.props.averageCosts.diffGesa}</TableCell>
-                                <this.TotalTableCell>{this.props.averageCosts.totalDiff}</this.TotalTableCell>
-                            </TableRow>
-                            <this.TotalTableRow key="total">
-                                <TableCell>Summe</TableCell>
-                                <TableCell>{this.props.averageCosts.totalAverageMischa}</TableCell>
-                                <TableCell>{this.props.averageCosts.totalAverageGesa}</TableCell>
-                                <this.TotalSumTableCell>{456}</this.TotalSumTableCell>
-                            </this.TotalTableRow>
-                        </TableBody>
-                    </Table>
-                </MuiPickersUtilsProvider>
+                    <FormGroup row>
+                        <FormControlLabel
+                            control={
+                                <Switch checked={this.state.includeOthers} onChange={(e, checked) => { this.handleIncludeOthersChange(checked) }} />
+                            }
+                            label="mit Sonstiges"
+                        /></FormGroup>
+                    <Button variant="contained" color="primary" onClick={() => { this.loadAverageCosts() }}>Laden</Button>
+                </Grid>
+
+                <AverageCostTable averageCosts={this.props.averageCosts} />
             </Paper>
-
         );
     }
 }

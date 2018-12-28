@@ -53,8 +53,11 @@ public class AverageCostsCalculationService {
 		result.setTotalAverageMischa(result.getFixedCostsMischa() + result.getFlexCostsMischa());
 		result.setTotalAverageGesa(result.getFixedCostsGesa() + result.getFlexCostsGesa());
 
+		result.setTotalCosts(this.calculateMonthlyCostAverage(relevantItems, null, null));
+
 		result.setAverageSavingsMischa(calculateMonthlySavingsAverage(relevantItems, CostOwner.MISCHA));
 		result.setAverageSavingsGesa(calculateMonthlySavingsAverage(relevantItems, CostOwner.GESA));
+		result.setTotalAverageSavings(result.getAverageSavingsGesa() + result.getAverageSavingsMischa());
 
 		result.setAbsoluteDiffMischa(this.calculateAbsoluteDiff(relevantItems, CostOwner.MISCHA));
 		result.setAbsoluteDiffGesa(this.calculateAbsoluteDiff(relevantItems, CostOwner.GESA));
@@ -65,7 +68,7 @@ public class AverageCostsCalculationService {
 	private double calculateAbsoluteDiff(List<CostItem> relevantItems, CostOwner owner) {
 		double costs = this.getCostItems(relevantItems, owner).stream().mapToDouble(i -> i.getAmount()).sum();
 		double earnings = getEarningItems(relevantItems, owner).stream().mapToDouble(i -> i.getAmount()).sum();
-	
+
 		return earnings + costs;
 	}
 
@@ -77,7 +80,7 @@ public class AverageCostsCalculationService {
 
 	private List<CostItem> getCostItems(List<CostItem> relevantItems, CostOwner owner) {
 		return relevantItems.stream()//
-				.filter(i -> i.getOwner() == owner)//
+				.filter(i -> owner == null || i.getOwner() == owner)//
 				.filter(i -> i.getType() != CostType.GEHALT)//
 				.collect(Collectors.toList());
 	}
@@ -87,30 +90,28 @@ public class AverageCostsCalculationService {
 				.collect(Collectors.toList());
 
 		Map<String, Double> monthlySums = getMonthlySums(ownerItems);
-		// monthlySums.entrySet().stream().forEach(e -> logger.info(e.getKey() + " " +
-		// e.getValue()));
 		return monthlySums.entrySet().stream().mapToDouble(e -> e.getValue()).average().orElse(0);
 	}
 
-	double calculateMonthlyCostAverage(List<CostItem> relevantItems, CostOwner owner, CostType type) {
+	double calculateMonthlyCostAverage(List<CostItem> relevantItems, CostOwner owner, CostType type) {		
 		List<CostItem> costTypeItems = this.getCostItems(relevantItems, owner)//
-				.stream().filter(i -> i.getType() == type)//
+				.stream().filter(i -> type == null || i.getType() == type)//
 				.collect(Collectors.toList());
-
+		
 		Map<String, Double> monthlySums = getMonthlySums(costTypeItems);
-		// monthlySums.entrySet().stream().forEach(e -> logger.info(e.getKey() + " " +
-		// e.getValue()));
+//		 monthlySums.entrySet().stream().forEach(e -> logger.info(e.getKey() + " " +
+//		 e.getValue()));
 		return monthlySums.entrySet().stream().mapToDouble(e -> e.getValue()).average().orElse(0);
 	}
 
 	Map<String, Double> getMonthlySums(List<CostItem> costTypeItems) {
 		Map<String, Double> monthlySums = new HashMap<>();
 		for (CostItem item : costTypeItems) {
-
 			LocalDate localDate = item.getCreationDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 			int year = localDate.getYear();
 			int month = localDate.getMonthValue();
 			String monthYear = month + "" + year;
+			
 			if (monthlySums.containsKey(monthYear)) {
 				Double oldValue = monthlySums.get(monthYear);
 				monthlySums.put(monthYear, oldValue + item.getAmount());

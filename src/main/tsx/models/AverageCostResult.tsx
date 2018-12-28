@@ -8,7 +8,11 @@ export default class AverageCostResult{
     totalAverageFlexCosts:number;
     totalAverageMischa:number;
     totalAverageGesa:number;
-    diffMischa:number;
-    diffGesa:number;
-    totalDiff:number;
+    averageSavingsMischa:number;
+    averageSavingsGesa:number;
+    totalAverageSavings:number;
+    absoluteDiffMischa:number;
+    absoluteDiffGesa:number;
+    absoluteTotalDiff:number;
+    totalCosts:number;
 }
