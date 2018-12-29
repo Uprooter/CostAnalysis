@@ -15,9 +15,15 @@ public class AverageCostModel {
 
 	private double totalAverageMischa;
 	private double totalAverageGesa;
+	
+	private double totalCosts;
+	
+	private double averageSavingsMischa;
+	private double averageSavingsGesa;
+	private double totalAverageSavings;
 
-	private double diffMischa;
-	private double diffGesa;
-	private double totalDiff;
+	private double absoluteDiffMischa;
+	private double absoluteDiffGesa;
+	private double absoluteTotalDiff;
 
 }

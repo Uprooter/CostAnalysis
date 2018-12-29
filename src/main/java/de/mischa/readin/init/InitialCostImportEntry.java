@@ -14,7 +14,7 @@ public class InitialCostImportEntry {
 	private String purpose;
 	private double amount;
 	private CostCluster cluster;
-	private String detailedClustes;
+	private String detailedCluster;
 	private CostOwner owner;
 	private CostType type;
 

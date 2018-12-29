@@ -4,6 +4,8 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -36,9 +38,11 @@ public class CostItem {
 	private Double amount;
 
 	@Column
+	@Enumerated(EnumType.STRING)
 	private CostOwner owner;
 
 	@Column
+	@Enumerated(EnumType.STRING)
 	private CostType type;
 
 	@ManyToOne

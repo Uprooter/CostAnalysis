@@ -68,7 +68,7 @@ public class InitialCostReader {
 			entry.setAmount(this.getAmount(r));
 			entry.setOwner(CostOwner.valueOf(r.get(OWNER_COLUMN_NAME).toUpperCase()));
 			entry.setCluster(this.getCluster(r.get(CLUSTER_COLUMN_NAME)));
-			entry.setDetailedClustes(r.get(DETAILED_CLUSTER_COLUMN_ANME));
+			entry.setDetailedCluster(r.get(DETAILED_CLUSTER_COLUMN_ANME));
 			entry.setType(CostType.valueOf(r.get(TYPE_COLUMN_NAME).toUpperCase()));
 			resultList.add(entry);
 		}
