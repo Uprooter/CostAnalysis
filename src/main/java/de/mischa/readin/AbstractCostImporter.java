@@ -1,8 +1,10 @@
 package de.mischa.readin;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
@@ -28,11 +30,11 @@ public class AbstractCostImporter {
 
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
 	private ImportConfig config;
-	
-	public AbstractCostImporter()
-	{
-		
+
+	public AbstractCostImporter() {
+
 	}
+
 	public AbstractCostImporter(ImportConfig config) {
 		this.config = config;
 	}
@@ -40,6 +42,12 @@ public class AbstractCostImporter {
 	public List<CostImportEntry> read(String file) throws FileNotFoundException, IOException {
 
 		Reader bufferedReader = this.readInFile(file);
+		return parseContent(bufferedReader);
+	}
+
+	public List<CostImportEntry> read(InputStream fileStream) throws FileNotFoundException, IOException {
+
+		Reader bufferedReader = this.readInFile(fileStream);
 		return parseContent(bufferedReader);
 	}
 
@@ -83,6 +91,21 @@ public class AbstractCostImporter {
 	private Reader readInFile(String fileName) throws IOException {
 		File file = new File(fileName);
 		List<String> lines = FileUtils.readLines(file, StandardCharsets.UTF_8.name());
+
+		lines = this.skipLines(lines);
+
+		Reader fileReader = new InputStreamReader(
+				IOUtils.toInputStream(this.linesToString(lines), StandardCharsets.UTF_8));
+		return fileReader;
+	}
+
+	private Reader readInFile(InputStream fileStream) throws IOException {
+
+		BufferedReader reader = new BufferedReader(new InputStreamReader(fileStream));
+		List<String> lines = new ArrayList<String>();
+		while (reader.ready()) {
+			lines.add(reader.readLine());
+		}
 
 		lines = this.skipLines(lines);
 
