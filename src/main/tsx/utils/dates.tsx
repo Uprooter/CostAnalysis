@@ -4,11 +4,17 @@ export function getDateString(date: Date): string {
 }
 
 export function getDashDateString(date: Date): string {
-    return date.toISOString().substring(0,10);
+    return date.toISOString().substring(0, 10);
+}
+
+export function parseISOString(dateString: string): Date {
+    let newDate: Date = new Date();
+    newDate.setMilliseconds(Date.parse(dateString));
+    return newDate;
 }
 
 export function getOneYearBefore(date: Date): Date {
     let newDate = date;
-    newDate.setFullYear(date.getFullYear()-1); 
+    newDate.setFullYear(date.getFullYear() - 1);
     return newDate;
 }

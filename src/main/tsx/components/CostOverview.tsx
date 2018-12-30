@@ -1,8 +1,7 @@
 import * as React from "react";
-import { NavigatioPageUpdateAction, AddCostItemsAction, UpdateAverageCostsAction } from "../actions/actions";
+import { NavigatioPageUpdateAction, UpdateAverageCostsAction } from "../actions/actions";
 import Page from "../utils/pages";
 import { getDateString, getDashDateString, getOneYearBefore } from "../utils/dates";
-import CostItemModel from "../models/CostItemModel";
 import AverageCostTable from "./AverageCostTable";
 import AverageCostResult from "../models/AverageCostResult";
 import { FormControlLabel, Button, Switch, Paper, Typography, FormGroup, Grid, TextField } from '@material-ui/core';
@@ -11,9 +10,7 @@ import * as mime from 'rest/interceptor/mime';
 
 interface CostOverviewProps {
     updatePageName: (newName: string) => NavigatioPageUpdateAction;
-    addCostItems: (newItems: CostItemModel[]) => AddCostItemsAction;
     updateAverageCostResult: (averageCosts: AverageCostResult) => UpdateAverageCostsAction;
-    costItems: CostItemModel[];
     averageCosts: AverageCostResult;
 }
 interface CostOverviewState {

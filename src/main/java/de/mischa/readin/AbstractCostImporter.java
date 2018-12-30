@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -29,6 +30,7 @@ import de.mischa.model.CostOwner;
 public class AbstractCostImporter {
 
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
+	private static final Charset CODING = StandardCharsets.ISO_8859_1;
 	private ImportConfig config;
 
 	public AbstractCostImporter() {
@@ -90,12 +92,12 @@ public class AbstractCostImporter {
 
 	private Reader readInFile(String fileName) throws IOException {
 		File file = new File(fileName);
-		List<String> lines = FileUtils.readLines(file, StandardCharsets.UTF_8.name());
+		List<String> lines = FileUtils.readLines(file, CODING.name());
 
 		lines = this.skipLines(lines);
 
 		Reader fileReader = new InputStreamReader(
-				IOUtils.toInputStream(this.linesToString(lines), StandardCharsets.UTF_8));
+				IOUtils.toInputStream(this.linesToString(lines), CODING));
 		return fileReader;
 	}
 
@@ -110,7 +112,7 @@ public class AbstractCostImporter {
 		lines = this.skipLines(lines);
 
 		Reader fileReader = new InputStreamReader(
-				IOUtils.toInputStream(this.linesToString(lines), StandardCharsets.UTF_8));
+				IOUtils.toInputStream(this.linesToString(lines), CODING));
 		return fileReader;
 	}
 
