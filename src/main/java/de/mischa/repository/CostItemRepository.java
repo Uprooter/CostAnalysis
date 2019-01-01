@@ -18,5 +18,8 @@ public interface CostItemRepository extends CrudRepository<CostItem, Long> {
 
 	@Query("SELECT c FROM CostItem c WHERE c.recipient.name=:recipientName")
 	List<CostItem> findByRecipient(String recipientName);
+	
+	@Query("SELECT c FROM CostItem c WHERE c.recipient.name=:recipientName order by c.id desc")
+	List<CostItem> findByRecipientLatestFirst(String recipientName);
 
 }

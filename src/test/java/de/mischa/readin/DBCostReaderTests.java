@@ -19,5 +19,4 @@ public class DBCostReaderTests {
 		Assert.assertThat(entries.get(0).getAmount(), is(-117.0));
 		Assert.assertThat(entries.get(1).getAmount(), is(-9.99));
 	}
-
 }

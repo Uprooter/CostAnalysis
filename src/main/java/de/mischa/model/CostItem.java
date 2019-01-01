@@ -13,6 +13,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import lombok.Data;
 
 @Entity
@@ -48,5 +51,28 @@ public class CostItem {
 	@ManyToOne
 	@JoinColumn(name = "DETAILED_CLUSTER_ID")
 	private DetailedCostCluster detailedCluster;
+	
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof CostItem)) {
+			return false;
+		}
+
+		CostItem other = (CostItem) o;
+
+		if (this.getId() == null || other.getId() == null) {
+			return false;
+		}
+		EqualsBuilder builder = new EqualsBuilder();
+		builder.append(getId(), other.getId());
+		return builder.isEquals();
+	}
+
+	@Override
+	public int hashCode() {
+		HashCodeBuilder builder = new HashCodeBuilder();
+		builder.append(getId());
+		return builder.hashCode();
+	}
 
 }
