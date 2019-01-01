@@ -8,6 +8,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import de.mischa.model.CostItem;
+import de.mischa.model.CostOwner;
 
 public interface CostItemRepository extends CrudRepository<CostItem, Long> {
 
@@ -16,10 +17,10 @@ public interface CostItemRepository extends CrudRepository<CostItem, Long> {
 	
 	List<CostItem> findAll();
 
-	@Query("SELECT c FROM CostItem c WHERE c.recipient.name=:recipientName")
-	List<CostItem> findByRecipient(String recipientName);
+	@Query("SELECT c FROM CostItem c WHERE c.recipient.name=:recipientName and c.owner=:owner")
+	List<CostItem> findByRecipientAndOwner(String recipientName, CostOwner owner);
 	
-	@Query("SELECT c FROM CostItem c WHERE c.recipient.name=:recipientName order by c.id desc")
-	List<CostItem> findByRecipientLatestFirst(String recipientName);
+	@Query("SELECT c FROM CostItem c WHERE c.recipient.name=:recipientName and c.owner=:owner order by c.id desc")
+	List<CostItem> findByRecipientAndOwnerLatestFirst(String recipientName, CostOwner owner);
 
 }

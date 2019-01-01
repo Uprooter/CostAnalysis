@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -34,7 +35,7 @@ public class UploadRestController {
 	private static final Logger logger = LoggerFactory.getLogger(UploadRestController.class);
 
 	@RequestMapping(value = "/api/upload", method = RequestMethod.POST)
-	public List<CostItem> getAverageCosts(@RequestParam("file") MultipartFile file) {
+	public List<CostItem> uploadNewItems(@RequestParam("file") MultipartFile file) {
 		try {
 			AbstractCostImporter reader = this.determineReader(file.getInputStream());
 
@@ -48,6 +49,13 @@ public class UploadRestController {
 			logger.info(e.getLocalizedMessage());
 		}
 		return new ArrayList<CostItem>();
+	}
+
+	@RequestMapping(value = "/api/uploadSingle", method = RequestMethod.POST)
+	public CostItem uploadSingleItem(@RequestParam("recipientName") String recipientName,
+			@RequestParam("purpose") String purpose, @RequestParam("owner") CostOwner owner) {
+		CostImportEntry i = new CostImportEntry(new Date(), recipientName, purpose, -1);
+		return this.uploadService.createItemFromImport(owner, i);
 	}
 
 	private List<CostItem> createItems(List<CostImportEntry> importEntries, CostOwner costOwner) {

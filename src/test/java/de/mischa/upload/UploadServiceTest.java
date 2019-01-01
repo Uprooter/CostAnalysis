@@ -47,7 +47,7 @@ public class UploadServiceTest {
 		matchingItem.setDetailedCluster(detailedCluster);
 		List<CostItem> matchingItems = new ArrayList<CostItem>();
 		matchingItems.add(matchingItem);
-		when(itemRep.findByRecipient(anyString())).thenReturn(matchingItems);
+		when(itemRep.findByRecipientAndOwner(anyString(), CostOwner.MISCHA)).thenReturn(matchingItems);
 
 		CostImportEntry importEntry = new CostImportEntry(new Date(), "TestRec", "SomePurpose", 22.0);
 		CostItem derivedCostItem = this.uploadService.createItemFromImport(CostOwner.MISCHA, importEntry);
@@ -61,12 +61,12 @@ public class UploadServiceTest {
 	 */
 	@Test
 	public void testNoneMatchFound() {
-		when(itemRep.findByRecipient(anyString())).thenReturn(new ArrayList<CostItem>());
+		when(itemRep.findByRecipientAndOwner(anyString(), CostOwner.MISCHA)).thenReturn(new ArrayList<CostItem>());
 
 		CostImportEntry importEntry = new CostImportEntry(new Date(), "SomeUnknownRecipient", "SomePurpose", 22.0);
 		CostItem derivedCostItem = this.uploadService.createItemFromImport(CostOwner.MISCHA, importEntry);
 		Assertions.assertThat(derivedCostItem.getType()).isNull();
-		Assertions.assertThat(derivedCostItem.getDetailedCluster()).isNull();
+		Assertions.assertThat(derivedCostItem.getDetailedCluster().getName()).isNull();
 
 	}
 
@@ -92,7 +92,7 @@ public class UploadServiceTest {
 		List<CostItem> matchingItems = new ArrayList<CostItem>();
 		matchingItems.add(gehaltItem);
 		matchingItems.add(anotherGehaltItem);
-		when(itemRep.findByRecipient(anyString())).thenReturn(matchingItems);
+		when(itemRep.findByRecipientAndOwner(anyString(), CostOwner.MISCHA)).thenReturn(matchingItems);
 
 		CostImportEntry importEntry = new CostImportEntry(new Date(), "TestRec", "SomePurpose", 22.0);
 		CostItem derivedCostItem = this.uploadService.createItemFromImport(CostOwner.MISCHA, importEntry);
@@ -109,6 +109,7 @@ public class UploadServiceTest {
 	public void testMultipleMatchesFoundNegative() {
 
 		DetailedCostCluster detailedCluster = new DetailedCostCluster(CostCluster.GEHALT, "");
+		detailedCluster.setId(1L);
 		CostItem gehaltItem = new CostItem();
 		gehaltItem.setId(1L);
 		gehaltItem.setType(CostType.GEHALT);
@@ -122,12 +123,12 @@ public class UploadServiceTest {
 		List<CostItem> matchingItems = new ArrayList<CostItem>();
 		matchingItems.add(gehaltItem);
 		matchingItems.add(anotherGehaltItem);
-		when(itemRep.findByRecipient(anyString())).thenReturn(matchingItems);
+		when(itemRep.findByRecipientAndOwner(anyString(), CostOwner.MISCHA)).thenReturn(matchingItems);
 
 		CostImportEntry importEntry = new CostImportEntry(new Date(), "TestRec", "SomePurpose", 22.0);
 		CostItem derivedCostItem = this.uploadService.createItemFromImport(CostOwner.MISCHA, importEntry);
 		Assertions.assertThat(derivedCostItem.getType()).isNull();
-		Assertions.assertThat(derivedCostItem.getDetailedCluster()).isNull();
+		Assertions.assertThat(derivedCostItem.getDetailedCluster().getName()).isNull();
 	}
 
 	/**
@@ -153,14 +154,14 @@ public class UploadServiceTest {
 		List<CostItem> matchingItems = new ArrayList<CostItem>();
 		matchingItems.add(gehaltItem);
 		matchingItems.add(gehaltItem2);
-		when(itemRep.findByRecipientLatestFirst(anyString())).thenReturn(matchingItems);
+		when(itemRep.findByRecipientAndOwnerLatestFirst(anyString(), CostOwner.MISCHA)).thenReturn(matchingItems);
 
 		CostImportEntry importEntry = new CostImportEntry(new Date(), null, purposePrefix + " dasdad", 22.0);
 		CostItem derivedCostItem = this.uploadService.createItemFromImport(CostOwner.MISCHA, importEntry);
 		Assertions.assertThat(derivedCostItem.getType()).isEqualTo(CostType.GEHALT);
 		Assertions.assertThat(derivedCostItem.getDetailedCluster().getCluster()).isEqualTo(CostCluster.GEHALT);
 	}
-	
+
 	/**
 	 * What to do if import entry does not have a recipient? Try to match first
 	 * characters / words of the purpose
@@ -184,7 +185,7 @@ public class UploadServiceTest {
 		List<CostItem> matchingItems = new ArrayList<CostItem>();
 		matchingItems.add(gehaltItem);
 		matchingItems.add(gehaltItem2);
-		when(itemRep.findByRecipientLatestFirst(anyString())).thenReturn(matchingItems);
+		when(itemRep.findByRecipientAndOwnerLatestFirst(anyString(), CostOwner.MISCHA)).thenReturn(matchingItems);
 
 		CostImportEntry importEntry = new CostImportEntry(new Date(), null, "dasd asd dasdad", 22.0);
 		CostItem derivedCostItem = this.uploadService.createItemFromImport(CostOwner.MISCHA, importEntry);
@@ -194,6 +195,25 @@ public class UploadServiceTest {
 	@Test
 	public void testGetFirstXWords() {
 		Assertions.assertThat(this.uploadService.getFirstXWords("a b c d e", 3)).isEqualTo("a b c");
+		Assertions.assertThat(this.uploadService.getFirstXWords("a b", 3)).isEqualTo("a b");
+		Assertions.assertThat(this.uploadService.getFirstXWords("a", 3)).isEqualTo("a");
 	}
 
+	@Test
+	public void testMatchByPurpose() {
+		CostImportEntry importItem = new CostImportEntry(new Date(), null, "123", 22.0);
+		CostItem item = new CostItem();
+		List<CostItem> itemsWithEmptyRecipient = new ArrayList<>();
+		CostItem dbItem1 = new CostItem();
+		dbItem1.setType(CostType.GEHALT);
+		dbItem1.setPurpose("123");
+		CostItem dbItem2 = new CostItem();
+		dbItem2.setPurpose("abc");
+		dbItem2.setType(CostType.FEST);
+		itemsWithEmptyRecipient.add(dbItem1);
+		itemsWithEmptyRecipient.add(dbItem2);
+
+		this.uploadService.matchByPurpose(importItem, item, itemsWithEmptyRecipient);
+		Assertions.assertThat(item.getType()).isEqualTo(CostType.GEHALT);
+	}
 }
