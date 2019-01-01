@@ -19,22 +19,17 @@ import org.springframework.web.multipart.MultipartFile;
 
 import de.mischa.model.CostItem;
 import de.mischa.model.CostOwner;
-import de.mischa.model.CostRecipient;
 import de.mischa.readin.AbstractCostImporter;
 import de.mischa.readin.CostImportEntry;
 import de.mischa.readin.db.DBCostReader;
 import de.mischa.readin.ing.INGCostReader;
-import de.mischa.repository.CostItemRepository;
-import de.mischa.repository.CostRecipientRepository;
+import de.mischa.upload.UploadService;
 
 @RestController
 public class UploadRestController {
 
 	@Autowired
-	private CostItemRepository itemRep;
-
-	@Autowired
-	private CostRecipientRepository recipientRep;
+	private UploadService uploadService;
 
 	private static final Logger logger = LoggerFactory.getLogger(UploadRestController.class);
 
@@ -58,34 +53,9 @@ public class UploadRestController {
 	private List<CostItem> createItems(List<CostImportEntry> importEntries, CostOwner costOwner) {
 		List<CostItem> costItems = new ArrayList<CostItem>();
 		importEntries.forEach(i -> {
-			costItems.add(createItemFromImport(costOwner, i));
+			costItems.add(this.uploadService.createItemFromImport(costOwner, i));
 		});
 		return costItems;
-	}
-
-	private CostItem createItemFromImport(CostOwner costOwner, CostImportEntry importItem) {
-		CostItem item = new CostItem();
-		item.setAmount(importItem.getAmount());
-		item.setCreationDate(importItem.getDate());
-		item.setPurpose(importItem.getPurpose());
-		item.setOwner(costOwner);
-		item.setRecipient(this.findOrCreateRecipient(importItem.getRecipient()));
-		List<CostItem> similarItems = itemRep.findByRecipient(importItem.getRecipient());
-		if (!similarItems.isEmpty()) {
-			item.setType(similarItems.get(0).getType());
-			item.setDetailedCluster(similarItems.get(0).getDetailedCluster());
-		}
-
-		return item;
-	}
-
-	private CostRecipient findOrCreateRecipient(String recipient) {
-		CostRecipient rec = this.recipientRep.findByName(recipient);
-		if (rec == null) {
-			rec = new CostRecipient();
-			rec.setName(recipient);
-		}
-		return rec;
 	}
 
 	private AbstractCostImporter determineReader(InputStream inputStream) throws IOException {

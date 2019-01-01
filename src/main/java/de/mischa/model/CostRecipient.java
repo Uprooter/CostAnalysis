@@ -14,10 +14,17 @@ import lombok.Data;
 @Data
 public class CostRecipient {
 
+	public CostRecipient(String name) {
+		this.name = name;
+	}
+
+	public CostRecipient() {
+	}
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
-	@Column(unique=true)
+	@Column(unique = true)
 	private String name;
 }
