@@ -34,13 +34,19 @@ public class UploadService {
 
 		if (item.getRecipient().getName() != null && !item.getRecipient().getName().isEmpty()) {
 			List<CostItem> similarItems = itemRep.findByRecipientAndOwner(importItem.getRecipient(), costOwner);
+			
+			//Searching by recipient will probably result in a list of potentionally different items
+			// If all of them have same type and detail cluster -> just take first
 			if (!similarItems.isEmpty() && this.allSimilarHaveSameTypeAndCluster(similarItems)) {
 				item.setType(similarItems.get(0).getType());
-				item.setDetailedCluster(similarItems.get(0).getDetailedCluster());
+				item.setDetailedCluster(similarItems.get(0).getDetailedCluster());				
+				
 			} else if (!similarItems.isEmpty()) {
+				// If not all are of same type use the purpose to find the first right one
 				this.matchByPurpose(importItem, item, similarItems);
 			}
 		} else {
+			// Without recipient match by purpose
 			List<CostItem> itemsWithEmptyRecipient = itemRep.findByRecipientAndOwnerLatestFirst("", costOwner);
 			this.matchByPurpose(importItem, item, itemsWithEmptyRecipient);
 		}

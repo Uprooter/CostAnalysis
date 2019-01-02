@@ -5,22 +5,28 @@ import Button from '@material-ui/core/Button';
 import * as rest from 'rest';
 import * as mime from 'rest/interceptor/mime';
 import CostItemModel from "../models/CostItemModel";
-import { Table, TableHead, TableRow, TableCell, TableBody } from '@material-ui/core';
+import CostItemTable from "./CostItemTable";
 
 interface UploadProps {
     updatePageName: (newName: string) => NavigatioPageUpdateAction;
 }
 interface UploadState {
-    importedItems: CostItemModel[];
+    mappedItems: CostItemModel[];
+    unmappedItems: CostItemModel[];
 }
 export default class Upload extends React.Component<UploadProps, UploadState> {
 
     state = {
-        importedItems: new Array<CostItemModel>()
+        mappedItems: new Array<CostItemModel>(),
+        unmappedItems: new Array<CostItemModel>()
     }
 
     componentDidMount() {
         this.props.updatePageName(Page.UPLOAD.name)
+    }
+
+    isEmpty(str: string) {
+        return (!str || 0 === str.length);
     }
 
     readInFile(file: File) {
@@ -34,15 +40,26 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
             method: "POST"
         }).then(r => {
             let newImportedItems: CostItemModel[] = r.entity;
-            let newState: CostItemModel[] = new Array<CostItemModel>();
+            let newMappedItems: CostItemModel[] = new Array<CostItemModel>();
+            let newUnmappedItems: CostItemModel[] = new Array<CostItemModel>();
             for (let i in newImportedItems) {
                 let item: CostItemModel = newImportedItems[i];
                 item.id = Number.parseInt(i);
-                newState.push(item)
+
+                if (this.isEmpty(item.type)) {
+                    newUnmappedItems.push(item);
+                }
+                else {
+                    newMappedItems.push(item);
+                }
             }
 
-            this.setState({ importedItems: newState });
+            this.setState({ mappedItems: newMappedItems, unmappedItems: newUnmappedItems });
         });
+    }
+
+    saveUploadedItems() {
+        console.log("Save");
     }
 
     render() {
@@ -57,42 +74,13 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
                 />
                 <label htmlFor="contained-button-file">
                     <Button variant="contained" component="span">
-                        Upload
+                        Datei Hochladen
                     </Button>
                 </label>
 
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Buchungstag</TableCell>
-                            <TableCell>Empfänger</TableCell>
-                            <TableCell>Betrag</TableCell>
-                            <TableCell>Wer</TableCell>
-                            <TableCell>Kostenart</TableCell>
-                            <TableCell>Typ</TableCell>
-                            <TableCell>Detail</TableCell>
-                            <TableCell>Verwendungszweck</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {
-                            this.state.importedItems.map(row => {
-                                return (
-                                    <TableRow key={row.id}>
-                                        <TableCell>{row.creationDate.substring(0, 10)}</TableCell>
-                                        <TableCell>{row.recipient.name}</TableCell>
-                                        <TableCell>{row.amount + " €"}</TableCell>
-                                        <TableCell>{row.owner}</TableCell>
-                                        <TableCell>{row.type}</TableCell>
-                                        <TableCell>{row.detailedCluster.cluster}</TableCell>
-                                        <TableCell>{row.detailedCluster.name}</TableCell>
-                                        <TableCell>{row.purpose}</TableCell>                                        
-                                    </TableRow>
-                                );
-                            })
-                        }
-                    </TableBody>
-                </Table>
+                <Button variant="contained" color="primary" onClick={() => { this.saveUploadedItems() }}>Speichern</Button>
+                <CostItemTable items={this.state.unmappedItems} title={"Konnten nicht zugewiesen werden"} />
+                <CostItemTable items={this.state.mappedItems} title={"Erfolgreich zugewiesen"} />
             </div>
         );
     }
