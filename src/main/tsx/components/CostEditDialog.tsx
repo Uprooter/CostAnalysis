@@ -8,38 +8,22 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import { getRequest } from '../utils/rest';
-import { Select, Button } from '@material-ui/core';
+import { Select, Button, Grid } from '@material-ui/core';
 import CostItemModel from "../models/CostItemModel";
-import { withStyles } from '@material-ui/core';
 
 
 interface CostEditDialogProps {
+    selections: {
+        types: string[],
+        detailedClusters: string[],
+        clusters: string[],
+    };
     dialogOpen: boolean;
     costItem: CostItemModel;
+    changeDialogVisibility: (dialogOpen: boolean) => void;
+    updateValue: (newValue: string, field: string) => void;
 }
-
-interface CostEditDialogState {
-    clusters: string[];
-    types: string[];
-    detailedClusters: string[];
-}
-export default class CostEditDialog extends React.Component<CostEditDialogProps, CostEditDialogState> {
-
-    state = {
-        clusters: new Array<string>(),
-        detailedClusters: new Array<string>(),
-        types: new Array<string>(),
-    }
-
-
-    componentDidMount() {
-        getRequest("/api/detailedClusterNames").then(r => { this.setState({ detailedClusters: r.entity }) });
-        getRequest("/api/types").then(r => { this.setState({ types: r.entity }) });
-    }
-
-    detailedClusterSelected(detailedCluster: string) {
-        getRequest("/api/clustersByDetailed?detailedCluster=" + detailedCluster).then(r => { this.setState({ clusters: r.entity }) });
-    }
+export default class CostEditDialog extends React.Component<CostEditDialogProps, {}> {
 
     render() {
         return (
@@ -56,53 +40,62 @@ export default class CostEditDialog extends React.Component<CostEditDialogProps,
                 <DialogTitle>Details anpassen...</DialogTitle>
                 <DialogContent>
                     <form onSubmit={e => { console.log("Submit") }}>
-                        <FormControl style={{ marginRight: "50px" }}>
-                            <InputLabel htmlFor="type-select">Kostenart</InputLabel>
-                            <Select
-                                style={{ width: "150px"}}
-                                value={""}
-                                onChange={e => { console.log("Change") }}
-                                input={<Input id="type-select" />}>
-                                {
-                                    this.state.types.map(c => {
-                                        return (<MenuItem value={c} key={c}>{c}</MenuItem>);
-                                    })
-                                }
-                            </Select>
-                        </FormControl>
-                        <FormControl style={{ marginRight: "50px" }}>
-                            <InputLabel htmlFor="detail-select">Detail</InputLabel>
-                            <Select
-                                style={{ width: "150px" }}
-                                value={""}
-                                onChange={e => { this.detailedClusterSelected(e.target.value) }}
-                                input={<Input id="detail-select" />}>
-                                {
-                                    this.state.detailedClusters.map(c => {
-                                        return (<MenuItem value={c} key={c}>{c}</MenuItem>);
-                                    })
-                                }
-                            </Select>
-                        </FormControl>
-                        <FormControl>
-                            <InputLabel htmlFor="cluster-select">Typ</InputLabel>
-                            <Select
-                                style={{ width: "150px" }}
-                                value={""}
-                                onChange={e => { console.log("Change") }}
-                                input={<Input id="cluster-select" />}>
-                                {
-                                    this.state.clusters.map(c => {
-                                        return (<MenuItem value={c} key={c}>{c}</MenuItem>);
-                                    })
-                                }
-                            </Select>
-                        </FormControl>
+                        <Grid container spacing={16}>
+                            <Grid item>
+                                <FormControl>
+                                    <InputLabel htmlFor="type-select">Kostenart</InputLabel>
+                                    <Select
+                                        style={{ width: "150px" }}
+                                        value={this.props.costItem.type}
+                                        onChange={e => { this.props.updateValue(e.target.value, "type") }}
+                                        input={<Input id="type-select" />}>
+                                        {
+                                            this.props.selections.types.map(c => {
+                                                return (<MenuItem value={c} key={c}>{c}</MenuItem>);
+                                            })
+                                        }
+                                    </Select>
+                                </FormControl>
+                            </Grid>                          
+                            <Grid item>
+                                <FormControl>
+                                    <InputLabel htmlFor="cluster-select">Typ</InputLabel>
+                                    <Select
+                                        style={{ width: "200px" }}
+                                        value={this.props.costItem.detailedCluster.cluster}
+                                        onChange={e => { this.props.updateValue(e.target.value, "cluster") }}
+                                        input={<Input id="cluster-select" />}>
+                                        {
+                                            this.props.selections.clusters.map(c => {
+                                                return (<MenuItem value={c} key={c}>{c}</MenuItem>);
+                                            })
+                                        }
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                            <Grid item>
+                                <FormControl>
+                                    <InputLabel htmlFor="detail-select">Detail</InputLabel>
+                                    <Select
+                                        style={{ width: "150px" }}
+                                        value={this.props.costItem.detailedCluster.name}
+                                        onChange={e => { this.props.updateValue(e.target.value, "detailedCluster") }}
+                                        input={<Input id="detail-select" />}>
+                                        {
+                                            this.props.selections.detailedClusters.map(c => {
+                                                return (<MenuItem value={c} key={c}>{c}</MenuItem>);
+                                            })
+                                        }
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                        </Grid>
+
                     </form>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={e => { console.log("OK") }} color="primary">Ok</Button>
-                    <Button onClick={() => { console.log("Cancel") }} color="primary">Cancel</Button>
+                    <Button onClick={() => { console.log("OK") }} color="primary">Ok</Button>
+                    <Button onClick={() => { this.props.changeDialogVisibility(false) }} color="primary">Cancel</Button>
                 </DialogActions>
             </Dialog>
         );

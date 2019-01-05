@@ -11,12 +11,11 @@ export enum ActionTypes {
 
 export interface AddDetailedClusterAction { type: ActionTypes.ADD_DETAILED_CLUSTER, payload: DetailedCostClusterModel }
 export interface AddCostItemsAction { type: ActionTypes.ADD_ITEMS, payload: CostItemModel[] }
-
 export interface NavigationAction { type: ActionTypes.NAVIGATION_OPEN, openStatus: boolean }
 export interface NavigatioPageUpdateAction { type: ActionTypes.UPDATE_PAGE_NAME, newName: string }
 export interface UpdateAverageCostsAction { type: ActionTypes.UPDATE_AVERAGE_COSTS, payload: AverageCostResult }
 
-export function updateAverageCostResult(averageCosts: AverageCostResult): UpdateAverageCostsAction {    
+export function updateAverageCostResult(averageCosts: AverageCostResult): UpdateAverageCostsAction {
     return {
         type: ActionTypes.UPDATE_AVERAGE_COSTS,
         payload: averageCosts
@@ -50,5 +49,6 @@ export function updatePageName(newName: string): NavigatioPageUpdateAction {
         newName: newName
     }
 }
+
 
 export type Action = AddDetailedClusterAction | NavigationAction | NavigatioPageUpdateAction | AddCostItemsAction | UpdateAverageCostsAction;

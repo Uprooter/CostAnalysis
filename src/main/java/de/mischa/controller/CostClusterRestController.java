@@ -1,5 +1,8 @@
 package de.mischa.controller;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,8 +27,10 @@ public class CostClusterRestController {
 	}
 
 	@RequestMapping("/api/clustersByDetailed")
-	public List<CostCluster> getClustersByDetailedCluster(@RequestParam("detailedCluster") String detailedCluster) {
-		return detailedClusterRep.findByName(detailedCluster).stream().map(d -> d.getCluster()).distinct()
+	public List<CostCluster> getClustersByDetailedCluster(@RequestParam("detailedCluster") String detailedCluster)
+			throws UnsupportedEncodingException {
+		String decodedName = URLDecoder.decode(detailedCluster, StandardCharsets.UTF_8.toString());
+		return detailedClusterRep.findByName(decodedName).stream().map(d -> d.getCluster()).distinct()
 				.collect(Collectors.toList());
 	}
 

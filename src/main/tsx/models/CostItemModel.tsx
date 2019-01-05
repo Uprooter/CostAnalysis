@@ -1,7 +1,7 @@
 import DetailedCluster from "./DetailedCostClusterModel"
 import RecipientModel from "./RecipientModel"
 
-export default class CostItemModel {   
+export default class CostItemModel {
     id: number;
 
     amount: number;
@@ -10,9 +10,9 @@ export default class CostItemModel {
 
     owner: string;
 
-    type: string;
+    type: string = "";
 
-    detailedCluster: DetailedCluster;
+    detailedCluster: DetailedCluster = { "name": "", "cluster": "" };
 
     purpose: string;
 
