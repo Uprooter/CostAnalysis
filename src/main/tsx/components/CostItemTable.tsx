@@ -1,19 +1,22 @@
 import * as React from "react";
 import CostItemModel from "../models/CostItemModel";
+import DetailedCostClusterModel from "../models/DetailedCostClusterModel";
 import { Table, TableHead, TableRow, TableCell, TableBody, Typography } from '@material-ui/core';
 import CostEditDialog from "./CostEditDialog";
 import { getRequest } from '../utils/rest';
+import { getFromDetailedName } from '../utils/detailedClusters';
 
 interface CostItemTableProps {
     items: CostItemModel[];
     title: string;
+    updateCostItem: (changedItem: CostItemModel) => void;
 }
 export interface CostItemTableState {
     dialogOpen: boolean;
     costItem: CostItemModel;
     selections: {
         types: string[],
-        detailedClusters: string[],
+        detailedClusters: DetailedCostClusterModel[],
         clusters: string[],
     };
 }
@@ -24,45 +27,52 @@ export default class CostItemTable extends React.Component<CostItemTableProps, C
         dialogOpen: false,
         selections: {
             types: new Array<string>(),
-            detailedClusters: new Array<string>(),
+            detailedClusters: new Array<DetailedCostClusterModel>(),
             clusters: new Array<string>(),
         }
     }
 
     componentDidMount() {
-        getRequest("/api/detailedClusterNames").then(r => { this.setState({ selections: Object.assign({}, this.state.selections, { detailedClusters: r.entity }) }) });
+        getRequest("/api/detailedCostClusters").then(r => {
+            this.setState({ selections: Object.assign({}, this.state.selections, { detailedClusters: r.entity._embedded.detailedCostClusters }) })
+        });
         getRequest("/api/types").then(r => { this.setState({ selections: Object.assign({}, this.state.selections, { types: r.entity }) }) });
+        getRequest("/api/clusters").then(r => { this.setState({ selections: Object.assign({}, this.state.selections, { clusters: r.entity }) }) });
     }
 
 
     handleRowClick(event: React.MouseEvent<HTMLTableRowElement>, rowId: number) {
-        this.setState({ costItem: this.initEmpty(this.props.items[rowId]) }, () => this.detailedClusterSelected());
+        this.setState({ costItem: this.initEmpty(this.getRowElement(this.props.items, rowId)) });
         this.changeDialogVisibility(true);
+    }
+
+    getRowElement(items: CostItemModel[], id: number): CostItemModel {
+        for (let item of items) {
+            if (item.id === id) {
+                return item;
+            }
+        }
+
+        return undefined;
     }
 
     changeDialogVisibility = (dialogOpen: boolean) => {
         this.setState({ dialogOpen: dialogOpen });
     }
 
-    // need to set it already here an pass it to the dialog otherwise the current cluster value will not be displayed in the selection box
-    detailedClusterSelected() {
-        if (this.state.costItem.detailedCluster.name !== "") {
-            getRequest(encodeURI("/api/clustersByDetailed?detailedCluster=" + encodeURIComponent(this.state.costItem.detailedCluster.name)))
-                .then(r => { this.setState({ selections: Object.assign({}, this.state.selections, { clusters: r.entity }) }) });
-        }
-        else {
-            this.setState({ selections: Object.assign({}, this.state.selections, { clusters: [this.state.costItem.detailedCluster.cluster] }) })
-        }
-    }
-
     initEmpty(costItem: CostItemModel) {
         let newCostItem = costItem;
+
+        if (newCostItem.detailedCluster === undefined) {
+            newCostItem.detailedCluster = new DetailedCostClusterModel("", "");
+        }
+
         if (newCostItem.detailedCluster.name === null) {
-            newCostItem.detailedCluster = { "name": "", "cluster": "" };
+            newCostItem.detailedCluster = new DetailedCostClusterModel("", "");
         }
 
         if (newCostItem.type === null) {
-            newCostItem.type="";
+            newCostItem.type = "";
         }
 
         return newCostItem;
@@ -74,11 +84,10 @@ export default class CostItemTable extends React.Component<CostItemTableProps, C
                 this.setState({ costItem: Object.assign({}, this.state.costItem, { type: newValue }) });
                 break;
             case "cluster":
-                this.setState({ costItem: { ...this.state.costItem, detailedCluster: { name: this.state.costItem.detailedCluster.name, cluster: newValue } } });
+                this.setState({ costItem: { ...this.state.costItem, detailedCluster: new DetailedCostClusterModel(this.state.costItem.detailedCluster.name, newValue) } });
                 break;
             case "detailedCluster":
-                this.setState({ costItem: { ...this.state.costItem, detailedCluster: { name: newValue, cluster: this.state.costItem.detailedCluster.cluster } } }, 
-                                () => this.detailedClusterSelected());
+                this.setState({ costItem: { ...this.state.costItem, detailedCluster: getFromDetailedName(newValue) } });
                 break;
             default:
                 console.log("Do not know field: " + field);
@@ -93,7 +102,7 @@ export default class CostItemTable extends React.Component<CostItemTableProps, C
                     {this.props.title}
                 </Typography>
                 <CostEditDialog dialogOpen={this.state.dialogOpen} costItem={this.state.costItem}
-                    changeDialogVisibility={this.changeDialogVisibility} selections={this.state.selections} updateValue={this.updateValue} />
+                    changeDialogVisibility={this.changeDialogVisibility} selections={this.state.selections} updateValue={this.updateValue} updateCostItem={this.props.updateCostItem} />
 
                 <Table>
                     <TableHead>

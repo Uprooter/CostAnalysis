@@ -1,7 +1,15 @@
 
 export default class DetailedCostClusterModel {
 
-    public name: string;
-
-    public cluster: string;
+    name: string;
+    cluster: string;
+    _links: {
+        self: {
+            href: string
+        }
+    }
+    constructor(name: string, cluster: string) {
+        this.name = name;
+        this.cluster = cluster;
+    }
 }

@@ -15,6 +15,9 @@ public interface DetailedCostClusterRepository extends CrudRepository<DetailedCo
 	
 	public List<DetailedCostCluster> findByName(String name);
 	
+	@Query("SELECT c FROM DetailedCostCluster c order by c.cluster, c.name asc")
+	public List<DetailedCostCluster> findAll();
+	
 	@Query("SELECT DISTINCT c.name FROM DetailedCostCluster c where c.name<>'' order by c.name asc")
 	public List<String> findAllDistinctNames();
 

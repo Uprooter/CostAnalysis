@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -31,6 +32,13 @@ public class UploadRestController {
 
 	@Autowired
 	private UploadService uploadService;
+
+	private Comparator<CostImportEntry> dateComparator = new Comparator<CostImportEntry>() {
+
+		public int compare(CostImportEntry o1, CostImportEntry o2) {
+			return o1.getDate().compareTo(o2.getDate());
+		};
+	};
 
 	private static final Logger logger = LoggerFactory.getLogger(UploadRestController.class);
 
@@ -60,7 +68,7 @@ public class UploadRestController {
 
 	private List<CostItem> createItems(List<CostImportEntry> importEntries, CostOwner costOwner) {
 		List<CostItem> costItems = new ArrayList<CostItem>();
-		importEntries.forEach(i -> {
+		importEntries.stream().sorted(dateComparator).forEach(i -> {
 			costItems.add(this.uploadService.createItemFromImport(costOwner, i));
 		});
 		return costItems;
