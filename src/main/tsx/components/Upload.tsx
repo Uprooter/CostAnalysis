@@ -62,6 +62,24 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
         console.log("Save");
     }
 
+    updateCostItem = (changedItem: CostItemModel) => {
+
+        // Dont know where changed item belongs to -> need to iterate through both lists
+        let newUnmappedItems: CostItemModel[] = this.state.unmappedItems;
+        for (let i in newUnmappedItems) {
+            if (newUnmappedItems[i].id === changedItem.id) {
+                newUnmappedItems[i] = changedItem;
+            }
+        }
+
+        let newMappedItems: CostItemModel[] = this.state.mappedItems;
+        for (let i in newMappedItems) {
+            if (newMappedItems[i].id === changedItem.id) {
+                newMappedItems[i] = changedItem;
+            }
+        }
+    }
+
     render() {
         return (
             <div>
@@ -70,7 +88,7 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
                     id="contained-button-file"
                     type="file"
                     style={{ display: 'none' }}
-                    onChange={e => { this.readInFile(e.target.files[0]) }}
+                    onChange={e => this.readInFile(e.target.files[0])}
                 />
                 <label htmlFor="contained-button-file">
                     <Button variant="contained" component="span">
@@ -78,9 +96,9 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
                     </Button>
                 </label>
 
-                <Button variant="contained" color="primary" onClick={() => { this.saveUploadedItems() }}>Speichern</Button>
-                <CostItemTable items={this.state.unmappedItems} title={"Konnten nicht zugewiesen werden"} />
-                <CostItemTable items={this.state.mappedItems} title={"Erfolgreich zugewiesen"} />
+                <Button variant="contained" color="primary" onClick={() => this.saveUploadedItems()}>Speichern</Button>
+                <CostItemTable items={this.state.unmappedItems} title={"Konnten nicht zugewiesen werden"} updateCostItem={this.updateCostItem} />
+                <CostItemTable items={this.state.mappedItems} title={"Erfolgreich zugewiesen"} updateCostItem={this.updateCostItem} />
             </div>
         );
     }

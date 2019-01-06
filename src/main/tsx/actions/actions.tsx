@@ -2,11 +2,11 @@ import DetailedCostClusterModel from "../models/DetailedCostClusterModel";
 import CostItemModel from "../models/CostItemModel";
 import AverageCostResult from "../models/AverageCostResult";
 export enum ActionTypes {
-    ADD_DETAILED_CLUSTER = "[DetailedCluster] Add",
-    ADD_ITEMS = "[CostItem] Add Many",
-    NAVIGATION_OPEN = "[Naviation] Open/Close",
-    UPDATE_PAGE_NAME = "[Naviation] Update Page Name",
-    UPDATE_AVERAGE_COSTS = "[CostOverview] Update Average Costs",
+    ADD_DETAILED_CLUSTER = "Add",
+    ADD_ITEMS = "Add Many",
+    NAVIGATION_OPEN = "Open/Close",
+    UPDATE_PAGE_NAME = "Update Page Name",
+    UPDATE_AVERAGE_COSTS = "Update Average Costs",
 }
 
 export interface AddDetailedClusterAction { type: ActionTypes.ADD_DETAILED_CLUSTER, payload: DetailedCostClusterModel }
