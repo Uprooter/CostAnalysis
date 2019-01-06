@@ -84,14 +84,24 @@ export default class CostItemTable extends React.Component<CostItemTableProps, C
                 this.setState({ costItem: Object.assign({}, this.state.costItem, { type: newValue }) });
                 break;
             case "cluster":
-                this.setState({ costItem: { ...this.state.costItem, detailedCluster: new DetailedCostClusterModel(this.state.costItem.detailedCluster.name, newValue) } });
+                this.setState({
+                    costItem:
+                        Object.assign({}, this.state.costItem, { detailedCluster: new DetailedCostClusterModel(this.state.costItem.detailedCluster.name, newValue) })
+                });
                 break;
             case "detailedCluster":
-                this.setState({ costItem: { ...this.state.costItem, detailedCluster: getFromDetailedName(newValue) } });
+                this.setState({ costItem: Object.assign({}, this.state.costItem, { detailedCluster: getFromDetailedName(newValue) }) });
                 break;
             default:
                 console.log("Do not know field: " + field);
         }
+    }
+
+    getStyle(item: CostItemModel) {
+        if (item.validState) {
+            return {};
+        }
+        return { backgroundColor: "#ff9333" };
     }
 
     render() {
@@ -119,17 +129,17 @@ export default class CostItemTable extends React.Component<CostItemTableProps, C
                     </TableHead>
                     <TableBody>
                         {
-                            this.props.items.map(row => {
+                            this.props.items.map(item => {
                                 return (
-                                    <TableRow key={row.id} hover onClick={event => this.handleRowClick(event, row.id)}>
-                                        <TableCell>{row.creationDate.substring(0, 10)}</TableCell>
-                                        <TableCell>{row.recipient.name}</TableCell>
-                                        <TableCell>{row.amount + " €"}</TableCell>
-                                        <TableCell>{row.owner}</TableCell>
-                                        <TableCell>{row.type}</TableCell>
-                                        <TableCell>{row.detailedCluster.cluster}</TableCell>
-                                        <TableCell>{row.detailedCluster.name}</TableCell>
-                                        <TableCell>{row.purpose}</TableCell>
+                                    <TableRow style={this.getStyle(item)} key={item.id} hover onClick={event => this.handleRowClick(event, item.id)}>
+                                        <TableCell>{item.creationDate.substring(0, 10)}</TableCell>
+                                        <TableCell>{item.recipient.name}</TableCell>
+                                        <TableCell>{item.amount + " €"}</TableCell>
+                                        <TableCell>{item.owner}</TableCell>
+                                        <TableCell>{item.type}</TableCell>
+                                        <TableCell>{item.detailedCluster.cluster}</TableCell>
+                                        <TableCell>{item.detailedCluster.name}</TableCell>
+                                        <TableCell>{item.purpose}</TableCell>
                                     </TableRow>
                                 );
                             })

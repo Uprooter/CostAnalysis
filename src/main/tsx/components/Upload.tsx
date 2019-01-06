@@ -43,10 +43,11 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
             let newMappedItems: CostItemModel[] = new Array<CostItemModel>();
             let newUnmappedItems: CostItemModel[] = new Array<CostItemModel>();
             for (let i in newImportedItems) {
-                let item: CostItemModel = newImportedItems[i];
+                let item: CostItemModel = Object.assign({}, newImportedItems[i], { validState: true });
                 item.id = Number.parseInt(i);
 
                 if (this.isEmpty(item.type)) {
+                    item.validState = false;
                     newUnmappedItems.push(item);
                 }
                 else {
@@ -58,26 +59,65 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
         });
     }
 
+    anyErrorsFound(): boolean {
+        let anyErrorFound: boolean = false;
+        for (let item of this.state.mappedItems.concat(this.state.unmappedItems)) {
+            if (!item.validState) {
+                anyErrorFound = true;
+                break;
+            }
+        }
+
+        return anyErrorFound;
+    }
     saveUploadedItems() {
+
+        if (this.anyErrorsFound()) {
+            window.alert("Fix errors first");
+            return;
+        }
         console.log("Save");
+
+        for (let item of this.state.mappedItems.concat(this.state.unmappedItems)) {
+
+            let client = rest.wrap(mime);
+            client({
+                path: "/api/costItems",
+                method: "POST",
+                entity: { item},
+                headers: { 'Content-Type': 'application/json' }
+            }).done(response => {
+                if (response.status.code === 409) {
+                    alert("Error occurred: " + response.entity.message);
+                }
+                else {
+                    console.log("Save Done");
+                }
+            });
+        }
     }
 
     updateCostItem = (changedItem: CostItemModel) => {
-
+        changedItem.validState = (changedItem.type !== ""
+            && changedItem.type !== undefined
+            && changedItem.detailedCluster !== undefined
+            && changedItem.detailedCluster.cluster !== "");
         // Dont know where changed item belongs to -> need to iterate through both lists
-        let newUnmappedItems: CostItemModel[] = this.state.unmappedItems;
+        let newUnmappedItems: CostItemModel[] = JSON.parse(JSON.stringify(this.state.unmappedItems));
         for (let i in newUnmappedItems) {
             if (newUnmappedItems[i].id === changedItem.id) {
                 newUnmappedItems[i] = changedItem;
             }
         }
 
-        let newMappedItems: CostItemModel[] = this.state.mappedItems;
+        let newMappedItems: CostItemModel[] = JSON.parse(JSON.stringify(this.state.mappedItems));
         for (let i in newMappedItems) {
             if (newMappedItems[i].id === changedItem.id) {
                 newMappedItems[i] = changedItem;
             }
         }
+
+        this.setState({ mappedItems: newMappedItems, unmappedItems: newUnmappedItems });
     }
 
     render() {

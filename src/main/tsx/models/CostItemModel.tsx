@@ -12,9 +12,11 @@ export default class CostItemModel {
 
     type: string = "";
 
-    detailedCluster: DetailedClusterModel = new DetailedClusterModel("","");
+    detailedCluster: DetailedClusterModel = new DetailedClusterModel("", "");
 
     purpose: string;
 
     creationDate: string;
+
+    validState: boolean = true;
 }
