@@ -1,5 +1,4 @@
 import * as fromDetailedClusters from "./detailedCostCluster";
-import * as costItems from "./costItems";
 import * as averageCosts from "./averageCosts";
 import * as navigationBar from "./navigationBar";
 import * as navigationPage from "./navigationPage";
@@ -12,8 +11,7 @@ export interface State {
     navigationBar: navigationBar.State,
     navigationPage: navigationPage.State,
     router: RouterState,
-    averageCosts: averageCosts.State,
-
+    averageCosts: averageCosts.State
 }
 
 const reducer = (history: History) => combineReducers<State>({

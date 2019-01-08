@@ -1,6 +1,6 @@
 import * as React from "react";
 import AverageCostResult from "../models/AverageCostResult";
-import { Table, TableHead, TableRow, TableCell, TableBody, Grid } from '@material-ui/core';
+import { Table, TableHead, TableRow, TableCell, TableBody } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 
 interface AverageCostTableProps {
@@ -28,8 +28,8 @@ export default class AverageCostTable extends React.Component<AverageCostTablePr
         }
     }))(TableCell);
 
-    toRoundEuroString(value:number):string{
-        return Math.ceil(value)+" €"
+    toRoundEuroString(value: number): string {
+        return Math.ceil(value) + " €"
     }
 
     render() {
@@ -67,13 +67,13 @@ export default class AverageCostTable extends React.Component<AverageCostTablePr
                         <TableCell>{this.toRoundEuroString(this.props.averageCosts.averageSavingsMischa)}</TableCell>
                         <TableCell>{this.toRoundEuroString(this.props.averageCosts.averageSavingsGesa)}</TableCell>
                         <this.TotalTableCell>{this.toRoundEuroString(this.props.averageCosts.totalAverageSavings)}</this.TotalTableCell>
-                    </TableRow>                 
+                    </TableRow>
                     <TableRow key="savedAbsolute">
                         <TableCell>Gespart (insgesamt Zeitraum)</TableCell>
                         <TableCell>{this.toRoundEuroString(this.props.averageCosts.absoluteDiffMischa)}</TableCell>
                         <TableCell>{this.toRoundEuroString(this.props.averageCosts.absoluteDiffGesa)}</TableCell>
                         <this.TotalTableCell>{this.toRoundEuroString(this.props.averageCosts.absoluteTotalDiff)}</this.TotalTableCell>
-                    </TableRow>                    
+                    </TableRow>
                 </TableBody>
             </Table>
         );

@@ -1,7 +1,7 @@
 import { connect } from 'react-redux'
 import { State } from '../reducers'
 import CostOverview from '../components/CostOverview'
-import { updatePageName, addCostItems, updateAverageCostResult } from '../actions/actions'
+import { updatePageName, updateAverageCostResult } from '../actions/actions'
 import { getAverageCost } from '../selectors/costItems'
 
 const mapStateToProps = (state: State) => ({
@@ -9,7 +9,6 @@ const mapStateToProps = (state: State) => ({
 })
 const mapDispatchToProps = {
   updatePageName: updatePageName,
-  addCostItems: addCostItems,
   updateAverageCostResult: updateAverageCostResult,
 }
 
