@@ -11,7 +11,7 @@ import de.mischa.model.CostType;
 @RestController
 public class CostTypeRestController {
 
-	@RequestMapping("/api/types")
+	@RequestMapping("/types")
 	public List<CostType> getTypes() {
 		return Arrays.asList(CostType.values());
 	}

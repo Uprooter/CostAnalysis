@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.apache.commons.csv.CSVFormat;
@@ -29,7 +30,7 @@ import de.mischa.model.CostOwner;
 @Component
 public class AbstractCostImporter {
 
-	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMAN);
 	private static final Charset CODING = StandardCharsets.ISO_8859_1;
 	private ImportConfig config;
 
@@ -96,8 +97,7 @@ public class AbstractCostImporter {
 
 		lines = this.skipLines(lines);
 
-		Reader fileReader = new InputStreamReader(
-				IOUtils.toInputStream(this.linesToString(lines), CODING));
+		Reader fileReader = new InputStreamReader(IOUtils.toInputStream(this.linesToString(lines), CODING));
 		return fileReader;
 	}
 
@@ -111,8 +111,7 @@ public class AbstractCostImporter {
 
 		lines = this.skipLines(lines);
 
-		Reader fileReader = new InputStreamReader(
-				IOUtils.toInputStream(this.linesToString(lines), CODING));
+		Reader fileReader = new InputStreamReader(IOUtils.toInputStream(this.linesToString(lines), CODING));
 		return fileReader;
 	}
 

@@ -1,5 +1,6 @@
 package de.mischa.upload;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -17,11 +18,13 @@ import org.mockito.junit.MockitoJUnitRunner;
 import de.mischa.model.CostCluster;
 import de.mischa.model.CostItem;
 import de.mischa.model.CostOwner;
+import de.mischa.model.CostRecipient;
 import de.mischa.model.CostType;
 import de.mischa.model.DetailedCostCluster;
 import de.mischa.readin.CostImportEntry;
 import de.mischa.repository.CostItemRepository;
 import de.mischa.repository.CostRecipientRepository;
+import de.mischa.utils.DateUtils;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UploadServiceTest {
@@ -47,7 +50,7 @@ public class UploadServiceTest {
 		matchingItem.setDetailedCluster(detailedCluster);
 		List<CostItem> matchingItems = new ArrayList<CostItem>();
 		matchingItems.add(matchingItem);
-		when(itemRep.findByRecipientAndOwner(anyString(), CostOwner.MISCHA)).thenReturn(matchingItems);
+		when(itemRep.findByRecipientAndOwner(anyString(), any(CostOwner.class))).thenReturn(matchingItems);
 
 		CostImportEntry importEntry = new CostImportEntry(new Date(), "TestRec", "SomePurpose", 22.0);
 		CostItem derivedCostItem = this.uploadService.createItemFromImport(CostOwner.MISCHA, importEntry);
@@ -61,7 +64,7 @@ public class UploadServiceTest {
 	 */
 	@Test
 	public void testNoneMatchFound() {
-		when(itemRep.findByRecipientAndOwner(anyString(), CostOwner.MISCHA)).thenReturn(new ArrayList<CostItem>());
+		when(itemRep.findByRecipientAndOwner(anyString(), any(CostOwner.class))).thenReturn(new ArrayList<CostItem>());
 
 		CostImportEntry importEntry = new CostImportEntry(new Date(), "SomeUnknownRecipient", "SomePurpose", 22.0);
 		CostItem derivedCostItem = this.uploadService.createItemFromImport(CostOwner.MISCHA, importEntry);
@@ -92,7 +95,7 @@ public class UploadServiceTest {
 		List<CostItem> matchingItems = new ArrayList<CostItem>();
 		matchingItems.add(gehaltItem);
 		matchingItems.add(anotherGehaltItem);
-		when(itemRep.findByRecipientAndOwner(anyString(), CostOwner.MISCHA)).thenReturn(matchingItems);
+		when(itemRep.findByRecipientAndOwner(anyString(), any(CostOwner.class))).thenReturn(matchingItems);
 
 		CostImportEntry importEntry = new CostImportEntry(new Date(), "TestRec", "SomePurpose", 22.0);
 		CostItem derivedCostItem = this.uploadService.createItemFromImport(CostOwner.MISCHA, importEntry);
@@ -123,7 +126,7 @@ public class UploadServiceTest {
 		List<CostItem> matchingItems = new ArrayList<CostItem>();
 		matchingItems.add(gehaltItem);
 		matchingItems.add(anotherGehaltItem);
-		when(itemRep.findByRecipientAndOwner(anyString(), CostOwner.MISCHA)).thenReturn(matchingItems);
+		when(itemRep.findByRecipientAndOwner(anyString(), any(CostOwner.class))).thenReturn(matchingItems);
 
 		CostImportEntry importEntry = new CostImportEntry(new Date(), "TestRec", "SomePurpose", 22.0);
 		CostItem derivedCostItem = this.uploadService.createItemFromImport(CostOwner.MISCHA, importEntry);
@@ -154,7 +157,7 @@ public class UploadServiceTest {
 		List<CostItem> matchingItems = new ArrayList<CostItem>();
 		matchingItems.add(gehaltItem);
 		matchingItems.add(gehaltItem2);
-		when(itemRep.findByRecipientAndOwnerLatestFirst(anyString(), CostOwner.MISCHA)).thenReturn(matchingItems);
+		when(itemRep.findByRecipientAndOwnerLatestFirst(anyString(), any(CostOwner.class))).thenReturn(matchingItems);
 
 		CostImportEntry importEntry = new CostImportEntry(new Date(), null, purposePrefix + " dasdad", 22.0);
 		CostItem derivedCostItem = this.uploadService.createItemFromImport(CostOwner.MISCHA, importEntry);
@@ -185,7 +188,7 @@ public class UploadServiceTest {
 		List<CostItem> matchingItems = new ArrayList<CostItem>();
 		matchingItems.add(gehaltItem);
 		matchingItems.add(gehaltItem2);
-		when(itemRep.findByRecipientAndOwnerLatestFirst(anyString(), CostOwner.MISCHA)).thenReturn(matchingItems);
+		when(itemRep.findByRecipientAndOwnerLatestFirst(anyString(), any(CostOwner.class))).thenReturn(matchingItems);
 
 		CostImportEntry importEntry = new CostImportEntry(new Date(), null, "dasd asd dasdad", 22.0);
 		CostItem derivedCostItem = this.uploadService.createItemFromImport(CostOwner.MISCHA, importEntry);
@@ -215,5 +218,82 @@ public class UploadServiceTest {
 
 		this.uploadService.matchByPurpose(importItem, item, itemsWithEmptyRecipient);
 		Assertions.assertThat(item.getType()).isEqualTo(CostType.GEHALT);
+	}
+
+	@Test
+	public void testFindEqual() {
+		DetailedCostCluster detailedCluster = new DetailedCostCluster(CostCluster.GEHALT, "");
+		CostItem itemToMatch = new CostItem();
+		itemToMatch.setId(1L);
+		itemToMatch.setAmount(22.0);
+		itemToMatch.setPurpose("SomePurpose");
+		itemToMatch.setType(CostType.GEHALT);
+		itemToMatch.setDetailedCluster(detailedCluster);
+		itemToMatch.setRecipient(new CostRecipient("SomeRecipient"));
+		itemToMatch.setCreationDate(DateUtils.createDate("01.01.2018"));
+
+		List<CostItem> allItems = new ArrayList<>();
+		allItems.add(itemToMatch);
+		Assertions.assertThat(this.uploadService.foundEqual(itemToMatch, allItems)).isEqualTo(itemToMatch);
+
+		CostItem differentDateItem = CostItem.copy(itemToMatch);
+		differentDateItem.setId(2L);
+		differentDateItem.setCreationDate(DateUtils.createDate("02.01.2018"));
+		allItems.add(differentDateItem);
+		Assertions.assertThat(this.uploadService.foundEqual(itemToMatch, allItems)).isEqualTo(itemToMatch);
+
+		allItems = new ArrayList<>();
+		allItems.add(differentDateItem);
+		Assertions.assertThat(this.uploadService.foundEqual(itemToMatch, allItems)).isNull();
+
+		CostItem differentAmount = CostItem.copy(itemToMatch);
+		differentAmount.setId(3L);
+		differentAmount.setAmount(21.0);
+
+		allItems = new ArrayList<>();
+		allItems.add(differentAmount);
+		Assertions.assertThat(this.uploadService.foundEqual(itemToMatch, allItems)).isNull();
+
+	}
+
+	@Test
+	public void testFindSimilar() {
+		DetailedCostCluster detailedCluster = new DetailedCostCluster(CostCluster.GEHALT, "");
+		CostItem itemToMatch = new CostItem();
+		itemToMatch.setId(1L);
+		itemToMatch.setAmount(22.0);
+		itemToMatch.setPurpose("SomePurpose");
+		itemToMatch.setType(CostType.GEHALT);
+		itemToMatch.setDetailedCluster(detailedCluster);
+		itemToMatch.setRecipient(new CostRecipient("SomeRecipient"));
+		itemToMatch.setCreationDate(DateUtils.createDate("01.01.2018"));
+
+		List<CostItem> allItems = new ArrayList<>();
+		allItems.add(itemToMatch);
+		Assertions.assertThat(this.uploadService.foundSimilar(itemToMatch, allItems)).isEqualTo(itemToMatch);
+
+		CostItem differentDateItem = CostItem.copy(itemToMatch);
+		differentDateItem.setId(2L);
+		differentDateItem.setCreationDate(DateUtils.createDate("02.01.2018"));
+		allItems.add(differentDateItem);
+		Assertions.assertThat(this.uploadService.foundSimilar(itemToMatch, allItems)).isEqualTo(itemToMatch);
+
+		allItems = new ArrayList<>();
+		allItems.add(differentDateItem);
+		Assertions.assertThat(this.uploadService.foundSimilar(itemToMatch, allItems)).isNull();
+
+		CostItem differentAmount = CostItem.copy(itemToMatch);
+		differentAmount.setId(3L);
+		differentAmount.setAmount(21.0);
+		allItems = new ArrayList<>();
+		allItems.add(differentAmount);
+		Assertions.assertThat(this.uploadService.foundSimilar(itemToMatch, allItems)).isNull();
+
+		CostItem purposeDifferent = CostItem.copy(itemToMatch);
+		differentAmount.setId(4L);
+		differentAmount.setPurpose("121");
+		allItems = new ArrayList<>();
+		allItems.add(purposeDifferent);
+		Assertions.assertThat(this.uploadService.foundSimilar(itemToMatch, allItems)).isEqualTo(itemToMatch);
 	}
 }

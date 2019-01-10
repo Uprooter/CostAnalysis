@@ -5,7 +5,9 @@ import Button from '@material-ui/core/Button';
 import * as rest from 'rest';
 import * as mime from 'rest/interceptor/mime';
 import CostItemModel from "../models/CostItemModel";
+import DuplicateItemModel from "../models/DuplicateItemModel";
 import CostItemTable from "./CostItemTable";
+import { getDateString, parseISOString } from "../utils/dates";
 
 interface UploadProps {
     updatePageName: (newName: string) => NavigatioPageUpdateAction;
@@ -32,7 +34,7 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
     readInFile(file: File) {
         let client = rest.wrap(mime);
         client({
-            path: "/api/upload",
+            path: "/upload",
             entity: { "file": file },
             headers: {
                 'Content-Type': 'multipart/form-data'
@@ -44,7 +46,7 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
             let newUnmappedItems: CostItemModel[] = new Array<CostItemModel>();
             for (let i in newImportedItems) {
                 let item: CostItemModel = Object.assign({}, newImportedItems[i], { validState: true });
-                item.id = Number.parseInt(i);
+                item.clientId = Number.parseInt(i);
 
                 if (this.isEmpty(item.type)) {
                     item.validState = false;
@@ -76,48 +78,56 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
             window.alert("Fix errors first");
             return;
         }
-        console.log("Save");
 
-        for (let item of this.state.mappedItems.concat(this.state.unmappedItems)) {
-
-            let client = rest.wrap(mime);
-            client({
-                path: "/api/costItems",
-                method: "POST",
-                entity: { item},
-                headers: { 'Content-Type': 'application/json' }
-            }).done(response => {
-                if (response.status.code === 409) {
-                    alert("Error occurred: " + response.entity.message);
+        let itemsToSave = this.state.mappedItems.concat(this.state.unmappedItems);
+        let client = rest.wrap(mime);
+        client({
+            path: "/upload/save",
+            method: "POST",
+            entity: { "correctedItems": itemsToSave },
+            headers: { 'Content-Type': 'application/json' }
+        }).done(response => {
+            if (response.status.code === 409) {
+                alert("Error occurred: " + response.entity.message);
+            }
+            else {
+                console.log("Save Done:", response.entity);
+                let potentialDuplicates: Array<DuplicateItemModel> = response.entity;
+                for (let item of potentialDuplicates) {
+                    let dublicateItem = item.clientItem;
+                    dublicateItem.validState = false;
+                    this.updateCostItem(dublicateItem);
                 }
-                else {
-                    console.log("Save Done");
-                }
-            });
-        }
+            }
+        });
     }
 
     updateCostItem = (changedItem: CostItemModel) => {
-        changedItem.validState = (changedItem.type !== ""
-            && changedItem.type !== undefined
-            && changedItem.detailedCluster !== undefined
-            && changedItem.detailedCluster.cluster !== "");
         // Dont know where changed item belongs to -> need to iterate through both lists
         let newUnmappedItems: CostItemModel[] = JSON.parse(JSON.stringify(this.state.unmappedItems));
         for (let i in newUnmappedItems) {
-            if (newUnmappedItems[i].id === changedItem.id) {
+            if (newUnmappedItems[i].clientId === changedItem.clientId) {
                 newUnmappedItems[i] = changedItem;
             }
         }
 
         let newMappedItems: CostItemModel[] = JSON.parse(JSON.stringify(this.state.mappedItems));
         for (let i in newMappedItems) {
-            if (newMappedItems[i].id === changedItem.id) {
+            if (newMappedItems[i].clientId === changedItem.clientId) {
                 newMappedItems[i] = changedItem;
             }
         }
 
         this.setState({ mappedItems: newMappedItems, unmappedItems: newUnmappedItems });
+    }
+
+    updateCostItemWithState = (changedItem: CostItemModel) => {
+        changedItem.validState = (changedItem.type !== ""
+            && changedItem.type !== undefined
+            && changedItem.detailedCluster !== undefined
+            && changedItem.detailedCluster.cluster !== "");
+
+        this.updateCostItem(changedItem);
     }
 
     render() {
@@ -137,8 +147,8 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
                 </label>
 
                 <Button variant="contained" color="primary" onClick={() => this.saveUploadedItems()}>Speichern</Button>
-                <CostItemTable items={this.state.unmappedItems} title={"Konnten nicht zugewiesen werden"} updateCostItem={this.updateCostItem} />
-                <CostItemTable items={this.state.mappedItems} title={"Erfolgreich zugewiesen"} updateCostItem={this.updateCostItem} />
+                <CostItemTable items={this.state.unmappedItems} title={"Konnten nicht zugewiesen werden"} updateCostItem={this.updateCostItemWithState} />
+                <CostItemTable items={this.state.mappedItems} title={"Erfolgreich zugewiesen"} updateCostItem={this.updateCostItemWithState} />
             </div>
         );
     }

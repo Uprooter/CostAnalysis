@@ -14,7 +14,7 @@ public class DetailedClusterRestController {
 	@Autowired
 	private DetailedCostClusterRepository rep;
 
-	@RequestMapping("/api/detailedClusterNames")
+	@RequestMapping("/detailedClusterNames")
 	public List<String> getDetailedClusterNames() {
 		return this.rep.findAllDistinctNames();
 	}

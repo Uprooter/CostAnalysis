@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -51,7 +52,15 @@ public class CostItem {
 	@ManyToOne
 	@JoinColumn(name = "DETAILED_CLUSTER_ID")
 	private DetailedCostCluster detailedCluster;
-	
+
+	@Transient
+	private int clientId;
+
+	public String toString() {
+		return "Cluster: " + this.getDetailedCluster().getCluster() + " Amount: " + this.getAmount() + " Recipient:"
+				+ this.getRecipient().getName();
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (!(o instanceof CostItem)) {
@@ -73,6 +82,19 @@ public class CostItem {
 		HashCodeBuilder builder = new HashCodeBuilder();
 		builder.append(getId());
 		return builder.hashCode();
+	}
+
+	public static CostItem copy(CostItem toCopy) {
+		CostItem copy = new CostItem();
+		copy.setAmount(toCopy.getAmount());
+		copy.setPurpose(toCopy.getPurpose());
+		copy.setType(toCopy.getType());
+		copy.setDetailedCluster(toCopy.getDetailedCluster());
+		copy.setRecipient(toCopy.getRecipient());
+		copy.setCreationDate(toCopy.getCreationDate());
+		copy.setOwner(toCopy.getOwner());
+
+		return copy;
 	}
 
 }
