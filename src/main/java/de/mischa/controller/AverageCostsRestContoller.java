@@ -17,7 +17,7 @@ public class AverageCostsRestContoller {
 	@Autowired
 	private AverageCostsCalculationService service;
 
-	@RequestMapping("/api/averageCosts")
+	@RequestMapping("/averageCosts")
 	public AverageCostModel getAverageCosts(//
 			@RequestParam(value = "from") @DateTimeFormat(pattern = "dd.MM.yyyy") Date from, //
 			@RequestParam(value = "to") @DateTimeFormat(pattern = "dd.MM.yyyy") Date to, //

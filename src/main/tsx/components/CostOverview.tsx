@@ -34,7 +34,7 @@ export default class CostOverview extends React.Component<CostOverviewProps, Cos
     loadAverageCosts() {
         let client = rest.wrap(mime);
         client({
-            path: "/api/averageCosts?from=" + getDateString(this.state.fromDate)
+            path: "/averageCosts?from=" + getDateString(this.state.fromDate)
                 + "&to=" + getDateString(this.state.toDate)
                 + "&includeOthers=" + this.state.includeOthers
         }).then(r => {

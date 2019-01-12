@@ -36,8 +36,8 @@ export default class CostItemTable extends React.Component<CostItemTableProps, C
         getRequest("/api/detailedCostClusters").then(r => {
             this.setState({ selections: Object.assign({}, this.state.selections, { detailedClusters: r.entity._embedded.detailedCostClusters }) })
         });
-        getRequest("/api/types").then(r => { this.setState({ selections: Object.assign({}, this.state.selections, { types: r.entity }) }) });
-        getRequest("/api/clusters").then(r => { this.setState({ selections: Object.assign({}, this.state.selections, { clusters: r.entity }) }) });
+        getRequest("/types").then(r => { this.setState({ selections: Object.assign({}, this.state.selections, { types: r.entity }) }) });
+        getRequest("/clusters").then(r => { this.setState({ selections: Object.assign({}, this.state.selections, { clusters: r.entity }) }) });
     }
 
 
@@ -48,7 +48,7 @@ export default class CostItemTable extends React.Component<CostItemTableProps, C
 
     getRowElement(items: CostItemModel[], id: number): CostItemModel {
         for (let item of items) {
-            if (item.id === id) {
+            if (item.clientId === id) {
                 return item;
             }
         }
@@ -97,11 +97,20 @@ export default class CostItemTable extends React.Component<CostItemTableProps, C
         }
     }
 
-    getStyle(item: CostItemModel) {
-        if (item.validState) {
-            return {};
+    getValidationColor(item: CostItemModel) {
+
+        if (!item.complete) {
+            return { backgroundColor: "#FFA833" };
         }
-        return { backgroundColor: "#ff9333" };
+
+        if (item.duplicate) {
+            return { backgroundColor: "#FF5B33" };
+        }
+
+        if (item.similar) {
+            return { backgroundColor: "#FFD133" };
+        }
+        return {};
     }
 
     render() {
@@ -112,7 +121,8 @@ export default class CostItemTable extends React.Component<CostItemTableProps, C
                     {this.props.title}
                 </Typography>
                 <CostEditDialog dialogOpen={this.state.dialogOpen} costItem={this.state.costItem}
-                    changeDialogVisibility={this.changeDialogVisibility} selections={this.state.selections} updateValue={this.updateValue} updateCostItem={this.props.updateCostItem} />
+                    changeDialogVisibility={this.changeDialogVisibility} selections={this.state.selections}
+                    updateValue={this.updateValue} updateCostItem={this.props.updateCostItem} />
 
                 <Table>
                     <TableHead>
@@ -131,8 +141,8 @@ export default class CostItemTable extends React.Component<CostItemTableProps, C
                         {
                             this.props.items.map(item => {
                                 return (
-                                    <TableRow style={this.getStyle(item)} key={item.id} hover onClick={event => this.handleRowClick(event, item.id)}>
-                                        <TableCell>{item.creationDate.substring(0, 10)}</TableCell>
+                                    <TableRow style={this.getValidationColor(item)} key={item.clientId} hover onClick={event => this.handleRowClick(event, item.clientId)}>
+                                        <TableCell>{item.creationDate.toString().substring(0, 10)}</TableCell>
                                         <TableCell>{item.recipient.name}</TableCell>
                                         <TableCell>{item.amount + " €"}</TableCell>
                                         <TableCell>{item.owner}</TableCell>

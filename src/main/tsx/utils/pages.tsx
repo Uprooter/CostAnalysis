@@ -1,6 +1,6 @@
 export default class Page {
 
-    static ROOT = new Page("Kostenübersicht", "");
+    static ROOT = new Page("Auswertung", "");
     static UPLOAD = new Page("Hochladen", 'upload');
     static ADMIN_DETAILED_CLUSTERS = new Page('Pflege Detail Typen', 'detailedclusters');
 

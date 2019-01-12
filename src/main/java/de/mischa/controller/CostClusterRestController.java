@@ -21,12 +21,12 @@ public class CostClusterRestController {
 	@Autowired
 	private DetailedCostClusterRepository detailedClusterRep;
 
-	@RequestMapping("/api/clusters")
+	@RequestMapping("/clusters")
 	public List<CostCluster> getClusters() {
 		return Arrays.asList(CostCluster.values());
 	}
 
-	@RequestMapping("/api/clustersByDetailed")
+	@RequestMapping("/clustersByDetailed")
 	public List<CostCluster> getClustersByDetailedCluster(@RequestParam("detailedCluster") String detailedCluster)
 			throws UnsupportedEncodingException {
 		String decodedName = URLDecoder.decode(detailedCluster, StandardCharsets.UTF_8.toString());

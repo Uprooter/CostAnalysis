@@ -13,6 +13,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,7 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import de.mischa.model.CostItem;
+import de.mischa.model.DuplicateCheckResult;
 import de.mischa.model.CostOwner;
+import de.mischa.model.UploadedItems;
 import de.mischa.readin.AbstractCostImporter;
 import de.mischa.readin.CostImportEntry;
 import de.mischa.readin.db.DBCostReader;
@@ -33,16 +36,11 @@ public class UploadRestController {
 	@Autowired
 	private UploadService uploadService;
 
-	private Comparator<CostImportEntry> dateComparator = new Comparator<CostImportEntry>() {
-
-		public int compare(CostImportEntry o1, CostImportEntry o2) {
-			return o1.getDate().compareTo(o2.getDate());
-		};
-	};
+	private Comparator<CostImportEntry> dateComparator = (o1, o2) -> o1.getDate().compareTo(o2.getDate());
 
 	private static final Logger logger = LoggerFactory.getLogger(UploadRestController.class);
 
-	@RequestMapping(value = "/api/upload", method = RequestMethod.POST)
+	@RequestMapping(value = "/upload", method = RequestMethod.POST)
 	public List<CostItem> uploadNewItems(@RequestParam("file") MultipartFile file) {
 		try {
 			AbstractCostImporter reader = this.determineReader(file.getInputStream());
@@ -51,19 +49,25 @@ public class UploadRestController {
 				return this.createItems(reader.read(file.getInputStream()), reader.getCostOwner());
 			} else {
 				logger.info("Could not determine format");
-				return new ArrayList<CostItem>();
+				return new ArrayList<>();
 			}
 		} catch (IOException e) {
 			logger.info(e.getLocalizedMessage());
 		}
-		return new ArrayList<CostItem>();
+		return new ArrayList<>();
 	}
 
-	@RequestMapping(value = "/api/uploadSingle", method = RequestMethod.POST)
+	@RequestMapping(value = "/upload/single", method = RequestMethod.POST)
 	public CostItem uploadSingleItem(@RequestParam("recipientName") String recipientName,
 			@RequestParam("purpose") String purpose, @RequestParam("owner") CostOwner owner) {
 		CostImportEntry i = new CostImportEntry(new Date(), recipientName, purpose, -1);
 		return this.uploadService.createItemFromImport(owner, i);
+	}
+
+	@RequestMapping(value = "/upload/save", method = RequestMethod.POST)
+	public List<DuplicateCheckResult> saveCorrectedItems(@RequestBody UploadedItems itemsToUpload) {
+
+		return this.uploadService.saveItems(itemsToUpload.getCorrectedItems());
 	}
 
 	private List<CostItem> createItems(List<CostImportEntry> importEntries, CostOwner costOwner) {
@@ -71,6 +75,7 @@ public class UploadRestController {
 		importEntries.stream().sorted(dateComparator).forEach(i -> {
 			costItems.add(this.uploadService.createItemFromImport(costOwner, i));
 		});
+
 		return costItems;
 	}
 

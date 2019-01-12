@@ -44,15 +44,15 @@ export default class CostEditDialog extends React.Component<CostEditDialogProps,
     }
 
     handleSumbit(event: React.FormEvent) {
-        if ( this.hasErrors()) {
+        if (this.hasErrors()) {
             event.preventDefault();
         }
         else {
             if (detailedName(this.props.costItem.detailedCluster) !== "") {
-                this.props.updateCostItem(this.props.costItem);
+                this.props.updateCostItem(Object.assign({}, this.props.costItem, { duplicate: false, similar: false }));
             }
             else {
-                this.props.updateCostItem(Object.assign({}, this.props.costItem, { detailedCluster: this.state.newDetailedCluster }));
+                this.props.updateCostItem(Object.assign({}, this.props.costItem, { detailedCluster: this.state.newDetailedCluster, duplicate: false, similar: false }));
             }
             this.props.changeDialogVisibility(false);
         }
@@ -60,8 +60,8 @@ export default class CostEditDialog extends React.Component<CostEditDialogProps,
 
     hasErrors(): boolean {
         let typeIsMissing = this.props.costItem.type === "";
-        let combinedMissing= detailedName(this.props.costItem.detailedCluster) === "";
-        let newClusterMissing= this.state.newDetailedCluster.cluster === "";
+        let combinedMissing = detailedName(this.props.costItem.detailedCluster) === "";
+        let newClusterMissing = this.state.newDetailedCluster.cluster === "";
         let detailedClusterMissing = newClusterMissing && combinedMissing;
 
         this.setState({

@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import Upload from '../components/Upload'
+import IntegratedUploadWithSnackbar from '../components/Upload'
 import { updatePageName } from '../actions/actions'
 
 const mapStateToProps = () => ({
@@ -8,4 +8,4 @@ const mapDispatchToProps = {
   updatePageName: updatePageName
 }
 
-export default connect<any, any, any>(mapStateToProps, mapDispatchToProps)(Upload)
+export default connect<any, any, any>(mapStateToProps, mapDispatchToProps)(IntegratedUploadWithSnackbar)
