@@ -2,29 +2,23 @@ import * as React from "react";
 import { NavigatioPageUpdateAction } from "../actions/actions";
 import Page from "../utils/pages";
 import Button from '@material-ui/core/Button';
+import { SnackbarProvider, withSnackbar, InjectedNotistackProps, VariantType } from 'notistack';
 import * as rest from 'rest';
 import * as mime from 'rest/interceptor/mime';
 import CostItemModel from "../models/CostItemModel";
 import DuplicateItemModel from "../models/DuplicateItemModel";
 import CostItemTable from "./CostItemTable";
-import { getDateString, parseISOString } from "../utils/dates";
 
-interface UploadProps {
-    updatePageName: (newName: string) => NavigatioPageUpdateAction;
-}
+
 interface UploadState {
     mappedItems: CostItemModel[];
     unmappedItems: CostItemModel[];
 }
-export default class Upload extends React.Component<UploadProps, UploadState> {
+class Upload extends React.Component<InjectedNotistackProps, UploadState> {
 
     state = {
         mappedItems: new Array<CostItemModel>(),
         unmappedItems: new Array<CostItemModel>()
-    }
-
-    componentDidMount() {
-        this.props.updatePageName(Page.UPLOAD.name)
     }
 
     isEmpty(str: string) {
@@ -83,12 +77,12 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
     saveUploadedItems() {
 
         if (this.anyItemIncomplete()) {
-            window.alert("Fix incomplete first");
+            this.displayMessage("Fix incomplete first", "warning");
             return;
         }
 
         if (this.anyItemDuplicate()) {
-            window.alert("Fix duplicates first");
+            this.displayMessage("Fix duplicates first", "error");
             return;
         }
 
@@ -101,7 +95,7 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
             headers: { 'Content-Type': 'application/json' }
         }).done(response => {
             if (response.status.code === 409) {
-                alert("Error occurred: " + response.entity.message);
+                this.displayMessage("Error occurred: " + response.entity.message, "error");
             }
             else {
                 console.log("Save Done:", response.entity);
@@ -153,6 +147,10 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
         this.updateCostItem(changedItem);
     }
 
+    displayMessage(message: string, variant: any) {
+        this.props.enqueueSnackbar(message, { variant });
+    };
+
     render() {
         return (
             <div>
@@ -176,3 +174,23 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
         );
     }
 }
+
+const UploadWithSnackbar = withSnackbar(Upload);
+
+interface UploadProps extends InjectedNotistackProps {
+    updatePageName: (newName: string) => NavigatioPageUpdateAction;
+}
+class IntegratedUploadWithSnackbar extends React.Component<UploadProps, {}> {
+    componentDidMount() {
+        this.props.updatePageName(Page.UPLOAD.name);
+    }
+    render() {
+        return (
+            <SnackbarProvider maxSnack={3} anchorOrigin={{ vertical: "top", horizontal: "center" }}>
+                <UploadWithSnackbar />
+            </SnackbarProvider>
+        );
+    }
+}
+
+export default IntegratedUploadWithSnackbar;

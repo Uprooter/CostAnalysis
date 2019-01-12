@@ -4,13 +4,15 @@ import de.mischa.model.*;
 import de.mischa.readin.CostImportEntry;
 import de.mischa.repository.CostItemRepository;
 import de.mischa.repository.CostRecipientRepository;
-import org.apache.commons.lang3.time.DateUtils;
+import de.mischa.repository.DetailedCostClusterRepository;
+import de.mischa.service.CostItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.StringTokenizer;
 
 @Service
@@ -20,7 +22,13 @@ public class UploadService {
     private CostItemRepository itemRep;
 
     @Autowired
+    CostItemService itemService;
+
+    @Autowired
     private CostRecipientRepository recipientRep;
+
+    @Autowired
+    private DetailedCostClusterRepository detailedCostClusterRepository;
 
     public CostItem createItemFromImport(CostOwner costOwner, CostImportEntry importItem) {
         CostItem item = new CostItem();
@@ -28,12 +36,12 @@ public class UploadService {
         item.setCreationDate(importItem.getDate());
         item.setPurpose(importItem.getPurpose());
         item.setOwner(costOwner);
-        item.setRecipient(this.findOrCreateRecipient(importItem.getRecipient()));
+        item.setRecipient(this.findOrCreateTransientRecipient(importItem.getRecipient()));
 
         if (item.getRecipient().getName() != null && !item.getRecipient().getName().isEmpty()) {
             List<CostItem> similarItems = itemRep.findByRecipientAndOwner(importItem.getRecipient(), costOwner);
 
-            // Searching by recipient will probably result in a list of potentionally
+            // Searching by recipient will probably result in a list of potentially
             // different items
             // If all of them have same type and detail cluster -> just take first
             if (!similarItems.isEmpty() && this.allSimilarHaveSameTypeAndCluster(similarItems)) {
@@ -102,34 +110,69 @@ public class UploadService {
     private CostRecipient findOrCreateRecipient(String recipient) {
         CostRecipient rec = this.recipientRep.findByName(recipient);
         if (rec == null) {
-            rec = new CostRecipient();
-            rec.setName(recipient);
+            return this.recipientRep.save(new CostRecipient(recipient));
+        }
+        return rec;
+    }
+
+    private CostRecipient findOrCreateTransientRecipient(String recipient) {
+        CostRecipient rec = this.recipientRep.findByName(recipient);
+        if (rec == null) {
+            return new CostRecipient(recipient);
         }
         return rec;
     }
 
     public List<DuplicateCheckResult> saveItems(List<CostItem> correctedItems) {
         List<DuplicateCheckResult> potentialDuplicates = this.checkForDuplicates(correctedItems);
-        if (!potentialDuplicates.isEmpty()) {
+        if (potentialDuplicates.stream().map(DuplicateCheckResult::getDuplicateItem).anyMatch(Objects::nonNull)) {
             return potentialDuplicates;
         } else {
 
-            // 1. create receivers and detailed clusters
+            this.createAndSetReceivers(correctedItems);
+            this.createAndSetDetailedClusters(correctedItems);
 
-            // 2. save
+            correctedItems.forEach(i -> {
+                //TODO: need to introduce unique constraint for items on db level
+                this.itemRep.save(i);
+            });
         }
 
         return new ArrayList<>();
 
     }
 
-    public List<DuplicateCheckResult> checkForDuplicates(List<CostItem> correctedItems) throws ResponseStatusException {
+    private void createAndSetDetailedClusters(List<CostItem> correctedItems) {
+        correctedItems.forEach(i -> {
+            if (i.getDetailedCluster().getId() == null) {
+                i.setDetailedCluster(this.findOrCreateDetailedCluster(i.getDetailedCluster().getCluster(), i.getDetailedCluster().getName()));
+            }
+        });
+    }
+
+    private DetailedCostCluster findOrCreateDetailedCluster(CostCluster cluster, String name) {
+        DetailedCostCluster detail = this.detailedCostClusterRepository.findByNameAndCluster(name, cluster);
+        if (detail == null) {
+            return this.detailedCostClusterRepository.save(new DetailedCostCluster(cluster, name));
+        }
+        return detail;
+    }
+
+    private void createAndSetReceivers(List<CostItem> correctedItems) {
+        correctedItems.forEach(i -> {
+            if (i.getRecipient().getId() == null) {
+                i.setRecipient(this.findOrCreateRecipient(i.getRecipient().getName()));
+            }
+        });
+    }
+
+    private List<DuplicateCheckResult> checkForDuplicates(List<CostItem> correctedItems) throws ResponseStatusException {
 
         List<DuplicateCheckResult> foundSimilarItems = new ArrayList<>();
         List<CostItem> allItems = this.itemRep.findAll();
         for (CostItem item : correctedItems) {
-            CostItem equalItem = this.foundEqual(item, allItems);
-            CostItem verySimilarItem = this.foundSimilar(item, allItems);
+            CostItem equalItem = this.itemService.foundEqual(item, allItems);
+            CostItem verySimilarItem = this.itemService.foundSimilar(item, allItems);
 
             if (equalItem != null || verySimilarItem != null) {
                 foundSimilarItems.add(new DuplicateCheckResult(item, equalItem, verySimilarItem));
@@ -138,40 +181,6 @@ public class UploadService {
 
         return foundSimilarItems;
 
-    }
-
-    CostItem foundSimilar(CostItem item, List<CostItem> allItems) {
-        for (CostItem existingItem : allItems) {
-
-            boolean dateEqual = DateUtils.isSameDay(item.getCreationDate(), existingItem.getCreationDate());
-            boolean recipientEqual = item.getRecipient().getName().equals(existingItem.getRecipient().getName());
-            boolean amountEqual = item.getAmount().doubleValue() == existingItem.getAmount().doubleValue();
-
-            if (dateEqual && recipientEqual && amountEqual) {
-                return existingItem;
-            }
-        }
-
-        return null;
-    }
-
-    CostItem foundEqual(CostItem item, List<CostItem> allItems) {
-        for (CostItem existingItem : allItems) {
-            boolean dateEqual = DateUtils.isSameDay(item.getCreationDate(), existingItem.getCreationDate());
-            boolean recipientEqual = item.getRecipient().getName().equals(existingItem.getRecipient().getName());
-            boolean amountEqual = item.getAmount().doubleValue() == existingItem.getAmount().doubleValue();
-            boolean typeEqual = item.getType() == existingItem.getType();
-            boolean detailedCusterEqual = item.getDetailedCluster().getName()
-                    .equals(existingItem.getDetailedCluster().getName());
-            boolean clusterEqual = item.getDetailedCluster().getCluster() == existingItem.getDetailedCluster()
-                    .getCluster();
-
-            if (dateEqual && recipientEqual && amountEqual && typeEqual && detailedCusterEqual && clusterEqual) {
-                return existingItem;
-            }
-        }
-
-        return null;
     }
 
 }

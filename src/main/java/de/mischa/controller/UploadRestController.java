@@ -36,12 +36,7 @@ public class UploadRestController {
 	@Autowired
 	private UploadService uploadService;
 
-	private Comparator<CostImportEntry> dateComparator = new Comparator<CostImportEntry>() {
-
-		public int compare(CostImportEntry o1, CostImportEntry o2) {
-			return o1.getDate().compareTo(o2.getDate());
-		};
-	};
+	private Comparator<CostImportEntry> dateComparator = (o1, o2) -> o1.getDate().compareTo(o2.getDate());
 
 	private static final Logger logger = LoggerFactory.getLogger(UploadRestController.class);
 
@@ -54,12 +49,12 @@ public class UploadRestController {
 				return this.createItems(reader.read(file.getInputStream()), reader.getCostOwner());
 			} else {
 				logger.info("Could not determine format");
-				return new ArrayList<CostItem>();
+				return new ArrayList<>();
 			}
 		} catch (IOException e) {
 			logger.info(e.getLocalizedMessage());
 		}
-		return new ArrayList<CostItem>();
+		return new ArrayList<>();
 	}
 
 	@RequestMapping(value = "/upload/single", method = RequestMethod.POST)
