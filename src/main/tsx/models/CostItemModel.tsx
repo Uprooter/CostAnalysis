@@ -20,5 +20,9 @@ export default class CostItemModel {
 
     creationDate: Date;
 
-    validState: boolean = true;
+    complete: boolean = true;
+
+    duplicate: boolean = false;
+
+    similar: boolean = false;
 }

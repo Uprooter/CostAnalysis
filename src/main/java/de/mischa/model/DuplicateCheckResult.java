@@ -7,13 +7,13 @@ public class DuplicateCheckResult {
 
 	private CostItem clientItem;
 
-	private CostItem equalItem;
+	private CostItem duplicateItem;
 
 	private CostItem similarItem;
 
-	public DuplicateCheckResult(CostItem clientItem, CostItem equalItem, CostItem similarItem) {
+	public DuplicateCheckResult(CostItem clientItem, CostItem duplicateItem, CostItem similarItem) {
 		this.clientItem = clientItem;
-		this.equalItem = equalItem;
+		this.duplicateItem = duplicateItem;
 		this.similarItem = similarItem;
 	}
 }

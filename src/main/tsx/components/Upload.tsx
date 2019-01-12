@@ -45,37 +45,50 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
             let newMappedItems: CostItemModel[] = new Array<CostItemModel>();
             let newUnmappedItems: CostItemModel[] = new Array<CostItemModel>();
             for (let i in newImportedItems) {
-                let item: CostItemModel = Object.assign({}, newImportedItems[i], { validState: true });
+                let item: CostItemModel = Object.assign({}, newImportedItems[i], { complete: true, duplicate: false, similar: false });
                 item.clientId = Number.parseInt(i);
 
                 if (this.isEmpty(item.type)) {
-                    item.validState = false;
+                    item.complete = false;
                     newUnmappedItems.push(item);
                 }
                 else {
                     newMappedItems.push(item);
                 }
             }
-
             this.setState({ mappedItems: newMappedItems, unmappedItems: newUnmappedItems });
         });
     }
 
-    anyErrorsFound(): boolean {
-        let anyErrorFound: boolean = false;
+    anyItemIncomplete(): boolean {
         for (let item of this.state.mappedItems.concat(this.state.unmappedItems)) {
-            if (!item.validState) {
-                anyErrorFound = true;
-                break;
+            if (!item.complete) {
+                return true;
             }
         }
 
-        return anyErrorFound;
+        return false;
     }
+
+    anyItemDuplicate(): boolean {
+        for (let item of this.state.mappedItems.concat(this.state.unmappedItems)) {
+            if (item.duplicate) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     saveUploadedItems() {
 
-        if (this.anyErrorsFound()) {
-            window.alert("Fix errors first");
+        if (this.anyItemIncomplete()) {
+            window.alert("Fix incomplete first");
+            return;
+        }
+
+        if (this.anyItemDuplicate()) {
+            window.alert("Fix duplicates first");
             return;
         }
 
@@ -95,7 +108,17 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
                 let potentialDuplicates: Array<DuplicateItemModel> = response.entity;
                 for (let item of potentialDuplicates) {
                     let dublicateItem = item.clientItem;
-                    dublicateItem.validState = false;
+                    dublicateItem.complete = true;
+
+                    if (item.duplicateItem !== null) {
+
+                        dublicateItem.duplicate = true;
+                    }
+
+                    if (item.similarItem !== null) {
+                        dublicateItem.similar = true;
+                    }
+
                     this.updateCostItem(dublicateItem);
                 }
             }
@@ -122,7 +145,7 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
     }
 
     updateCostItemWithState = (changedItem: CostItemModel) => {
-        changedItem.validState = (changedItem.type !== ""
+        changedItem.complete = (changedItem.type !== ""
             && changedItem.type !== undefined
             && changedItem.detailedCluster !== undefined
             && changedItem.detailedCluster.cluster !== "");
