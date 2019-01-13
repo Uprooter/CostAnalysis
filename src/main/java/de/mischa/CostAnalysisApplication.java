@@ -21,26 +21,25 @@ import de.mischa.upload.UploadService;
 @SpringBootApplication
 public class CostAnalysisApplication {
 
-	private static final Logger logger = LoggerFactory.getLogger(CostAnalysisApplication.class);
+    private static final Logger logger = LoggerFactory.getLogger(CostAnalysisApplication.class);
 
-	public static void main(String[] args) {
-		SpringApplication.run(CostAnalysisApplication.class, args);
-	}
-	
-	@Bean
-	public Jackson2ObjectMapperBuilderCustomizer jacksonObjectMapperCustomization() {
-	    return jacksonObjectMapperBuilder -> 
-	        jacksonObjectMapperBuilder.timeZone(TimeZone.getTimeZone("Europe/Berlin"));
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(CostAnalysisApplication.class, args);
+    }
 
-	@Bean
-	public CommandLineRunner demo(CostItemRepository costRep, UploadService uploadService,
-			InitialCostItemImporterService initialImporter) {
-		return (args) -> {
+    @Bean
+    public Jackson2ObjectMapperBuilderCustomizer jacksonObjectMapperCustomization() {
+        return jacksonObjectMapperBuilder ->
+                jacksonObjectMapperBuilder.timeZone(TimeZone.getTimeZone("Europe/Berlin"));
+    }
 
-			initialImporter.createItems("C:\\Users\\Mischa\\Qsync\\Haushalt\\All_Duplicates.csv");
-			List<CostItem> allItems = costRep.findAll();
-			logger.info(String.valueOf(allItems.size()));
+    @Bean
+    public CommandLineRunner demo(CostItemRepository costRep, InitialCostItemImporterService initialImporter) {
+        return (args) -> {
+
+            initialImporter.createItems("C:\\Users\\Mischa\\Qsync\\Haushalt\\All.csv");
+            List<CostItem> allItems = costRep.findAll();
+            logger.info(String.valueOf(allItems.size()));
 
 //			Map<CostItem, CostItemPair> duplicates = uploadService.checkForDuplicates(allItems);
 //			for (CostItem key : duplicates.keySet()) {
@@ -49,6 +48,6 @@ public class CostAnalysisApplication {
 //			
 //			System.out.println("Done");
 
-		};
-	}
+        };
+    }
 }

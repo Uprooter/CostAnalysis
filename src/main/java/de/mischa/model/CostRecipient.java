@@ -1,11 +1,6 @@
 package de.mischa.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -17,40 +12,41 @@ import lombok.Data;
 @Data
 public class CostRecipient {
 
-	public CostRecipient(String name) {
-		this.name = name;
-	}
+    public CostRecipient(String name) {
+        this.name = name;
+    }
 
-	public CostRecipient() {
-	}
+    public CostRecipient() {
+    }
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "cost_recipient_id_gen")
+    @SequenceGenerator(name = "cost_recipient_id_gen", allocationSize = 1, sequenceName = "ID_SEQUENCE")
+    private Long id;
 
-	@Column(unique = true)
-	private String name;
-	
-	@Override
-	public boolean equals(Object o) {
-		if (!(o instanceof CostRecipient)) {
-			return false;
-		}
+    @Column(unique = true)
+    private String name;
 
-		CostRecipient other = (CostRecipient) o;
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof CostRecipient)) {
+            return false;
+        }
 
-		if (this.getId() == null || other.getId() == null) {
-			return false;
-		}
-		EqualsBuilder builder = new EqualsBuilder();
-		builder.append(getId(), other.getId());
-		return builder.isEquals();
-	}
+        CostRecipient other = (CostRecipient) o;
 
-	@Override
-	public int hashCode() {
-		HashCodeBuilder builder = new HashCodeBuilder();
-		builder.append(getId());
-		return builder.hashCode();
-	}
+        if (this.getId() == null || other.getId() == null) {
+            return false;
+        }
+        EqualsBuilder builder = new EqualsBuilder();
+        builder.append(getId(), other.getId());
+        return builder.isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        HashCodeBuilder builder = new HashCodeBuilder();
+        builder.append(getId());
+        return builder.hashCode();
+    }
 }

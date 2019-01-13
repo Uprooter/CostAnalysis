@@ -1,0 +1,65 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd 
+   http://www.liquibase.org/xml/ns/dbchangelog 
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <changeSet author="mischa" id="1">
+        <createTable tableName="COST_ITEM">
+            <column name="ID" type="int">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="CREATION_DATE" type="date"/>
+            <column name="RECIPIENT_ID" type="int"/>
+            <column name="PURPOSE" type="VARCHAR2(2048 CHAR)"/>
+            <column name="AMOUNT" type="FLOAT(126)"/>
+            <column name="OWNER" type="VARCHAR2(50 CHAR)"/>
+            <column name="TYPE" type="VARCHAR2(50 CHAR)"/>
+            <column name="DETAILED_CLUSTER_ID" type="int"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="mischa" id="2">
+        <createTable tableName="COST_RECIPIENT">
+            <column name="ID" type="int">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="NAME" type="VARCHAR2(200 CHAR)">
+                <constraints unique="true"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="DETAILED_COST_CLUSTER">
+            <column name="ID" type="int">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="NAME" type="VARCHAR2(100 CHAR)"/>
+            <column name="COST_CLUSTER" type="VARCHAR2(50 CHAR)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint columnNames="NAME, COST_CLUSTER" constraintName="UNQ_DETAILED_CLUSTER"
+                             tableName="DETAILED_COST_CLUSTER"/>
+
+        <addUniqueConstraint columnNames="DETAILED_CLUSTER_ID, RECIPIENT_ID, AMOUNT, CREATION_DATE, TYPE, PURPOSE"
+                             constraintName="UNQ_COST_ITEM"
+                             tableName="COST_ITEM"/>
+
+        <addForeignKeyConstraint baseColumnNames="RECIPIENT_ID"
+                                 baseTableName="COST_ITEM"
+                                 constraintName="fk_cost_item_recipient"
+                                 referencedColumnNames="id"
+                                 referencedTableName="COST_RECIPIENT"/>
+
+        <addForeignKeyConstraint baseColumnNames="DETAILED_CLUSTER_ID"
+                                 baseTableName="COST_ITEM"
+                                 constraintName="fk_cost_item_detailed_cluster"
+                                 referencedColumnNames="id"
+                                 referencedTableName="DETAILED_COST_CLUSTER"/>
+    </changeSet>
+
+</databaseChangeLog>

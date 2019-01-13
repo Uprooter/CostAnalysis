@@ -6,9 +6,6 @@ import de.mischa.readin.ImportConfig;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.StringTokenizer;
-
 @Component
 public class INGCostReader extends AbstractCostImporter {
 
@@ -18,11 +15,10 @@ public class INGCostReader extends AbstractCostImporter {
     private static final String AMOUNT_NEG_COLUMN_NAME = "Betrag";
     private static final String[] COLUMN_NAMES = {DATE_COLUMN_NAME, "Valuta", RECIPIENT_COLUMN_NAME, "Buchungstext",
             PURPOSE_COLUMN_NAME, AMOUNT_NEG_COLUMN_NAME, "Währung"};
-    private static final int SKIP_LINES = 11;
 
     public INGCostReader() {
         super(new ImportConfig(COLUMN_NAMES, DATE_COLUMN_NAME, RECIPIENT_COLUMN_NAME, PURPOSE_COLUMN_NAME,
-                AMOUNT_NEG_COLUMN_NAME, "None", SKIP_LINES));
+                AMOUNT_NEG_COLUMN_NAME, "None"));
     }
 
     protected double getAmount(CSVRecord r) {

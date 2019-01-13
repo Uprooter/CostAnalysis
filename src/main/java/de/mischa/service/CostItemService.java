@@ -34,12 +34,14 @@ public class CostItemService {
             boolean recipientEqual = item.getRecipient().getName().equals(existingItem.getRecipient().getName());
             boolean amountEqual = item.getAmount().doubleValue() == existingItem.getAmount().doubleValue();
             boolean typeEqual = item.getType() == existingItem.getType();
+            boolean purposeEqual = item.getPurpose().equals(existingItem.getPurpose());
             boolean detailedCusterEqual = item.getDetailedCluster().getName()
                     .equals(existingItem.getDetailedCluster().getName());
             boolean clusterEqual = item.getDetailedCluster().getCluster() == existingItem.getDetailedCluster()
                     .getCluster();
 
-            if (dateEqual && recipientEqual && amountEqual && typeEqual && detailedCusterEqual && clusterEqual) {
+            if (dateEqual && recipientEqual && amountEqual && typeEqual
+                    && detailedCusterEqual && clusterEqual && purposeEqual) {
                 return existingItem;
             }
         }
