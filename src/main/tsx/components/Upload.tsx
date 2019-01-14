@@ -77,12 +77,12 @@ class Upload extends React.Component<InjectedNotistackProps, UploadState> {
     saveUploadedItems() {
 
         if (this.anyItemIncomplete()) {
-            this.displayMessage("Fix incomplete first", "warning");
+            this.displayMessage("Zuerst vervollständigen!", "error");
             return;
         }
 
         if (this.anyItemDuplicate()) {
-            this.displayMessage("Fix duplicates first", "error");
+            this.displayMessage("Zuerst die Duplikate entfernen!", "error");
             return;
         }
 
@@ -98,7 +98,6 @@ class Upload extends React.Component<InjectedNotistackProps, UploadState> {
                 this.displayMessage("Error occurred: " + response.entity.message, "error");
             }
             else {
-                console.log("Save Done:", response.entity);
                 let potentialDuplicates: Array<DuplicateItemModel> = response.entity;
                 for (let item of potentialDuplicates) {
                     let dublicateItem = item.clientItem;
@@ -115,6 +114,9 @@ class Upload extends React.Component<InjectedNotistackProps, UploadState> {
 
                     this.updateCostItem(dublicateItem);
                 }
+
+                this.displayMessage("Gespeichert!", "success");
+
             }
         });
     }
@@ -167,7 +169,7 @@ class Upload extends React.Component<InjectedNotistackProps, UploadState> {
                     </Button>
                 </label>
 
-                <Button variant="contained" color="primary" onClick={() => this.saveUploadedItems()}>Speichern</Button>
+                <Button variant="contained" color="primary" onClick={() => { this.saveUploadedItems() }}>Speichern</Button>
                 <CostItemTable items={this.state.unmappedItems} title={"Konnten nicht zugewiesen werden"} updateCostItem={this.updateCostItemWithState} />
                 <CostItemTable items={this.state.mappedItems} title={"Erfolgreich zugewiesen"} updateCostItem={this.updateCostItemWithState} />
             </div>

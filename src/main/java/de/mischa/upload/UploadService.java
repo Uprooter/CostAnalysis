@@ -1,13 +1,17 @@
 package de.mischa.upload;
 
-import de.mischa.model.*;
+import de.mischa.model.CostItem;
+import de.mischa.model.CostOwner;
+import de.mischa.model.DetailedCostCluster;
+import de.mischa.model.DuplicateCheckResult;
 import de.mischa.readin.CostImportEntry;
 import de.mischa.repository.CostItemRepository;
-import de.mischa.repository.CostRecipientRepository;
-import de.mischa.repository.DetailedCostClusterRepository;
 import de.mischa.service.CostItemService;
+import de.mischa.service.CostRecipientService;
+import de.mischa.service.DetailedClusterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -25,10 +29,10 @@ public class UploadService {
     CostItemService itemService;
 
     @Autowired
-    private CostRecipientRepository recipientRep;
+    private DetailedClusterService detailedCostClusterService;
 
     @Autowired
-    private DetailedCostClusterRepository detailedCostClusterRepository;
+    private CostRecipientService costRecipientService;
 
     public CostItem createItemFromImport(CostOwner costOwner, CostImportEntry importItem) {
         CostItem item = new CostItem();
@@ -36,10 +40,10 @@ public class UploadService {
         item.setCreationDate(importItem.getDate());
         item.setPurpose(importItem.getPurpose());
         item.setOwner(costOwner);
-        item.setRecipient(this.findOrCreateTransientRecipient(importItem.getRecipient()));
+        item.setRecipient(this.costRecipientService.findOrCreateTransientRecipient(importItem.getRecipient()));
 
         if (item.getRecipient().getName() != null && !item.getRecipient().getName().isEmpty()) {
-            List<CostItem> similarItems = itemRep.findByRecipientAndOwner(importItem.getRecipient(), costOwner);
+            List<CostItem> similarItems = itemRep.findByRecipientAndOwner(item.getRecipient().getName(), costOwner);
 
             // Searching by recipient will probably result in a list of potentially
             // different items
@@ -82,7 +86,7 @@ public class UploadService {
     String getFirstXWords(String originalString, int numberOfWords) {
         if (originalString != null && originalString.contains(" ")) {
             StringTokenizer tok = new StringTokenizer(originalString, " ");
-            List<String> words = new ArrayList<String>();
+            List<String> words = new ArrayList<>();
             while (tok.hasMoreTokens()) {
                 words.add(tok.nextToken());
             }
@@ -107,22 +111,7 @@ public class UploadService {
         return true;
     }
 
-    private CostRecipient findOrCreateRecipient(String recipient) {
-        CostRecipient rec = this.recipientRep.findByName(recipient);
-        if (rec == null) {
-            return this.recipientRep.save(new CostRecipient(recipient));
-        }
-        return rec;
-    }
-
-    private CostRecipient findOrCreateTransientRecipient(String recipient) {
-        CostRecipient rec = this.recipientRep.findByName(recipient);
-        if (rec == null) {
-            return new CostRecipient(recipient);
-        }
-        return rec;
-    }
-
+    @Transactional
     public List<DuplicateCheckResult> saveItems(List<CostItem> correctedItems) {
         List<DuplicateCheckResult> potentialDuplicates = this.checkForDuplicates(correctedItems);
         if (potentialDuplicates.stream().map(DuplicateCheckResult::getDuplicateItem).anyMatch(Objects::nonNull)) {
@@ -132,10 +121,7 @@ public class UploadService {
             this.createAndSetReceivers(correctedItems);
             this.createAndSetDetailedClusters(correctedItems);
 
-            correctedItems.forEach(i -> {
-                //TODO: need to introduce unique constraint for items on db level
-                this.itemRep.save(i);
-            });
+            correctedItems.forEach(i -> this.itemRep.save(i));
         }
 
         return new ArrayList<>();
@@ -145,23 +131,18 @@ public class UploadService {
     private void createAndSetDetailedClusters(List<CostItem> correctedItems) {
         correctedItems.forEach(i -> {
             if (i.getDetailedCluster().getId() == null) {
-                i.setDetailedCluster(this.findOrCreateDetailedCluster(i.getDetailedCluster().getCluster(), i.getDetailedCluster().getName()));
+                i.setDetailedCluster(
+                        this.detailedCostClusterService.findOrDetailedCluster(i.getDetailedCluster().getCluster(),
+                                i.getDetailedCluster().getName()));
             }
         });
     }
 
-    private DetailedCostCluster findOrCreateDetailedCluster(CostCluster cluster, String name) {
-        DetailedCostCluster detail = this.detailedCostClusterRepository.findByNameAndCluster(name, cluster);
-        if (detail == null) {
-            return this.detailedCostClusterRepository.save(new DetailedCostCluster(cluster, name));
-        }
-        return detail;
-    }
 
     private void createAndSetReceivers(List<CostItem> correctedItems) {
         correctedItems.forEach(i -> {
             if (i.getRecipient().getId() == null) {
-                i.setRecipient(this.findOrCreateRecipient(i.getRecipient().getName()));
+                i.setRecipient(this.costRecipientService.findOrCreateRecipient(i.getRecipient().getName()));
             }
         });
     }
