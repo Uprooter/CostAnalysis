@@ -64,7 +64,8 @@ class Upload extends React.Component<InjectedNotistackProps, UploadState> {
         return false;
     }
 
-    anyItemDuplicate(): boolean {
+    // Any items to be saved have already a duplicate on server
+    anyServerDuplicate(): boolean {
         for (let item of this.state.mappedItems.concat(this.state.unmappedItems)) {
             if (item.duplicate) {
                 return true;
@@ -74,6 +75,29 @@ class Upload extends React.Component<InjectedNotistackProps, UploadState> {
         return false;
     }
 
+    // Any items to be saved do not have duplicate on server but duplicate in list to be uploaded
+    anyClientDuplicates(): boolean {
+        let anyDuplicatesFound = false;
+        for (let item of this.state.mappedItems.concat(this.state.unmappedItems)) {
+            for (let anotherItem of this.state.mappedItems.concat(this.state.unmappedItems)) {
+                let differentClientId = item.clientId !== anotherItem.clientId;
+                let amoutEqual = item.amount === anotherItem.amount;
+                let dateEqual = item.creationDate === anotherItem.creationDate;
+                let typeEqual = item.type === anotherItem.type;
+                let detailedClusterEqual = item.detailedCluster.name === anotherItem.detailedCluster.name;
+                let clusterEqual = item.detailedCluster.cluster === anotherItem.detailedCluster.cluster;
+
+                if (differentClientId && amoutEqual && dateEqual && typeEqual && detailedClusterEqual && clusterEqual) {
+                    item.duplicate = true;
+                    this.updateCostItem(item);
+                    anyDuplicatesFound = true;
+                }
+            }
+        }
+
+        return anyDuplicatesFound;
+    }
+
     saveUploadedItems() {
 
         if (this.anyItemIncomplete()) {
@@ -81,44 +105,51 @@ class Upload extends React.Component<InjectedNotistackProps, UploadState> {
             return;
         }
 
-        if (this.anyItemDuplicate()) {
+        if (this.anyServerDuplicate()) {
             this.displayMessage("Zuerst die Duplikate entfernen!", "error");
             return;
         }
 
-        let itemsToSave = this.state.mappedItems.concat(this.state.unmappedItems);
-        let client = rest.wrap(mime);
-        client({
-            path: "/upload/save",
-            method: "POST",
-            entity: { "correctedItems": itemsToSave },
-            headers: { 'Content-Type': 'application/json' }
-        }).done(response => {
-            if (response.status.code === 409) {
-                this.displayMessage("Error occurred: " + response.entity.message, "error");
-            }
-            else {
-                let potentialDuplicates: Array<DuplicateItemModel> = response.entity;
-                for (let item of potentialDuplicates) {
-                    let dublicateItem = item.clientItem;
-                    dublicateItem.complete = true;
+        if (this.anyClientDuplicates()) {
+            this.displayMessage("Zuerst lokale Duplikate entfernen!", "error");
+            return;
+        }
 
-                    if (item.duplicateItem !== null) {
+        console.log("Save");
 
-                        dublicateItem.duplicate = true;
-                    }
+        // let itemsToSave = this.state.mappedItems.concat(this.state.unmappedItems);
+        // let client = rest.wrap(mime);
+        // client({
+        //     path: "/upload/save",
+        //     method: "POST",
+        //     entity: { "correctedItems": itemsToSave },
+        //     headers: { 'Content-Type': 'application/json' }
+        // }).done(response => {
+        //     if (response.status.code === 409) {
+        //         this.displayMessage("Error occurred: " + response.entity.message, "error");
+        //     }
+        //     else {
+        //         let potentialDuplicates: Array<DuplicateItemModel> = response.entity;
+        //         for (let item of potentialDuplicates) {
+        //             let dublicateItem = item.clientItem;
+        //             dublicateItem.complete = true;
 
-                    if (item.similarItem !== null) {
-                        dublicateItem.similar = true;
-                    }
+        //             if (item.duplicateItem !== null) {
 
-                    this.updateCostItem(dublicateItem);
-                }
+        //                 dublicateItem.duplicate = true;
+        //             }
 
-                this.displayMessage("Gespeichert!", "success");
+        //             if (item.similarItem !== null) {
+        //                 dublicateItem.similar = true;
+        //             }
 
-            }
-        });
+        //             this.updateCostItem(dublicateItem);
+        //         }
+
+        //         this.displayMessage("Gespeichert!", "success");
+
+        //     }
+        // });
     }
 
     updateCostItem = (changedItem: CostItemModel) => {
