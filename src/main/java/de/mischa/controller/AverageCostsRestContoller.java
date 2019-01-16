@@ -14,15 +14,16 @@ import de.mischa.model.AverageCostModel;
 @RestController
 public class AverageCostsRestContoller {
 
-	@Autowired
-	private AverageCostsCalculationService service;
+    @Autowired
+    private AverageCostsCalculationService service;
 
-	@RequestMapping("/averageCosts")
-	public AverageCostModel getAverageCosts(//
-			@RequestParam(value = "from") @DateTimeFormat(pattern = "dd.MM.yyyy") Date from, //
-			@RequestParam(value = "to") @DateTimeFormat(pattern = "dd.MM.yyyy") Date to, //
-			@RequestParam(value = "includeOthers") boolean includeOthers//
-	) {
-		return service.calculate(from, to, includeOthers);
-	}
+    @RequestMapping("/averageCosts")
+    public AverageCostModel getAverageCosts(
+            @RequestParam(value = "from") @DateTimeFormat(pattern = "dd.MM.yyyy") Date from, //
+            @RequestParam(value = "to") @DateTimeFormat(pattern = "dd.MM.yyyy") Date to, //
+            @RequestParam(value = "includeOthers") boolean includeOthers,
+            @RequestParam(value = "savingsAreCosts") boolean savingsAreCosts
+    ) {
+        return service.calculate(from, to, includeOthers, savingsAreCosts);
+    }
 }

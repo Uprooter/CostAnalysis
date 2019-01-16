@@ -12,6 +12,7 @@ import javax.persistence.*;
 @SequenceGenerator(name = "detailed_cluster_id_gen", allocationSize = 1, sequenceName = "ID_SEQUENCE")
 public class DetailedCostCluster {
 
+    public static final String DAUERAUFTRAG = "Dauerauftrag";
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "detailed_cluster_id_gen")
     @Column(nullable = false, name = "ID", unique = true)

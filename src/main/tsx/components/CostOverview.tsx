@@ -17,6 +17,7 @@ interface CostOverviewState {
     fromDate: Date;
     toDate: Date;
     includeOthers: boolean;
+    savingsAreCosts: boolean;
 }
 export default class CostOverview extends React.Component<CostOverviewProps, CostOverviewState> {
 
@@ -24,6 +25,7 @@ export default class CostOverview extends React.Component<CostOverviewProps, Cos
         fromDate: getOneYearBefore(new Date()),
         toDate: new Date(),
         includeOthers: false,
+        savingsAreCosts: false
     }
 
     componentDidMount() {
@@ -37,6 +39,7 @@ export default class CostOverview extends React.Component<CostOverviewProps, Cos
             path: "/averageCosts?from=" + getDateString(this.state.fromDate)
                 + "&to=" + getDateString(this.state.toDate)
                 + "&includeOthers=" + this.state.includeOthers
+                + "&savingsAreCosts=" + this.state.savingsAreCosts
         }).then(r => {
             this.props.updateAverageCostResult(r.entity);
         });
@@ -54,6 +57,10 @@ export default class CostOverview extends React.Component<CostOverviewProps, Cos
 
     handleIncludeOthersChange(include: boolean) {
         this.setState({ includeOthers: include }, () => this.loadAverageCosts());
+    }
+
+    handleWithSavingsChange(savingsAreCosts: boolean) {
+        this.setState({ savingsAreCosts: savingsAreCosts }, () => this.loadAverageCosts());
     }
 
     render() {
@@ -79,8 +86,13 @@ export default class CostOverview extends React.Component<CostOverviewProps, Cos
                             control={
                                 <Switch checked={this.state.includeOthers} onChange={(e, checked) => { this.handleIncludeOthersChange(checked) }} />
                             }
-                            label="mit Sonstiges"
-                        /></FormGroup>
+                            label="mit Sonstiges" />
+                        <FormControlLabel
+                            control={
+                                <Switch checked={this.state.savingsAreCosts} onChange={(e, checked) => { this.handleWithSavingsChange(checked) }} />
+                            }
+                            label="Sparbeiträge sind Kosten" />
+                    </FormGroup>
                     <Button variant="contained" color="primary" onClick={() => { this.loadAverageCosts() }}>Laden</Button>
                 </Grid>
 
