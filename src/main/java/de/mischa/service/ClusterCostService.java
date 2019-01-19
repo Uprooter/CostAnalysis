@@ -16,7 +16,6 @@ public class ClusterCostService {
     @Autowired
     private CostItemRepository costItemRep;
 
-
     public List<ClusterCost> calculate(Date from, Date to) {
 
         List<CostItem> relevantItems = this.costItemRep.findRelevant(from, to);
@@ -34,7 +33,7 @@ public class ClusterCostService {
 
         }
 
-        Collections.sort(result, Comparator.comparing(ClusterCost::getTotalAmount));
+        result.sort(Comparator.comparing(ClusterCost::getTotalAmount));
         return result;
     }
 
