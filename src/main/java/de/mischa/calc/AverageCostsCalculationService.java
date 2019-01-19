@@ -29,11 +29,15 @@ public class AverageCostsCalculationService {
 
         if (!includeOthers) {
             return this.calculateResult(
-                    relevantItems.stream().filter(i -> i.getDetailedCluster().getCluster() != CostCluster.SONSTIGES)
+                    relevantItems.stream()
+                            .filter(i -> i.getDetailedCluster().getCluster() != CostCluster.SONSTIGE_AUSGABEN)
+                            .filter(i -> i.getDetailedCluster().getCluster() != CostCluster.SONSTIGE_EINNAHMEN)
                             .collect(Collectors.toList()), savingsAreCosts);
         }
 
-        return calculateResult(relevantItems, savingsAreCosts);
+        return calculateResult(relevantItems.stream()
+                        .filter(i -> i.getDetailedCluster().getCluster() != CostCluster.UMBUCHUNG).collect(Collectors.toList()),
+                savingsAreCosts);
     }
 
     AverageCostModel calculateResult(List<CostItem> relevantItems, boolean savingsAreCosts) {
