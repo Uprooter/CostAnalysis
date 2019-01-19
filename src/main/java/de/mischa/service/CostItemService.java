@@ -1,17 +1,13 @@
 package de.mischa.service;
 
 import de.mischa.model.CostItem;
-import de.mischa.repository.CostItemRepository;
 import org.apache.commons.lang3.time.DateUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class CostItemService {
-    @Autowired
-    private CostItemRepository itemRep;
 
     public CostItem foundSimilar(CostItem item, List<CostItem> allItems) {
         for (CostItem existingItem : allItems) {
