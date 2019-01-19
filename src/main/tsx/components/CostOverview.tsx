@@ -82,24 +82,53 @@ export default class CostOverview extends React.Component<CostOverviewProps, Cos
         this.setState({ savingsAreCosts: savingsAreCosts }, () => this.loadAverageCosts());
     }
 
+    getYears(): number[] {
+        let years: number[] = new Array<number>();
+        let currentYear: number = new Date().getFullYear();
+        for (let year = 2014; year <= currentYear; year++) {
+            years.push(year);
+        }
+
+        return years;
+    }
+
+    updateDateRangeToFullYear(year: number) {
+        let fromDate: Date = new Date(year, 0, 1, 22);
+        let toDate: Date = new Date(year, 11, 31, 22);
+
+        this.setState({ fromDate: fromDate, toDate: toDate }, () => this.updateCosts());
+
+    }
+
     render() {
-        const gritItemStyle = { marginLeft: 20, marginTop: 20 };
+        const gridItemStyle = { marginLeft: 10, marginTop: 20 };
+        const years = this.getYears();
         return (
 
             <Grid container spacing={16}>
-                <Grid item sm style={gritItemStyle}>
-                    <TextField id="fromDate" label="Von" type="date" defaultValue={getDashDateString(this.state.fromDate)}
+                <Grid item sm style={gridItemStyle}>
+                    <TextField id="fromDate" label="Von" type="date" style={{ margin: 5 }} value={getDashDateString(this.state.fromDate)}
                         InputLabelProps={{
                             shrink: true,
                         }} onChange={e => { this.handleDateChange(new Date(e.target.value), "fromDate") }}
                     />
-                    <TextField id="fromDate" label="Bis" type="date" defaultValue={getDashDateString(this.state.toDate)}
+                    <TextField id="fromDate" label="Bis" type="date" style={{ margin: 5 }} value={getDashDateString(this.state.toDate)}
                         InputLabelProps={{
                             shrink: true,
                         }} onChange={e => { this.handleDateChange(new Date(e.target.value), "toDate") }}
                     />
                 </Grid>
-                <Grid item sm style={gritItemStyle}>
+                <Grid item sm style={gridItemStyle}>
+                    {
+                        years.map(year => {
+                            return (
+                                <Button variant="outlined" key={year.toString()} onClick={() => { this.updateDateRangeToFullYear(year) }}>
+                                    {year}
+                                </Button>);
+                        })
+                    }
+                </Grid>
+                <Grid item xs style={gridItemStyle}>
                     <FormGroup row>
                         <FormControlLabel
                             control={
@@ -113,7 +142,7 @@ export default class CostOverview extends React.Component<CostOverviewProps, Cos
                             label="Sparbeiträge sind Kosten" />
                     </FormGroup>
                 </Grid>
-                <Grid item sm style={gritItemStyle}>
+                <Grid item sm style={gridItemStyle}>
                     <Button variant="contained" color="primary" onClick={() => { this.updateCosts() }}>Laden</Button>
 
                 </Grid>

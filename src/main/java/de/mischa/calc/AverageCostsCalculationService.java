@@ -25,6 +25,7 @@ public class AverageCostsCalculationService {
 
     public AverageCostModel calculate(Date from, Date to, boolean includeOthers, boolean savingsAreCosts) {
 
+        logger.info("from:" + from + " to:" + to);
         List<CostItem> relevantItems = this.costItemRep.findRelevant(from, to).stream()
                 .filter(i -> i.getDetailedCluster().getCluster() != CostCluster.UMBUCHUNG).collect(Collectors.toList());
 
