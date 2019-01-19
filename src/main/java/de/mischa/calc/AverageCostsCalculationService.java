@@ -25,11 +25,14 @@ public class AverageCostsCalculationService {
 
     public AverageCostModel calculate(Date from, Date to, boolean includeOthers, boolean savingsAreCosts) {
 
-        List<CostItem> relevantItems = this.costItemRep.findRelevant(from, to);
+        List<CostItem> relevantItems = this.costItemRep.findRelevant(from, to).stream()
+                .filter(i -> i.getDetailedCluster().getCluster() != CostCluster.UMBUCHUNG).collect(Collectors.toList());
 
         if (!includeOthers) {
             return this.calculateResult(
-                    relevantItems.stream().filter(i -> i.getDetailedCluster().getCluster() != CostCluster.SONSTIGES)
+                    relevantItems.stream()
+                            .filter(i -> i.getDetailedCluster().getCluster() != CostCluster.SONSTIGE_AUSGABEN)
+                            .filter(i -> i.getDetailedCluster().getCluster() != CostCluster.SONSTIGE_EINNAHMEN)
                             .collect(Collectors.toList()), savingsAreCosts);
         }
 
