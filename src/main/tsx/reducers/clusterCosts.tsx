@@ -1,19 +1,19 @@
-import AverageCostResult from "../models/AverageCostResult";
+import ClusterCost from "../models/ClusterCost";
 import { Action, ActionTypes } from "../actions/actions";
 export interface State {
-    averageCosts: AverageCostResult
+    clusterCosts: ClusterCost[]
 }
 
 export const initialState: State = {
-    averageCosts: new AverageCostResult()
+    clusterCosts: new Array<ClusterCost>()
 }
 
 export function reducer(state: State = initialState, action: Action): State {
     switch (action.type) {
-        case ActionTypes.UPDATE_AVERAGE_COSTS:
+        case ActionTypes.UPDATE_CLUSTER_COSTS:
             return {
                 ...state,
-                averageCosts: action.payload
+                clusterCosts: action.payload
             }
 
         default:
