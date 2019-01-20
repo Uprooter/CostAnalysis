@@ -7,10 +7,9 @@ import AverageCostTable from "./AverageCostTable";
 import ClusterHistoryChart from "./ClusterHistoryChart";
 import ClusterCostTable from "./ClusterCostTable";
 import AverageCostResult from "../models/AverageCostResult";
-import { FormControlLabel, Button, Switch, Paper, Typography, FormGroup, Grid, TextField } from '@material-ui/core';
+import { FormControlLabel, Button, Switch, Typography, FormGroup, Grid, TextField } from '@material-ui/core';
 import ClusterCost from "../models/ClusterCost";
 import YearlyCost from "../models/YearlyCost";
-import MyChart from "../charts/Chart";
 
 interface CostOverviewProps {
     updatePageName: (newName: string) => NavigatioPageUpdateAction;
@@ -25,6 +24,7 @@ interface CostOverviewState {
     includeOthers: boolean;
     savingsAreCosts: boolean;
     yearlyClusterCosts: YearlyCost[];
+    selectedClusterForHistory: string
 }
 export default class CostOverview extends React.Component<CostOverviewProps, CostOverviewState> {
 
@@ -33,7 +33,8 @@ export default class CostOverview extends React.Component<CostOverviewProps, Cos
         toDate: new Date(),
         includeOthers: false,
         savingsAreCosts: false,
-        yearlyClusterCosts: new Array<YearlyCost>()
+        yearlyClusterCosts: new Array<YearlyCost>(),
+        selectedClusterForHistory: ""
     }
 
     componentDidMount() {
@@ -65,6 +66,7 @@ export default class CostOverview extends React.Component<CostOverviewProps, Cos
     }
 
     loadClusterHistory = (cluster: string) => {
+        this.setState({ selectedClusterForHistory: cluster });
         getRequest("/costsByCluster?cluster=" + cluster)
             .then(r => {
                 this.setState({ yearlyClusterCosts: r.entity });
@@ -72,18 +74,20 @@ export default class CostOverview extends React.Component<CostOverviewProps, Cos
     }
 
     getJSONForOwer(owner: string, yearlyClusterCosts: YearlyCost[]) {
+        if (yearlyClusterCosts.length === 0) {
+            return {};
+        }
         let jsonString: string = "{";
         for (let yearlyCost of yearlyClusterCosts) {
             if (owner === "mischa") {
-                jsonString += "\"" + yearlyCost.year.toString() + "\":" + yearlyCost.mischaAmount.toString() + ",";
+                jsonString += "\"" + yearlyCost.year.toString() + "\":" + yearlyCost.mischaAmount + ",";
             }
             else {
-                jsonString += "\"" + yearlyCost.year.toString() + "\":" + yearlyCost.gesaAmount.toString() + ",";
+                jsonString += "\"" + yearlyCost.year.toString() + "\":" + yearlyCost.gesaAmount + ",";
             }
         }
-       
-        console.log(jsonString.substring(0,(jsonString.length-2))+"}");
-        return JSON.parse(jsonString.substring(0,(jsonString.length-2))+"}");
+
+        return JSON.parse(jsonString.substring(0, (jsonString.length - 1)) + "}");
     }
 
     handleDateChange(newDate: Date, dateField: string) {
@@ -174,13 +178,18 @@ export default class CostOverview extends React.Component<CostOverviewProps, Cos
                     </Typography>
                 </Grid>
 
-                <Grid item sm>
+                <Grid item xs={12}>
                     <AverageCostTable averageCosts={this.props.averageCosts} />
                 </Grid>
 
-                <Grid item xs={12}>
+                <Grid item xs={6}>
                     <Typography variant="h5" component="h3">
                         Zusammenfassung Nach Typ
+                    </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                    <Typography variant="h5" component="h3">
+                        Entwicklung für Typ: {this.state.selectedClusterForHistory}
                     </Typography>
                 </Grid>
 
@@ -188,8 +197,9 @@ export default class CostOverview extends React.Component<CostOverviewProps, Cos
                     <ClusterCostTable clusterCosts={this.props.clusterCosts} loadClusterHistory={this.loadClusterHistory} />
                 </Grid>
 
-                <Grid item xs={12}>
-                    <MyChart mischaClusterCosts={this.getJSONForOwer("mischa", this.state.yearlyClusterCosts)}
+
+                <Grid item sm>
+                    <ClusterHistoryChart mischaClusterCosts={this.getJSONForOwer("mischa", this.state.yearlyClusterCosts)}
                         gesaClusterCosts={this.getJSONForOwer("gesa", this.state.yearlyClusterCosts)} />
                 </Grid>
             </Grid>

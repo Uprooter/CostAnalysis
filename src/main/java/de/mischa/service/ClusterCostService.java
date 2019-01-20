@@ -69,7 +69,7 @@ public class ClusterCostService {
                                 CostItem::getCreationDateYear, Collectors.summingDouble(CostItem::getAmount)));
 
         List<YearlyCost> result = new ArrayList<>();
-        mischaClusterCosts.forEach((k, v) -> result.add(new YearlyCost(k, v * -1.0, 0)));
+        mischaClusterCosts.forEach((k, v) -> result.add(new YearlyCost(k, v * -1.0, 0.0)));
         gesaClusterCosts.forEach((k, v) -> this.updateOrAddGesaAmount(k, v * -1.0, result));
         result.sort(Comparator.comparing(YearlyCost::getYear));
         return result;
@@ -84,6 +84,6 @@ public class ClusterCostService {
             }
         }
 
-        result.add(new YearlyCost(year, 0, gesaAmount));
+        result.add(new YearlyCost(year, 0.0, gesaAmount));
     }
 }
