@@ -1,13 +1,12 @@
 package de.mischa.model;
 
-import java.util.Date;
-
-import javax.persistence.*;
-
+import lombok.Data;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import lombok.Data;
+import javax.persistence.*;
+import java.util.Calendar;
+import java.util.Date;
 
 @Entity
 @Table(name = "COST_ITEM")
@@ -66,6 +65,16 @@ public class CostItem {
         EqualsBuilder builder = new EqualsBuilder();
         builder.append(getId(), other.getId());
         return builder.isEquals();
+    }
+
+    public int getCreationDateYear() {
+        if (this.creationDate != null) {
+            Calendar c = Calendar.getInstance();
+            c.setTime(this.creationDate);
+            return c.get(Calendar.YEAR);
+        }
+
+        return -1;
     }
 
     @Override

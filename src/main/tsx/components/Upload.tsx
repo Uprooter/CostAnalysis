@@ -117,39 +117,39 @@ class Upload extends React.Component<InjectedNotistackProps, UploadState> {
 
         console.log("Save");
 
-        // let itemsToSave = this.state.mappedItems.concat(this.state.unmappedItems);
-        // let client = rest.wrap(mime);
-        // client({
-        //     path: "/upload/save",
-        //     method: "POST",
-        //     entity: { "correctedItems": itemsToSave },
-        //     headers: { 'Content-Type': 'application/json' }
-        // }).done(response => {
-        //     if (response.status.code === 409) {
-        //         this.displayMessage("Error occurred: " + response.entity.message, "error");
-        //     }
-        //     else {
-        //         let potentialDuplicates: Array<DuplicateItemModel> = response.entity;
-        //         for (let item of potentialDuplicates) {
-        //             let dublicateItem = item.clientItem;
-        //             dublicateItem.complete = true;
+        let itemsToSave = this.state.mappedItems.concat(this.state.unmappedItems);
+        let client = rest.wrap(mime);
+        client({
+            path: "/upload/save",
+            method: "POST",
+            entity: { "correctedItems": itemsToSave },
+            headers: { 'Content-Type': 'application/json' }
+        }).done(response => {
+            if (response.status.code === 409) {
+                this.displayMessage("Error occurred: " + response.entity.message, "error");
+            }
+            else {
+                let potentialDuplicates: Array<DuplicateItemModel> = response.entity;
+                for (let item of potentialDuplicates) {
+                    let dublicateItem = item.clientItem;
+                    dublicateItem.complete = true;
 
-        //             if (item.duplicateItem !== null) {
+                    if (item.duplicateItem !== null) {
 
-        //                 dublicateItem.duplicate = true;
-        //             }
+                        dublicateItem.duplicate = true;
+                    }
 
-        //             if (item.similarItem !== null) {
-        //                 dublicateItem.similar = true;
-        //             }
+                    if (item.similarItem !== null) {
+                        dublicateItem.similar = true;
+                    }
 
-        //             this.updateCostItem(dublicateItem);
-        //         }
+                    this.updateCostItem(dublicateItem);
+                }
 
-        //         this.displayMessage("Gespeichert!", "success");
+                this.displayMessage("Gespeichert!", "success");
 
-        //     }
-        // });
+            }
+        });
     }
 
     updateCostItem = (changedItem: CostItemModel) => {

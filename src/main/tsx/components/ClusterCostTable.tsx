@@ -6,13 +6,21 @@ import { toRoundEuroString } from "../utils/numbers";
 
 interface ClusterCostTableProps {
     clusterCosts: ClusterCost[];
+    loadClusterHistory: (cluster: string) => void;
 }
 export default class ClusterCostTable extends React.Component<ClusterCostTableProps, {}> {
+
+    handleRowClick(event: React.MouseEvent<HTMLTableRowElement>, cluster: string) {
+        this.props.loadClusterHistory(cluster);
+    }
+
     render() {
         return (
             <Table>
                 <TableHead>
                     <TableRow>
+                        <TableCell></TableCell>
+                        <TableCell></TableCell>
                         <TableCell>Typ</TableCell>
                         <TableCell>Mischa</TableCell>
                         <TableCell>Gesa</TableCell>
@@ -22,7 +30,9 @@ export default class ClusterCostTable extends React.Component<ClusterCostTablePr
                 <TableBody>
                     {this.props.clusterCosts.map(row => {
                         return (
-                            <TableRow key={row.cluster}>
+                            <TableRow key={row.cluster} hover onClick={event => this.handleRowClick(event, row.cluster)}>
+                                <TableCell>Entwicklung</TableCell>
+                                <TableCell>Details</TableCell>
                                 <TableCell>{row.cluster}</TableCell>
                                 <TableCell>{toRoundEuroString(row.mischaAmount)}</TableCell>
                                 <TableCell>{toRoundEuroString(row.gesaAmount)}</TableCell>

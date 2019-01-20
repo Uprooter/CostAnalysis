@@ -1,14 +1,12 @@
 package de.mischa.service;
 
-import de.mischa.model.ClusterCost;
-import de.mischa.model.CostCluster;
-import de.mischa.model.CostItem;
-import de.mischa.model.CostOwner;
+import de.mischa.model.*;
 import de.mischa.repository.CostItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ClusterCostService {
@@ -58,5 +56,34 @@ public class ClusterCostService {
             }
         });
         return clusterMap;
+    }
+
+    public List<YearlyCost> calculate(CostCluster cluster) {
+        Map<Integer, Double> mischaClusterCosts =
+                this.costItemRep.findByClusterAndOwner(cluster, CostOwner.MISCHA).stream().collect(
+                        Collectors.groupingBy(
+                                CostItem::getCreationDateYear, Collectors.summingDouble(CostItem::getAmount)));
+        Map<Integer, Double> gesaClusterCosts =
+                this.costItemRep.findByClusterAndOwner(cluster, CostOwner.GESA).stream().collect(
+                        Collectors.groupingBy(
+                                CostItem::getCreationDateYear, Collectors.summingDouble(CostItem::getAmount)));
+
+        List<YearlyCost> result = new ArrayList<>();
+        mischaClusterCosts.forEach((k, v) -> result.add(new YearlyCost(k, v * -1.0, 0)));
+        gesaClusterCosts.forEach((k, v) -> this.updateOrAddGesaAmount(k, v * -1.0, result));
+        result.sort(Comparator.comparing(YearlyCost::getYear));
+        return result;
+    }
+
+    private void updateOrAddGesaAmount(Integer year, Double gesaAmount, List<YearlyCost> result) {
+
+        for (YearlyCost yearlyCost : result) {
+            if (yearlyCost.getYear() == year) {
+                yearlyCost.setGesaAmount(gesaAmount);
+                return;
+            }
+        }
+
+        result.add(new YearlyCost(year, 0, gesaAmount));
     }
 }

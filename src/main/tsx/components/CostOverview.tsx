@@ -1,14 +1,16 @@
 import * as React from "react";
 import { NavigatioPageUpdateAction, UpdateAverageCostsAction, UpdateClusterCostsAction } from "../actions/actions";
 import Page from "../utils/pages";
+import { getRequest } from "../utils/rest";
 import { getDateString, getDashDateString, getOneYearBefore } from "../utils/dates";
 import AverageCostTable from "./AverageCostTable";
+import ClusterHistoryChart from "./ClusterHistoryChart";
 import ClusterCostTable from "./ClusterCostTable";
 import AverageCostResult from "../models/AverageCostResult";
 import { FormControlLabel, Button, Switch, Paper, Typography, FormGroup, Grid, TextField } from '@material-ui/core';
-import * as rest from 'rest';
-import * as mime from 'rest/interceptor/mime';
 import ClusterCost from "../models/ClusterCost";
+import YearlyCost from "../models/YearlyCost";
+import MyChart from "../charts/Chart";
 
 interface CostOverviewProps {
     updatePageName: (newName: string) => NavigatioPageUpdateAction;
@@ -22,6 +24,7 @@ interface CostOverviewState {
     toDate: Date;
     includeOthers: boolean;
     savingsAreCosts: boolean;
+    yearlyClusterCosts: YearlyCost[];
 }
 export default class CostOverview extends React.Component<CostOverviewProps, CostOverviewState> {
 
@@ -29,7 +32,8 @@ export default class CostOverview extends React.Component<CostOverviewProps, Cos
         fromDate: getOneYearBefore(new Date()),
         toDate: new Date(),
         includeOthers: false,
-        savingsAreCosts: false
+        savingsAreCosts: false,
+        yearlyClusterCosts: new Array<YearlyCost>()
     }
 
     componentDidMount() {
@@ -43,25 +47,43 @@ export default class CostOverview extends React.Component<CostOverviewProps, Cos
     }
 
     loadAverageCosts() {
-        let client = rest.wrap(mime);
-        client({
-            path: "/averageCosts?from=" + getDateString(this.state.fromDate)
-                + "&to=" + getDateString(this.state.toDate)
-                + "&includeOthers=" + this.state.includeOthers
-                + "&savingsAreCosts=" + this.state.savingsAreCosts
-        }).then(r => {
-            this.props.updateAverageCostResult(r.entity);
-        });
+        getRequest("/averageCosts?from=" + getDateString(this.state.fromDate)
+            + "&to=" + getDateString(this.state.toDate)
+            + "&includeOthers=" + this.state.includeOthers
+            + "&savingsAreCosts=" + this.state.savingsAreCosts)
+            .then(r => {
+                this.props.updateAverageCostResult(r.entity);
+            });
     }
 
     loadClusterCosts() {
-        let client = rest.wrap(mime);
-        client({
-            path: "/clusterCosts?from=" + getDateString(this.state.fromDate)
-                + "&to=" + getDateString(this.state.toDate)
-        }).then(r => {
-            this.props.updateClusterCosts(r.entity);
-        });
+        getRequest("/clusterCosts?from=" + getDateString(this.state.fromDate)
+            + "&to=" + getDateString(this.state.toDate))
+            .then(r => {
+                this.props.updateClusterCosts(r.entity);
+            });
+    }
+
+    loadClusterHistory = (cluster: string) => {
+        getRequest("/costsByCluster?cluster=" + cluster)
+            .then(r => {
+                this.setState({ yearlyClusterCosts: r.entity });
+            });
+    }
+
+    getJSONForOwer(owner: string, yearlyClusterCosts: YearlyCost[]) {
+        let jsonString: string = "{";
+        for (let yearlyCost of yearlyClusterCosts) {
+            if (owner === "mischa") {
+                jsonString += "\"" + yearlyCost.year.toString() + "\":" + yearlyCost.mischaAmount.toString() + ",";
+            }
+            else {
+                jsonString += "\"" + yearlyCost.year.toString() + "\":" + yearlyCost.gesaAmount.toString() + ",";
+            }
+        }
+       
+        console.log(jsonString.substring(0,(jsonString.length-2))+"}");
+        return JSON.parse(jsonString.substring(0,(jsonString.length-2))+"}");
     }
 
     handleDateChange(newDate: Date, dateField: string) {
@@ -163,7 +185,12 @@ export default class CostOverview extends React.Component<CostOverviewProps, Cos
                 </Grid>
 
                 <Grid item sm>
-                    <ClusterCostTable clusterCosts={this.props.clusterCosts} />
+                    <ClusterCostTable clusterCosts={this.props.clusterCosts} loadClusterHistory={this.loadClusterHistory} />
+                </Grid>
+
+                <Grid item xs={12}>
+                    <MyChart mischaClusterCosts={this.getJSONForOwer("mischa", this.state.yearlyClusterCosts)}
+                        gesaClusterCosts={this.getJSONForOwer("gesa", this.state.yearlyClusterCosts)} />
                 </Grid>
             </Grid>
         );
