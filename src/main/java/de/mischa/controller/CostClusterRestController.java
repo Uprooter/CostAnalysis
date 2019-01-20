@@ -2,6 +2,8 @@ package de.mischa.controller;
 
 import de.mischa.model.ClusterCost;
 import de.mischa.model.CostCluster;
+import de.mischa.model.DetailedCostCluster;
+import de.mischa.model.YearlyCost;
 import de.mischa.repository.DetailedCostClusterRepository;
 import de.mischa.service.ClusterCostService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +38,7 @@ public class CostClusterRestController {
     public List<CostCluster> getClustersByDetailedCluster(@RequestParam("detailedCluster") String detailedCluster)
             throws UnsupportedEncodingException {
         String decodedName = URLDecoder.decode(detailedCluster, StandardCharsets.UTF_8.toString());
-        return detailedClusterRep.findByName(decodedName).stream().map(d -> d.getCluster()).distinct()
+        return detailedClusterRep.findByName(decodedName).stream().map(DetailedCostCluster::getCluster).distinct()
                 .collect(Collectors.toList());
     }
 
@@ -45,5 +47,10 @@ public class CostClusterRestController {
             @RequestParam(value = "from") @DateTimeFormat(pattern = "dd.MM.yyyy") Date from,
             @RequestParam(value = "to") @DateTimeFormat(pattern = "dd.MM.yyyy") Date to) {
         return clusterCostService.calculate(from, to);
+    }
+
+    @RequestMapping("/costsByCluster")
+    public List<YearlyCost> getCostsByCluster(@RequestParam(value = "cluster") String clusterName) {
+        return clusterCostService.calculate(CostCluster.valueOf(clusterName));
     }
 }

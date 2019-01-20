@@ -98,7 +98,7 @@ public class AverageCostsCalculationService {
         //switch savings cost to positive amount
         for (CostItem item : relevantItems) {
             if (!savingsAreCosts && this.isAccessibleSaving(item)) {
-                item.setAmount(item.getAmount() * -1);
+                item.setAmount(item.getAmount() * -1.0);
             }
         }
 
