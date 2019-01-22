@@ -4,7 +4,7 @@ import { Provider } from "react-redux";
 import DetailedClusterAdmin from "./containers/DetailedClusterAdmin";
 import Notfound from "./components/Notfound";
 import Upload from "./containers/Upload";
-import CostOverview from "./containers/CostOverview";
+import CostOverview from "./components/analysis/containers/CostOverview";
 import { Route, Switch } from "react-router";
 import { createStore, applyMiddleware, compose } from "redux";
 import reducer from "./reducers";

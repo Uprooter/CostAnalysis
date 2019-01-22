@@ -1,6 +1,7 @@
 import * as React from "react";
 import CostItemModel from "../../models/CostItemModel";
 import { Table, TableHead, TableRow, TableCell, TableBody } from '@material-ui/core';
+import { getDEDateString} from "../../utils/dates";
 
 interface CostItemTableProps {
     items: CostItemModel[];
@@ -32,7 +33,7 @@ export default class CostItemTable extends React.PureComponent<CostItemTableProp
                                 <TableRow style={this.props.getValidationColor(item)}
                                     key={item.clientId} hover
                                     onClick={event => this.props.handleRowClick(event, item.clientId)}>
-                                    <TableCell>{item.creationDate.toString().substring(0, 10)}</TableCell>
+                                    <TableCell>{getDEDateString(item.creationDate)}</TableCell>
                                     <TableCell>{item.recipient.name}</TableCell>
                                     <TableCell>{item.amount + " €"}</TableCell>
                                     <TableCell>{item.owner}</TableCell>

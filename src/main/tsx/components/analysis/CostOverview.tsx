@@ -4,7 +4,7 @@ import Page from "../../utils/pages";
 import { getRequest } from "../../utils/rest";
 import MonthlySummaryTable from "./MonthlySummaryTable";
 import ClusterHistoryChart from "./ClusterHistoryChart";
-import CostOverviewControl from "./CostOverviewControl";
+import CostOverviewControl from "./containers/CostOverviewControl";
 import ClusterCostTable from "./ClusterCostTable";
 import AverageCostResult from "../../models/AverageCostResult";
 import { Grid, } from '@material-ui/core';

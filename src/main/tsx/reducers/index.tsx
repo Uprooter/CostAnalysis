@@ -13,7 +13,7 @@ export interface State {
     navigationPage: navigationPage.State,
     router: RouterState,
     averageCosts: averageCosts.State,
-    clusterCosts : clusterCosts.State
+    clusterCosts: clusterCosts.State
 }
 
 const reducer = (history: History) => combineReducers<State>({
