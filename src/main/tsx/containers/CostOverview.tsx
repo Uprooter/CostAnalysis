@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import { State } from '../reducers'
-import CostOverview from '../components/CostOverview'
+import CostOverview from '../components/analysis/CostOverview'
 import { updatePageName, updateAverageCostResult, updateClusterCosts } from '../actions/actions'
 import { getAverageCost, getClusterCosts } from '../selectors/costItems'
 

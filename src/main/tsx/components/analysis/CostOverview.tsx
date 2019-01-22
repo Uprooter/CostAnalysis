@@ -1,16 +1,15 @@
 import * as React from "react";
-import { NavigatioPageUpdateAction, UpdateAverageCostsAction, UpdateClusterCostsAction } from "../actions/actions";
-import Page from "../utils/pages";
-import { getRequest } from "../utils/rest";
-import { getDateString } from "../utils/dates";
-import AverageCostTable from "./AverageCostTable";
+import { NavigatioPageUpdateAction, UpdateAverageCostsAction, UpdateClusterCostsAction } from "../../actions/actions";
+import Page from "../../utils/pages";
+import { getRequest } from "../../utils/rest";
+import MonthlySummaryTable from "./MonthlySummaryTable";
 import ClusterHistoryChart from "./ClusterHistoryChart";
 import CostOverviewControl from "./CostOverviewControl";
 import ClusterCostTable from "./ClusterCostTable";
-import AverageCostResult from "../models/AverageCostResult";
+import AverageCostResult from "../../models/AverageCostResult";
 import { Grid, } from '@material-ui/core';
-import ClusterCost from "../models/ClusterCost";
-import YearlyCost from "../models/YearlyCost";
+import ClusterCost from "../../models/ClusterCost";
+import YearlyCost from "../../models/YearlyCost";
 
 interface CostOverviewProps {
     updatePageName: (newName: string) => NavigatioPageUpdateAction;
@@ -32,7 +31,7 @@ export default class CostOverview extends React.Component<CostOverviewProps, Cos
 
     componentDidMount() {
         this.props.updatePageName(Page.ROOT.name);
-    }    
+    }
 
     loadClusterHistory = (cluster: string) => {
         this.setState({ selectedClusterForHistory: cluster });
@@ -50,7 +49,7 @@ export default class CostOverview extends React.Component<CostOverviewProps, Cos
                 </Grid>
 
                 <Grid item xs={12}>
-                    <AverageCostTable averageCosts={this.props.averageCosts} />
+                    <MonthlySummaryTable averageCosts={this.props.averageCosts} />
                 </Grid>
 
                 <Grid item sm>

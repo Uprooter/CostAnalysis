@@ -1,9 +1,7 @@
 package de.mischa.controller;
 
-import de.mischa.model.ClusterCost;
-import de.mischa.model.CostCluster;
-import de.mischa.model.DetailedCostCluster;
-import de.mischa.model.YearlyCost;
+import de.mischa.model.*;
+import de.mischa.repository.CostItemRepository;
 import de.mischa.repository.DetailedCostClusterRepository;
 import de.mischa.service.ClusterCostService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +27,9 @@ public class CostClusterRestController {
     @Autowired
     private ClusterCostService clusterCostService;
 
+    @Autowired
+    private CostItemRepository costItemRepository;
+
     @RequestMapping("/clusters")
     public List<CostCluster> getClusters() {
         return Arrays.asList(CostCluster.values());
@@ -47,6 +48,14 @@ public class CostClusterRestController {
             @RequestParam(value = "from") @DateTimeFormat(pattern = "dd.MM.yyyy") Date from,
             @RequestParam(value = "to") @DateTimeFormat(pattern = "dd.MM.yyyy") Date to) {
         return clusterCostService.calculate(from, to);
+    }
+
+    @RequestMapping("/clusterCostsByCluster")
+    public List<CostItem> getClusterCosts(
+            @RequestParam(value = "from") @DateTimeFormat(pattern = "dd.MM.yyyy") Date from,
+            @RequestParam(value = "to") @DateTimeFormat(pattern = "dd.MM.yyyy") Date to,
+            @RequestParam(value = "clusterName") String clusterName) {
+        return costItemRepository.findRelevantByCluster(from, to, CostCluster.valueOf(clusterName));
     }
 
     @RequestMapping("/costsByCluster")

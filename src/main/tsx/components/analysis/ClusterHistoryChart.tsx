@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Chart } from "chart.js";
 import { Typography } from '@material-ui/core';
-import YearlyCost from '../models/YearlyCost';
+import YearlyCost from '../../models/YearlyCost';
 
 const ClusterHistoryChart = (props: any) => {
 

@@ -1,14 +1,14 @@
 import * as React from "react";
-import AverageCostResult from "../models/AverageCostResult";
-import { toRoundEuroString } from "../utils/numbers";
-import TotalTableCell from "../components/TotalTableCell";
+import AverageCostResult from "../../models/AverageCostResult";
+import { toRoundEuroString } from "../../utils/numbers";
+import TotalTableCell from "../util/TotalTableCell";
 import { Table, TableHead, TableRow, TableCell, TableBody, Typography } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 
 interface AverageCostTableProps {
     averageCosts: AverageCostResult;
 }
-export default class AverageCostTable extends React.Component<AverageCostTableProps, {}> {
+export default class MonthlySummaryTable extends React.PureComponent<AverageCostTableProps> {
 
     TotalTableRow = withStyles(theme => ({
         root: {

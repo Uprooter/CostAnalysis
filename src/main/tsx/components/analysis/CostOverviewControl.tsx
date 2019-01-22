@@ -1,10 +1,10 @@
 import * as React from "react";
 import { FormControlLabel, Button, Switch, FormGroup, Grid, TextField } from '@material-ui/core';
-import { getDateString, getDashDateString, getOneYearBefore } from "../utils/dates";
-import { getRequest } from "../utils/rest";
-import AverageCostResult from "../models/AverageCostResult";
-import { UpdateAverageCostsAction, UpdateClusterCostsAction } from "../actions/actions";
-import ClusterCost from "../models/ClusterCost";
+import { getDateString, getDashDateString, getOneYearBefore } from "../../utils/dates";
+import { getRequest } from "../../utils/rest";
+import AverageCostResult from "../../models/AverageCostResult";
+import { UpdateAverageCostsAction, UpdateClusterCostsAction } from "../../actions/actions";
+import ClusterCost from "../../models/ClusterCost";
 
 interface CostOverviewControlProps {
     updateAverageCostResult: (averageCosts: AverageCostResult) => UpdateAverageCostsAction;
