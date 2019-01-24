@@ -1,13 +1,13 @@
 import * as React from "react";
-import { NavigatioPageUpdateAction } from "../actions/actions";
-import Page from "../utils/pages";
+import { NavigatioPageUpdateAction } from "../../actions/actions";
+import Page from "../../utils/pages";
 import Button from '@material-ui/core/Button';
 import { SnackbarProvider, withSnackbar, InjectedNotistackProps, VariantType } from 'notistack';
 import * as rest from 'rest';
 import * as mime from 'rest/interceptor/mime';
-import CostItemModel from "../models/CostItemModel";
-import DuplicateItemModel from "../models/DuplicateItemModel";
-import CostItemTable from "./CostItemTable";
+import CostItemModel from "../../models/CostItemModel";
+import DuplicateItemModel from "../../models/DuplicateItemModel";
+import EditableCostItemTable from "../analysis/EditableCostItemTable";
 
 
 interface UploadState {
@@ -186,7 +186,7 @@ class Upload extends React.Component<InjectedNotistackProps, UploadState> {
 
     render() {
         return (
-            <div>
+            <React.Fragment>
                 <input
                     accept=".csv"
                     id="contained-button-file"
@@ -201,9 +201,9 @@ class Upload extends React.Component<InjectedNotistackProps, UploadState> {
                 </label>
 
                 <Button variant="contained" color="primary" onClick={() => { this.saveUploadedItems() }}>Speichern</Button>
-                <CostItemTable items={this.state.unmappedItems} title={"Konnten nicht zugewiesen werden"} updateCostItem={this.updateCostItemWithState} />
-                <CostItemTable items={this.state.mappedItems} title={"Erfolgreich zugewiesen"} updateCostItem={this.updateCostItemWithState} />
-            </div>
+                <EditableCostItemTable items={this.state.unmappedItems} title={"Konnten nicht zugewiesen werden"} updateCostItem={this.updateCostItemWithState} />
+                <EditableCostItemTable items={this.state.mappedItems} title={"Erfolgreich zugewiesen"} updateCostItem={this.updateCostItemWithState} />
+            </React.Fragment>
         );
     }
 }

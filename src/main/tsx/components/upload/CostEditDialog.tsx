@@ -7,10 +7,10 @@ import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
-import DetailedCostClusterModel from "../models/DetailedCostClusterModel";
+import DetailedCostClusterModel from "../../models/DetailedCostClusterModel";
 import { Select, Button, Grid, TextField } from '@material-ui/core';
-import CostItemModel from "../models/CostItemModel";
-import { detailedName } from '../utils/detailedClusters';
+import CostItemModel from "../../models/CostItemModel";
+import { detailedName } from '../../utils/detailedClusters';
 
 interface CostEditDialogProps {
     selections: {

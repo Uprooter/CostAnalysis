@@ -1,17 +1,18 @@
 import * as React from "react";
-import CostItemModel from "../models/CostItemModel";
-import DetailedCostClusterModel from "../models/DetailedCostClusterModel";
-import { Table, TableHead, TableRow, TableCell, TableBody, Typography } from '@material-ui/core';
-import CostEditDialog from "./CostEditDialog";
-import { getRequest } from '../utils/rest';
-import { getFromDetailedName } from '../utils/detailedClusters';
+import CostItemModel from "../../models/CostItemModel";
+import DetailedCostClusterModel from "../../models/DetailedCostClusterModel";
+import CostItemTable from "../util/CostItemTable";
+import { Typography } from '@material-ui/core';
+import CostEditDialog from "../upload/CostEditDialog";
+import { getRequest } from '../../utils/rest';
+import { getFromDetailedName } from '../../utils/detailedClusters';
 
-interface CostItemTableProps {
+interface EditableCostItemTableProps {
     items: CostItemModel[];
     title: string;
     updateCostItem: (changedItem: CostItemModel) => void;
 }
-export interface CostItemTableState {
+export interface EditableCostItemTableState {
     dialogOpen: boolean;
     costItem: CostItemModel;
     selections: {
@@ -20,7 +21,7 @@ export interface CostItemTableState {
         clusters: string[],
     };
 }
-export default class CostItemTable extends React.Component<CostItemTableProps, CostItemTableState> {
+export default class EditableCostItemTable extends React.Component<EditableCostItemTableProps, EditableCostItemTableState> {
 
     state = {
         costItem: new CostItemModel(),
@@ -41,7 +42,7 @@ export default class CostItemTable extends React.Component<CostItemTableProps, C
     }
 
 
-    handleRowClick(event: React.MouseEvent<HTMLTableRowElement>, rowId: number) {
+    handleRowClick = (event: React.MouseEvent<HTMLTableRowElement>, rowId: number) => {
         this.setState({ costItem: this.initEmpty(this.getRowElement(this.props.items, rowId)) });
         this.changeDialogVisibility(true);
     }
@@ -116,7 +117,7 @@ export default class CostItemTable extends React.Component<CostItemTableProps, C
     render() {
         return (
 
-            <div>
+            <React.Fragment>
                 <Typography variant="h5" component="h3">
                     {this.props.title}
                 </Typography>
@@ -124,39 +125,8 @@ export default class CostItemTable extends React.Component<CostItemTableProps, C
                     changeDialogVisibility={this.changeDialogVisibility} selections={this.state.selections}
                     updateValue={this.updateValue} updateCostItem={this.props.updateCostItem} />
 
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Buchungstag</TableCell>
-                            <TableCell>Empfänger</TableCell>
-                            <TableCell>Betrag</TableCell>
-                            <TableCell>Wer</TableCell>
-                            <TableCell>Kostenart</TableCell>
-                            <TableCell>Typ</TableCell>
-                            <TableCell>Detail</TableCell>
-                            <TableCell>Verwendungszweck</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {
-                            this.props.items.map(item => {
-                                return (
-                                    <TableRow style={this.getValidationColor(item)} key={item.clientId} hover onClick={event => this.handleRowClick(event, item.clientId)}>
-                                        <TableCell>{item.creationDate.toString().substring(0, 10)}</TableCell>
-                                        <TableCell>{item.recipient.name}</TableCell>
-                                        <TableCell>{item.amount + " €"}</TableCell>
-                                        <TableCell>{item.owner}</TableCell>
-                                        <TableCell>{item.type}</TableCell>
-                                        <TableCell>{item.detailedCluster.cluster}</TableCell>
-                                        <TableCell>{item.detailedCluster.name}</TableCell>
-                                        <TableCell>{item.purpose}</TableCell>
-                                    </TableRow>
-                                );
-                            })
-                        }
-                    </TableBody>
-                </Table>
-            </div>
+                <CostItemTable getValidationColor={this.getValidationColor} handleRowClick={this.handleRowClick} items={this.props.items} />
+            </React.Fragment>
         );
     }
 }

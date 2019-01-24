@@ -1,7 +1,7 @@
 import { connect } from 'react-redux'
 import { State } from '../reducers'
 import { triggerNavigationBar, updatePageName } from '../actions/actions'
-import NavigationBar from '../components/NavigationBar'
+import NavigationBar from '../components/navigation/NavigationBar'
 import { push } from 'connected-react-router'
 
 // get my required props out of the state
