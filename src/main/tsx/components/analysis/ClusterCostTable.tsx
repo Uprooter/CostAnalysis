@@ -2,11 +2,13 @@ import * as React from "react";
 import TotalTableCell from "../util/TotalTableCell";
 import ClusterCost from "../../models/ClusterCost";
 import ClusterDetailsDialog from "./ClusterDetailsDialog";
-import { Table, TableHead, TableRow, TableCell, TableBody, Typography, Button } from '@material-ui/core';
+import { Table, TableHead, TableRow, TableCell, TableBody, Typography, Button, withWidth } from '@material-ui/core';
 import { toRoundEuroString } from "../../utils/numbers";
 import { getRequest } from '../../utils/rest';
 import { getDateString } from '../../utils/dates';
 import CostItemModel from "../../models/CostItemModel";
+import ListIcon from '@material-ui/icons/List';
+import IconButton from '@material-ui/core/IconButton';
 
 interface ClusterCostTableProps {
     clusterCosts: ClusterCost[];
@@ -72,7 +74,7 @@ export default class ClusterCostTable extends React.Component<ClusterCostTablePr
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell></TableCell>
+                            <TableCell style={{ paddingLeft: 10, paddingRight: 10}}></TableCell>
                             <TableCell>Typ</TableCell>
                             <TableCell>Mischa</TableCell>
                             <TableCell>Gesa</TableCell>
@@ -83,8 +85,8 @@ export default class ClusterCostTable extends React.Component<ClusterCostTablePr
                         {this.props.clusterCosts.map(row => {
                             return (
                                 <TableRow key={row.cluster} hover onClick={event => this.handleRowClick(event, row.cluster)}>
-                                    <TableCell>
-                                        <Button onClick={event => this.showClusterDetails(row.cluster)}>Details</Button>
+                                    <TableCell style={{ paddingLeft: 10, paddingRight: 10}}>
+                                        <IconButton onClick={event => this.showClusterDetails(row.cluster)}><ListIcon /></IconButton>
                                     </TableCell>
                                     <TableCell>{row.cluster}</TableCell>
                                     <TableCell>{toRoundEuroString(row.mischaAmount)}</TableCell>
