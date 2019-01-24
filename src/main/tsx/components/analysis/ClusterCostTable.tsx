@@ -11,6 +11,8 @@ import CostItemModel from "../../models/CostItemModel";
 interface ClusterCostTableProps {
     clusterCosts: ClusterCost[];
     loadClusterHistory: (cluster: string) => void;
+    from: Date;
+    to: Date;
 }
 interface ClusterCostTableState {
     dialogOpen: boolean;
@@ -32,19 +34,12 @@ export default class ClusterCostTable extends React.Component<ClusterCostTablePr
     showClusterDetails = (cluster: string) => {
         this.setState({ selectedCluster: cluster }, () => this.changeDialogVisibility(true));
 
-        getRequest("/clusterCostsByCluster?from=01.01.2018"
-            + "&to=31.12.2018"
+        getRequest("/clusterCostsByCluster?from=" + getDateString(this.props.from)
+            + "&to=" + getDateString(this.props.to)
             + "&clusterName=" + cluster)
             .then(r => {
                 this.updateSelectedClusterCostsWithClientId(r.entity);
             });
-
-        // getRequest("/clusterCostsByCluster?from=" + getDateString(this.props.fromDate)
-        //     + "&to=" + getDateString(this.props.toDate)
-        //     + "&clusterName=" + cluster)
-        //     .then(r => {
-        //         this.setState({ selectedClusterCosts: r.entity });
-        //     });
     }
 
     updateSelectedClusterCostsWithClientId = (selectedClusterCosts: CostItemModel[]) => {

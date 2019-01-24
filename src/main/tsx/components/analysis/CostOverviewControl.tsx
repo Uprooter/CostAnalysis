@@ -28,12 +28,18 @@ export default class CostOverviewControl extends React.Component<CostOverviewCon
         this.updateCosts();
     }
 
+    componentDidUpdate(prevProps: CostOverviewControlProps) {
+        if (prevProps.from !== this.props.from || prevProps.to !== this.props.to) {
+            this.updateCosts();
+        }
+    }
+
     updateCosts = () => {
         this.loadAverageCosts();
         this.loadClusterCosts();
     }
 
-    loadClusterCosts() {
+    loadClusterCosts = () => {
         getRequest("/clusterCosts?from=" + getDateString(this.props.from)
             + "&to=" + getDateString(this.props.to))
             .then(r => {
@@ -72,11 +78,9 @@ export default class CostOverviewControl extends React.Component<CostOverviewCon
     handleDateChange(newDate: Date, dateField: string) {
         if (dateField === "fromDate") {
             this.props.updateAnalysisDates(newDate, this.props.to);
-            this.updateCosts();
         }
         else {
             this.props.updateAnalysisDates(this.props.from, newDate);
-            this.updateCosts();
         }
     }
 
@@ -85,7 +89,6 @@ export default class CostOverviewControl extends React.Component<CostOverviewCon
         let toDate: Date = new Date(year, 11, 31, 22);
 
         this.props.updateAnalysisDates(fromDate, toDate);
-        this.updateCosts();
     }
 
     render() {

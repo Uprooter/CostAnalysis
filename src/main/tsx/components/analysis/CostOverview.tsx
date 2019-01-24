@@ -5,7 +5,7 @@ import { getRequest } from "../../utils/rest";
 import MonthlySummaryTable from "./MonthlySummaryTable";
 import ClusterHistoryChart from "./ClusterHistoryChart";
 import CostOverviewControl from "./containers/CostOverviewControl";
-import ClusterCostTable from "./ClusterCostTable";
+import ClusterCostTable from "./containers/ClusterCostTable";
 import AverageCostResult from "../../models/AverageCostResult";
 import { Grid, } from '@material-ui/core';
 import ClusterCost from "../../models/ClusterCost";

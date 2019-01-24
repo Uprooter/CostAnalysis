@@ -14,26 +14,13 @@ export const initialState: State = {
 }
 
 export function reducer(state: State = initialState, action: Action): State {
+
     switch (action.type) {
         case ActionTypes.UPDATE_AVERAGE_COSTS:
             return {
                 ...state,
                 averageCosts: action.payload
             }
-        case ActionTypes.UPDATE_ANALYSIS_DATES:
-            return {
-                ...state,
-                fromDate: action.payload.from,
-                toDate: action.payload.to
-            }
-
-        default:
-            return state
-    }
-}
-
-export function analysisDateReducer(state: State = initialState, action: Action): State {
-    switch (action.type) {
         case ActionTypes.UPDATE_ANALYSIS_DATES:
             return {
                 ...state,
