@@ -2,7 +2,7 @@ import * as React from "react";
 import TotalTableCell from "../util/TotalTableCell";
 import ClusterCost from "../../models/ClusterCost";
 import ClusterDetailsDialog from "./ClusterDetailsDialog";
-import { Table, TableHead, TableRow, TableCell, TableBody, Typography, Button, withWidth } from '@material-ui/core';
+import { Table, TableHead, TableRow, TableCell, TableBody, Typography } from '@material-ui/core';
 import { toRoundEuroString } from "../../utils/numbers";
 import { getRequest } from '../../utils/rest';
 import { getDateString } from '../../utils/dates';
@@ -74,7 +74,7 @@ export default class ClusterCostTable extends React.Component<ClusterCostTablePr
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell style={{ paddingLeft: 10, paddingRight: 10}}></TableCell>
+                            <TableCell style={{ paddingLeft: 10, paddingRight: 10 }}></TableCell>
                             <TableCell>Typ</TableCell>
                             <TableCell>Mischa</TableCell>
                             <TableCell>Gesa</TableCell>
@@ -85,7 +85,7 @@ export default class ClusterCostTable extends React.Component<ClusterCostTablePr
                         {this.props.clusterCosts.map(row => {
                             return (
                                 <TableRow key={row.cluster} hover onClick={event => this.handleRowClick(event, row.cluster)}>
-                                    <TableCell style={{ paddingLeft: 10, paddingRight: 10}}>
+                                    <TableCell style={{ paddingLeft: 10, paddingRight: 10 }}>
                                         <IconButton onClick={event => this.showClusterDetails(row.cluster)}><ListIcon /></IconButton>
                                     </TableCell>
                                     <TableCell>{row.cluster}</TableCell>
