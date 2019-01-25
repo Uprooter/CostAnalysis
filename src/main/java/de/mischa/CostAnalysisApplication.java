@@ -33,21 +33,21 @@ public class CostAnalysisApplication {
                 jacksonObjectMapperBuilder.timeZone(TimeZone.getTimeZone("Europe/Berlin"));
     }
 
-    @Bean
-    public CommandLineRunner demo(CostItemRepository costRep, InitialCostItemImporterService initialImporter) {
-        return (args) -> {
-
-//            initialImporter.createItems("C:\\Users\\Mischa\\Qsync\\Haushalt\\All.csv");
-            List<CostItem> allItems = costRep.findAll();
-            logger.info(String.valueOf(allItems.size()));
-
-//			Map<CostItem, CostItemPair> duplicates = uploadService.checkForDuplicates(allItems);
-//			for (CostItem key : duplicates.keySet()) {
-//				System.out.println(key.toString());
-//			}
-//			
-//			System.out.println("Done");
-
-        };
-    }
+//    @Bean
+//    public CommandLineRunner demo(CostItemRepository costRep, InitialCostItemImporterService initialImporter) {
+//        return (args) -> {
+//
+////            initialImporter.createItems("C:\\Users\\Mischa\\Qsync\\Haushalt\\All.csv");
+//            List<CostItem> allItems = costRep.findAll();
+//            logger.info(String.valueOf(allItems.size()));
+//
+////			Map<CostItem, CostItemPair> duplicates = uploadService.checkForDuplicates(allItems);
+////			for (CostItem key : duplicates.keySet()) {
+////				System.out.println(key.toString());
+////			}
+////
+////			System.out.println("Done");
+//
+//        };
+//    }
 }

@@ -1,6 +1,8 @@
 package de.mischa.calc;
 
-import static org.hamcrest.CoreMatchers.is;
+import de.mischa.model.*;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -9,13 +11,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import de.mischa.model.AverageCostModel;
-import de.mischa.model.CostItem;
-import de.mischa.model.CostOwner;
-import de.mischa.model.CostType;
+import static org.hamcrest.CoreMatchers.is;
 
 public class AverageCostsCalculationServiceTests {
 
@@ -32,6 +28,9 @@ public class AverageCostsCalculationServiceTests {
         Assert.assertThat(monthlySums.get("92018"), is(-150.0));
     }
 
+    /**
+     * 3 months, 3 values -> sum them up and get average.
+     */
     @Test
     public void testMonthlyAverage() {
         List<CostItem> costTypeItems = new ArrayList<>();
@@ -88,6 +87,8 @@ public class AverageCostsCalculationServiceTests {
 
     private CostItem createCostItem(LocalDate localDate, double amount, CostOwner owner, CostType type) {
         CostItem item = new CostItem();
+        DetailedCostCluster detailedCostCluster = new DetailedCostCluster(CostCluster.ALLGEMEIN, "SomeName");
+        item.setDetailedCluster(detailedCostCluster);
         item.setCreationDate(Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
         item.setAmount(amount);
         item.setOwner(owner);

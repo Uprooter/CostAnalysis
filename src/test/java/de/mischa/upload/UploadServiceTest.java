@@ -3,7 +3,7 @@ package de.mischa.upload;
 import de.mischa.model.*;
 import de.mischa.readin.CostImportEntry;
 import de.mischa.repository.CostItemRepository;
-import de.mischa.utils.DateUtils;
+import de.mischa.service.CostRecipientService;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -24,6 +25,9 @@ public class UploadServiceTest {
     @Mock
     private CostItemRepository itemRep;
 
+    @Mock
+    private CostRecipientService recipientService;
+
     @InjectMocks
     private UploadService uploadService;
 
@@ -32,7 +36,10 @@ public class UploadServiceTest {
      */
     @Test
     public void testOneMatchFound() {
+        String recipientName = "TestRec";
+        CostRecipient rep = new CostRecipient(recipientName);
         CostItem matchingItem = new CostItem();
+        matchingItem.setRecipient(rep);
         matchingItem.setType(CostType.GEHALT);
         DetailedCostCluster detailedCluster = new DetailedCostCluster(CostCluster.GEHALT, "");
         detailedCluster.setId(1L);
@@ -40,8 +47,9 @@ public class UploadServiceTest {
         List<CostItem> matchingItems = new ArrayList<>();
         matchingItems.add(matchingItem);
         when(itemRep.findByRecipientAndOwner(anyString(), any(CostOwner.class))).thenReturn(matchingItems);
+        when(recipientService.findOrCreateTransientRecipient(anyString())).thenReturn(rep);
 
-        CostImportEntry importEntry = new CostImportEntry(new Date(), "TestRec", "SomePurpose", 22.0);
+        CostImportEntry importEntry = new CostImportEntry(new Date(), recipientName, "SomePurpose", 22.0);
         CostItem derivedCostItem = this.uploadService.createItemFromImport(CostOwner.MISCHA, importEntry);
         Assertions.assertThat(derivedCostItem.getType()).isEqualTo(CostType.GEHALT);
         Assertions.assertThat(derivedCostItem.getDetailedCluster().getCluster()).isEqualTo(CostCluster.GEHALT);
@@ -53,13 +61,12 @@ public class UploadServiceTest {
      */
     @Test
     public void testNoneMatchFound() {
-        when(itemRep.findByRecipientAndOwner(anyString(), any(CostOwner.class))).thenReturn(new ArrayList<>());
+        when(recipientService.findOrCreateTransientRecipient(anyString())).thenReturn(new CostRecipient());
 
         CostImportEntry importEntry = new CostImportEntry(new Date(), "SomeUnknownRecipient", "SomePurpose", 22.0);
         CostItem derivedCostItem = this.uploadService.createItemFromImport(CostOwner.MISCHA, importEntry);
         Assertions.assertThat(derivedCostItem.getType()).isNull();
         Assertions.assertThat(derivedCostItem.getDetailedCluster().getName()).isNull();
-
     }
 
     /**
@@ -69,24 +76,27 @@ public class UploadServiceTest {
     @Test
     public void testMultipleMatchesFoundPositive() {
 
+        String recipientName = "TestRec";
+        CostRecipient rep = new CostRecipient(recipientName);
         DetailedCostCluster detailedCluster = new DetailedCostCluster(CostCluster.GEHALT, "");
         detailedCluster.setId(1L);
         CostItem gehaltItem = new CostItem();
+        gehaltItem.setRecipient(rep);
         gehaltItem.setId(1L);
         gehaltItem.setType(CostType.GEHALT);
         gehaltItem.setDetailedCluster(detailedCluster);
 
         CostItem anotherGehaltItem = new CostItem();
+        anotherGehaltItem.setRecipient(rep);
         anotherGehaltItem.setId(2L);
         anotherGehaltItem.setType(CostType.GEHALT);
         anotherGehaltItem.setDetailedCluster(detailedCluster);
 
-        List<CostItem> matchingItems = new ArrayList<>();
-        matchingItems.add(gehaltItem);
-        matchingItems.add(anotherGehaltItem);
+        List<CostItem> matchingItems = Arrays.asList(gehaltItem, anotherGehaltItem);
         when(itemRep.findByRecipientAndOwner(anyString(), any(CostOwner.class))).thenReturn(matchingItems);
+        when(recipientService.findOrCreateTransientRecipient(anyString())).thenReturn(rep);
 
-        CostImportEntry importEntry = new CostImportEntry(new Date(), "TestRec", "SomePurpose", 22.0);
+        CostImportEntry importEntry = new CostImportEntry(new Date(), recipientName, "SomePurpose", 22.0);
         CostItem derivedCostItem = this.uploadService.createItemFromImport(CostOwner.MISCHA, importEntry);
         Assertions.assertThat(derivedCostItem.getType()).isEqualTo(CostType.GEHALT);
         Assertions.assertThat(derivedCostItem.getDetailedCluster().getCluster()).isEqualTo(CostCluster.GEHALT);
@@ -115,7 +125,7 @@ public class UploadServiceTest {
         List<CostItem> matchingItems = new ArrayList<>();
         matchingItems.add(gehaltItem);
         matchingItems.add(anotherGehaltItem);
-        when(itemRep.findByRecipientAndOwner(anyString(), any(CostOwner.class))).thenReturn(matchingItems);
+        when(recipientService.findOrCreateTransientRecipient(anyString())).thenReturn(new CostRecipient());
 
         CostImportEntry importEntry = new CostImportEntry(new Date(), "TestRec", "SomePurpose", 22.0);
         CostItem derivedCostItem = this.uploadService.createItemFromImport(CostOwner.MISCHA, importEntry);
@@ -130,9 +140,12 @@ public class UploadServiceTest {
     @Test
     public void testFindWithNoRecipientInfo() {
 
+        String recipientName = "TestRec";
+        CostRecipient rep = new CostRecipient(recipientName);
         String purposePrefix = "Some Pur pose";
         DetailedCostCluster detailedCluster = new DetailedCostCluster(CostCluster.GEHALT, "");
         CostItem gehaltItem = new CostItem();
+        gehaltItem.setRecipient(rep);
         gehaltItem.setId(1L);
         gehaltItem.setPurpose(purposePrefix + " sdakdjjadjklk");
         gehaltItem.setType(CostType.GEHALT);
@@ -140,15 +153,17 @@ public class UploadServiceTest {
 
         CostItem gehaltItem2 = new CostItem();
         gehaltItem2.setId(2L);
+        gehaltItem2.setRecipient(rep);
         gehaltItem2.setPurpose(purposePrefix + " 11111");
         gehaltItem2.setType(CostType.GEHALT);
         gehaltItem2.setDetailedCluster(detailedCluster);
-        List<CostItem> matchingItems = new ArrayList<>();
-        matchingItems.add(gehaltItem);
-        matchingItems.add(gehaltItem2);
-        when(itemRep.findByRecipientAndOwnerLatestFirst(anyString(), any(CostOwner.class))).thenReturn(matchingItems);
 
-        CostImportEntry importEntry = new CostImportEntry(new Date(), null, purposePrefix + " dasdad", 22.0);
+        List<CostItem> matchingItems = Arrays.asList(gehaltItem, gehaltItem2);
+
+        when(itemRep.findByRecipientAndOwnerLatestFirst(anyString(), any(CostOwner.class))).thenReturn(matchingItems);
+        when(recipientService.findOrCreateTransientRecipient(anyString())).thenReturn(new CostRecipient());
+
+        CostImportEntry importEntry = new CostImportEntry(new Date(), "", purposePrefix + " dasdad", 22.0);
         CostItem derivedCostItem = this.uploadService.createItemFromImport(CostOwner.MISCHA, importEntry);
         Assertions.assertThat(derivedCostItem.getType()).isEqualTo(CostType.GEHALT);
         Assertions.assertThat(derivedCostItem.getDetailedCluster().getCluster()).isEqualTo(CostCluster.GEHALT);
@@ -161,25 +176,27 @@ public class UploadServiceTest {
     @Test
     public void testFindWithNoRecipientInfoNegative() {
 
+        CostRecipient rep = new CostRecipient("SomeRecipient");
         String purposePrefix = "Some Pur pose";
         DetailedCostCluster detailedCluster = new DetailedCostCluster(CostCluster.GEHALT, "");
         CostItem gehaltItem = new CostItem();
         gehaltItem.setId(1L);
+        gehaltItem.setRecipient(rep);
         gehaltItem.setPurpose(purposePrefix + " sdakdjjadjklk");
         gehaltItem.setType(CostType.GEHALT);
         gehaltItem.setDetailedCluster(detailedCluster);
 
         CostItem gehaltItem2 = new CostItem();
         gehaltItem2.setId(2L);
+        gehaltItem2.setRecipient(rep);
         gehaltItem2.setPurpose(purposePrefix + " 11111");
         gehaltItem2.setType(CostType.GEHALT);
         gehaltItem2.setDetailedCluster(detailedCluster);
-        List<CostItem> matchingItems = new ArrayList<>();
-        matchingItems.add(gehaltItem);
-        matchingItems.add(gehaltItem2);
+        List<CostItem> matchingItems = Arrays.asList(gehaltItem, gehaltItem2);
         when(itemRep.findByRecipientAndOwnerLatestFirst(anyString(), any(CostOwner.class))).thenReturn(matchingItems);
+        when(recipientService.findOrCreateTransientRecipient(anyString())).thenReturn(new CostRecipient());
 
-        CostImportEntry importEntry = new CostImportEntry(new Date(), null, "dasd asd dasdad", 22.0);
+        CostImportEntry importEntry = new CostImportEntry(new Date(), "", "dasd asd dasdad", 22.0);
         CostItem derivedCostItem = this.uploadService.createItemFromImport(CostOwner.MISCHA, importEntry);
         Assertions.assertThat(derivedCostItem.getType()).isNull();
     }
@@ -209,80 +226,4 @@ public class UploadServiceTest {
         Assertions.assertThat(item.getType()).isEqualTo(CostType.GEHALT);
     }
 
-    @Test
-    public void testFindEqual() {
-        DetailedCostCluster detailedCluster = new DetailedCostCluster(CostCluster.GEHALT, "");
-        CostItem itemToMatch = new CostItem();
-        itemToMatch.setId(1L);
-        itemToMatch.setAmount(22.0);
-        itemToMatch.setPurpose("SomePurpose");
-        itemToMatch.setType(CostType.GEHALT);
-        itemToMatch.setDetailedCluster(detailedCluster);
-        itemToMatch.setRecipient(new CostRecipient("SomeRecipient"));
-        itemToMatch.setCreationDate(DateUtils.createDate("01.01.2018"));
-
-        List<CostItem> allItems = new ArrayList<>();
-        allItems.add(itemToMatch);
-        Assertions.assertThat(this.uploadService.itemService.foundEqual(itemToMatch, allItems)).isEqualTo(itemToMatch);
-
-        CostItem differentDateItem = CostItem.copy(itemToMatch);
-        differentDateItem.setId(2L);
-        differentDateItem.setCreationDate(DateUtils.createDate("02.01.2018"));
-        allItems.add(differentDateItem);
-        Assertions.assertThat(this.uploadService.itemService.foundEqual(itemToMatch, allItems)).isEqualTo(itemToMatch);
-
-        allItems = new ArrayList<>();
-        allItems.add(differentDateItem);
-        Assertions.assertThat(this.uploadService.itemService.foundEqual(itemToMatch, allItems)).isNull();
-
-        CostItem differentAmount = CostItem.copy(itemToMatch);
-        differentAmount.setId(3L);
-        differentAmount.setAmount(21.0);
-
-        allItems = new ArrayList<>();
-        allItems.add(differentAmount);
-        Assertions.assertThat(this.uploadService.itemService.foundEqual(itemToMatch, allItems)).isNull();
-
-    }
-
-    @Test
-    public void testFindSimilar() {
-        DetailedCostCluster detailedCluster = new DetailedCostCluster(CostCluster.GEHALT, "");
-        CostItem itemToMatch = new CostItem();
-        itemToMatch.setId(1L);
-        itemToMatch.setAmount(22.0);
-        itemToMatch.setPurpose("SomePurpose");
-        itemToMatch.setType(CostType.GEHALT);
-        itemToMatch.setDetailedCluster(detailedCluster);
-        itemToMatch.setRecipient(new CostRecipient("SomeRecipient"));
-        itemToMatch.setCreationDate(DateUtils.createDate("01.01.2018"));
-
-        List<CostItem> allItems = new ArrayList<>();
-        allItems.add(itemToMatch);
-        Assertions.assertThat(this.uploadService.itemService.foundSimilar(itemToMatch, allItems)).isEqualTo(itemToMatch);
-
-        CostItem differentDateItem = CostItem.copy(itemToMatch);
-        differentDateItem.setId(2L);
-        differentDateItem.setCreationDate(DateUtils.createDate("02.01.2018"));
-        allItems.add(differentDateItem);
-        Assertions.assertThat(this.uploadService.itemService.foundSimilar(itemToMatch, allItems)).isEqualTo(itemToMatch);
-
-        allItems = new ArrayList<>();
-        allItems.add(differentDateItem);
-        Assertions.assertThat(this.uploadService.itemService.foundSimilar(itemToMatch, allItems)).isNull();
-
-        CostItem differentAmount = CostItem.copy(itemToMatch);
-        differentAmount.setId(3L);
-        differentAmount.setAmount(21.0);
-        allItems = new ArrayList<>();
-        allItems.add(differentAmount);
-        Assertions.assertThat(this.uploadService.itemService.foundSimilar(itemToMatch, allItems)).isNull();
-
-        CostItem purposeDifferent = CostItem.copy(itemToMatch);
-        differentAmount.setId(4L);
-        differentAmount.setPurpose("121");
-        allItems = new ArrayList<>();
-        allItems.add(purposeDifferent);
-        Assertions.assertThat(this.uploadService.itemService.foundSimilar(itemToMatch, allItems)).isEqualTo(itemToMatch);
-    }
 }
