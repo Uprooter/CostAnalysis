@@ -77,18 +77,25 @@ public class UploadRestController {
     private AbstractCostImporter determineReader(InputStream inputStream) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.ISO_8859_1));
 
-        while (reader.ready()) {
-            String firstLine = reader.readLine();
-            if (firstLine.startsWith("Umsatzanzeige")) {
-                return new INGCostReader();
-            } else if (firstLine.endsWith("235")) {
-                return new DBCostReader();
-            } else {
-                return null;
-            }
-        }
+        List<String> lines = readFileLines(reader);
 
-        return null;
+        if (lines.get(0).startsWith("Umsatzanzeige") && lines.get(8).isEmpty()) {
+            return new INGCostReader();
+        } else if (lines.get(0).startsWith("Umsatzanzeige") && lines.get(8).startsWith("Saldo")) {
+            logger.error("Cannot import this file, please download without Saldo");
+            return null;
+        } else if (lines.get(0).endsWith("235")) {
+            return new DBCostReader();
+        } else {
+            return null;
+        }
     }
 
+    private List<String> readFileLines(BufferedReader reader) throws IOException {
+        List<String> lines = new ArrayList<>();
+        while (reader.ready()) {
+            lines.add(reader.readLine());
+        }
+        return lines;
+    }
 }
