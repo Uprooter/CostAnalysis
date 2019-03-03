@@ -2,8 +2,6 @@ package de.mischa.calc;
 
 import de.mischa.model.*;
 import de.mischa.repository.CostItemRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,14 +16,10 @@ import java.util.stream.Collectors;
 @Service
 public class AverageCostsCalculationService {
 
-    private static final Logger logger = LoggerFactory.getLogger(AverageCostsCalculationService.class);
-
     @Autowired
     private CostItemRepository costItemRep;
 
     public AverageCostModel calculate(Date from, Date to, boolean includeOthers, boolean savingsAreCosts) {
-
-        logger.info("from:" + from + " to:" + to);
         List<CostItem> relevantItems = this.costItemRep.findRelevant(from, to).stream()
                 .filter(i -> i.getDetailedCluster().getCluster() != CostCluster.UMBUCHUNG).collect(Collectors.toList());
 
@@ -91,7 +85,7 @@ public class AverageCostsCalculationService {
                 && item.getDetailedCluster().getName().equals(DetailedCostCluster.DAUERAUFTRAG);
     }
 
-    double calculateMonthlySavingsAverage(List<CostItem> relevantItems, CostOwner owner, boolean savingsAreCosts) {
+    private double calculateMonthlySavingsAverage(List<CostItem> relevantItems, CostOwner owner, boolean savingsAreCosts) {
         List<CostItem> ownerItems = relevantItems.stream().filter(i -> i.getOwner() == owner)
                 .collect(Collectors.toList());
 

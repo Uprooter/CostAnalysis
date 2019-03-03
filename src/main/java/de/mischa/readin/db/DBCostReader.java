@@ -16,7 +16,7 @@ public class DBCostReader extends AbstractCostImporter {
     private static final String[] COLUMN_NAMES = {DATE_COLUMN_NAME, "Wert", "Umsatzart", RECIPIENT_COLUMN_NAME,
             PURPOSE_COLUMN_NAME, "IBAN", "BIC", "Kundenreferenz", "Mandatsreferenz", "Gläubiger ID", "Fremde Gebühren",
             "Betrag", "Abweichender Empfänger", "Anzahl der Aufträge", "Anzahl der Schecks", AMOUNT_NEG_COLUMN_NAME,
-            AMOUNT_POS_COLUMN_NAME, "Währung"};
+            AMOUNT_POS_COLUMN_NAME, "FX"};
 
     public DBCostReader() {
         super(new ImportConfig(COLUMN_NAMES, DATE_COLUMN_NAME, RECIPIENT_COLUMN_NAME, PURPOSE_COLUMN_NAME,

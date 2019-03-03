@@ -8,17 +8,17 @@ import de.mischa.readin.AbstractCostImporter;
 import de.mischa.readin.CostImportEntry;
 import de.mischa.readin.db.DBCostReader;
 import de.mischa.readin.ing.INGCostReader;
+import de.mischa.readin.ing.INGCostReaderWithSaldo;
+import de.mischa.upload.UploadException;
 import de.mischa.upload.UploadService;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -36,12 +36,14 @@ public class UploadRestController {
     private static final Logger logger = LoggerFactory.getLogger(UploadRestController.class);
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public List<CostItem> uploadNewItems(@RequestParam("file") MultipartFile file) {
+    public List<CostItem> uploadNewItems(@RequestParam("file") MultipartFile file) throws UploadException {
         try {
-            AbstractCostImporter reader = this.determineReader(file.getInputStream());
+            InputStream stream = getCleanedInputStream(file);
+
+            AbstractCostImporter reader = this.determineReader(stream);
 
             if (reader != null) {
-                return this.createItems(reader.read(file.getInputStream()), reader.getCostOwner());
+                return this.createItems(reader.read(getCleanedInputStream(file)), reader.getCostOwner());
             } else {
                 logger.info("Could not determine format");
                 return new ArrayList<>();
@@ -50,6 +52,21 @@ public class UploadRestController {
             logger.info(e.getLocalizedMessage());
         }
         return new ArrayList<>();
+    }
+
+    /**
+     * If file contains 2 times 'Währung' then replace the first one with 'FX' in order to be able to parse the CSV.
+     *
+     * @param file The file to be cleaned
+     * @return Input stream without duplicate 'Währung' entries.
+     * @throws IOException
+     */
+    private InputStream getCleanedInputStream(@RequestParam("file") MultipartFile file) throws IOException {
+        File tempFile = File.createTempFile("costimport", ".csv");
+        FileUtils.copyInputStreamToFile(file.getInputStream(), tempFile);
+        String fileContent = FileUtils.readFileToString(tempFile, StandardCharsets.ISO_8859_1);
+        String modifiedFileContent = fileContent.replaceFirst("Währung", "FX");
+        return new ByteArrayInputStream(modifiedFileContent.getBytes(StandardCharsets.ISO_8859_1));
     }
 
     @RequestMapping(value = "/upload/single", method = RequestMethod.POST)
@@ -74,7 +91,7 @@ public class UploadRestController {
         return costItems;
     }
 
-    private AbstractCostImporter determineReader(InputStream inputStream) throws IOException {
+    private AbstractCostImporter determineReader(InputStream inputStream) throws IOException, UploadException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.ISO_8859_1));
 
         List<String> lines = readFileLines(reader);
@@ -82,12 +99,11 @@ public class UploadRestController {
         if (lines.get(0).startsWith("Umsatzanzeige") && lines.get(8).isEmpty()) {
             return new INGCostReader();
         } else if (lines.get(0).startsWith("Umsatzanzeige") && lines.get(8).startsWith("Saldo")) {
-            logger.error("Cannot import this file, please download without Saldo");
-            return null;
+            return new INGCostReaderWithSaldo();
         } else if (lines.get(0).endsWith("235")) {
             return new DBCostReader();
         } else {
-            return null;
+            throw new UploadException("Unexpected file format", "1");
         }
     }
 

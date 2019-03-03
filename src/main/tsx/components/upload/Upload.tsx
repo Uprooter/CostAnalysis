@@ -1,8 +1,9 @@
 import * as React from "react";
 import { NavigatioPageUpdateAction } from "../../actions/actions";
 import Page from "../../utils/pages";
+import ErrorBoundary from "../util/ErrorBoundary";
 import Button from '@material-ui/core/Button';
-import { SnackbarProvider, withSnackbar, InjectedNotistackProps, VariantType } from 'notistack';
+import { SnackbarProvider, withSnackbar, InjectedNotistackProps } from 'notistack';
 import * as rest from 'rest';
 import * as mime from 'rest/interceptor/mime';
 import CostItemModel from "../../models/CostItemModel";
@@ -35,6 +36,7 @@ class Upload extends React.Component<InjectedNotistackProps, UploadState> {
             },
             method: "POST"
         }).then(r => {
+            console.log(r.status);
             let newImportedItems: CostItemModel[] = r.entity;
             let newMappedItems: CostItemModel[] = new Array<CostItemModel>();
             let newUnmappedItems: CostItemModel[] = new Array<CostItemModel>();
@@ -51,6 +53,8 @@ class Upload extends React.Component<InjectedNotistackProps, UploadState> {
                 }
             }
             this.setState({ mappedItems: newMappedItems, unmappedItems: newUnmappedItems });
+        }).catch(reason => {
+            this.displayMessage(reason.entity, "error");
         });
     }
 
@@ -220,7 +224,9 @@ class IntegratedUploadWithSnackbar extends React.Component<UploadProps, {}> {
     render() {
         return (
             <SnackbarProvider maxSnack={3} anchorOrigin={{ vertical: "top", horizontal: "center" }}>
-                <UploadWithSnackbar />
+                <ErrorBoundary>
+                    <UploadWithSnackbar />
+                </ErrorBoundary>
             </SnackbarProvider>
         );
     }
