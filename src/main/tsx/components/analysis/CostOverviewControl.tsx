@@ -3,6 +3,7 @@ import { FormControlLabel, Button, Switch, FormGroup, Grid, TextField } from '@m
 import { getDateString, getDashDateString, getOneYearBefore } from "../../utils/dates";
 import { getRequest } from "../../utils/rest";
 import AverageCostResult from "../../models/AverageCostResult";
+import Month from "../../models/Month";
 import { UpdateAverageCostsAction, UpdateClusterCostsAction, UpdateAnalysisDatesAction } from "../../actions/actions";
 import ClusterCost from "../../models/ClusterCost";
 
@@ -91,9 +92,21 @@ export default class CostOverviewControl extends React.Component<CostOverviewCon
         this.props.updateAnalysisDates(fromDate, toDate);
     }
 
+    updateDateRangeToSelectedMonth(month: Month) {
+        let currentYear: number = this.props.from.getFullYear();
+
+        let fromDate: Date = new Date(currentYear, month.number, 1, 22);
+        let toDate: Date = new Date(currentYear, (month.number + 1), 0, 22); // calculate last day of a month
+
+        this.props.updateAnalysisDates(fromDate, toDate);
+    }
+
     render() {
         const gridItemStyle = { marginLeft: 10, marginTop: 20 };
         const years = this.getYears();
+        const months: Month[] = [new Month("Jan", 0), new Month("Feb", 1), new Month("Mär", 2),
+        new Month("Apr", 3), new Month("Mai", 4), new Month("Jun", 5), new Month("Jul", 6),
+        new Month("Aug", 7), new Month("Sep", 8), new Month("Oct", 9), new Month("Nov", 10), new Month("Dec", 11)];
         return (
             <Grid container spacing={16}>
                 <Grid item sm style={gridItemStyle}>
@@ -118,6 +131,16 @@ export default class CostOverviewControl extends React.Component<CostOverviewCon
                         })
                     }
                 </Grid>
+                <Grid item sm style={gridItemStyle}>                   
+                    {
+                        months.map(month => {
+                            return (
+                                <Button variant="outlined" key={month.number} onClick={() => { this.updateDateRangeToSelectedMonth(month) }}>
+                                    {month.name}
+                                </Button>);
+                        })
+                    }
+                </Grid>
                 <Grid item xs style={gridItemStyle}>
                     <FormGroup row>
                         <FormControlLabel
@@ -129,9 +152,10 @@ export default class CostOverviewControl extends React.Component<CostOverviewCon
                             control={
                                 <Switch checked={this.state.savingsAreCosts} onChange={(e, checked) => { this.handleWithSavingsChange(checked) }} />
                             }
-                            label="Sparbeiträge sind Kosten" />
+                            label="Spar-Daueraufträge sind Kosten" />
                     </FormGroup>
                 </Grid>
+
                 <Grid item sm style={gridItemStyle}>
                     <Button variant="contained" color="primary" onClick={() => { this.updateCosts() }}>Laden</Button>
                 </Grid>
