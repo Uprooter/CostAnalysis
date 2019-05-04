@@ -26,6 +26,9 @@ public interface CostItemRepository extends CrudRepository<CostItem, Long> {
     @Query("SELECT c FROM CostItem c WHERE c.detailedCluster.cluster=:cluster and c.owner=:owner order by c.creationDate asc")
     List<CostItem> findByClusterAndOwner(CostCluster cluster, CostOwner owner);
 
+    @Query("SELECT c FROM CostItem c WHERE c.detailedCluster.cluster=:cluster and c.owner=:owner and c.creationDate between :from and :to order by c.creationDate asc")
+    List<CostItem> findByClusterAndOwnerForPeriod(CostCluster cluster, CostOwner owner, @Param("from") Date from, @Param("to") Date to);
+
     @Query("SELECT c FROM CostItem c WHERE c.creationDate between :from and :to and c.detailedCluster.cluster=:cluster order by c.creationDate asc")
     List<CostItem> findRelevantByCluster(Date from, Date to, CostCluster cluster);
 }

@@ -58,8 +58,15 @@ public class CostClusterRestController {
         return costItemRepository.findRelevantByCluster(from, to, CostCluster.valueOf(clusterName));
     }
 
-    @RequestMapping("/costsByCluster")
-    public List<YearlyCost> getCostsByCluster(@RequestParam(value = "cluster") String clusterName) {
-        return clusterCostService.calculate(CostCluster.valueOf(clusterName));
+    @RequestMapping("/costsByClusterYearly")
+    public List<TimeFrameCostEntry> getYearlyCostsByCluster(@RequestParam(value = "cluster") String clusterName) {
+        return clusterCostService.calculateYearly(CostCluster.valueOf(clusterName));
+    }
+
+    @RequestMapping("/costsByClusterMonthly")
+    public List<TimeFrameCostEntry> getMonthlyCostsByCluster(
+            @RequestParam(value = "cluster") String clusterName,
+            @DateTimeFormat(pattern = "dd.MM.yyyy") Date from) {
+        return clusterCostService.calculateMonthlyLast12From(CostCluster.valueOf(clusterName), from);
     }
 }

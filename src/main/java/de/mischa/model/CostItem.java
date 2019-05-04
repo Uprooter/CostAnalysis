@@ -77,6 +77,17 @@ public class CostItem {
         return -1;
     }
 
+    public String getCreationDateMonthYear() {
+        if (this.creationDate != null) {
+            Calendar c = Calendar.getInstance();
+            c.setTime(this.creationDate);
+
+            return "" + (c.get(Calendar.MONTH) + 1) + "." + c.get(Calendar.YEAR);
+        }
+
+        return "";
+    }
+
     @Override
     public int hashCode() {
         HashCodeBuilder builder = new HashCodeBuilder();

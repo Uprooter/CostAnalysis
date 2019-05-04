@@ -58,7 +58,7 @@ public class ClusterCostService {
         return clusterMap;
     }
 
-    public List<YearlyCost> calculate(CostCluster cluster) {
+    public List<TimeFrameCostEntry> calculateYearly(CostCluster cluster) {
         Map<Integer, Double> mischaClusterCosts =
                 this.costItemRep.findByClusterAndOwner(cluster, CostOwner.MISCHA).stream().collect(
                         Collectors.groupingBy(
@@ -68,22 +68,60 @@ public class ClusterCostService {
                         Collectors.groupingBy(
                                 CostItem::getCreationDateYear, Collectors.summingDouble(CostItem::getAmount)));
 
-        List<YearlyCost> result = new ArrayList<>();
-        mischaClusterCosts.forEach((k, v) -> result.add(new YearlyCost(k, v * -1.0, 0.0)));
-        gesaClusterCosts.forEach((k, v) -> this.updateOrAddGesaAmount(k, v * -1.0, result));
-        result.sort(Comparator.comparing(YearlyCost::getYear));
+        List<TimeFrameCostEntry> result = new ArrayList<>();
+        mischaClusterCosts.forEach((k, v) -> result.add(new TimeFrameCostEntry(k.toString(), v * -1.0, 0.0)));
+        gesaClusterCosts.forEach((k, v) -> this.updateOrAddGesaYearlyAmount(k.toString(), v * -1.0, result));
+        result.sort(Comparator.comparing(TimeFrameCostEntry::getTimeFrame));
         return result;
     }
 
-    private void updateOrAddGesaAmount(Integer year, Double gesaAmount, List<YearlyCost> result) {
+    public List<TimeFrameCostEntry> calculateMonthlyLast12From(CostCluster cluster, Date from) {
+        Calendar periodFrom = Calendar.getInstance();
+        periodFrom.setTime(from);
+        periodFrom.add(Calendar.MONTH, -12);
+        periodFrom.set(Calendar.DATE, 1); // need first day of moth
 
-        for (YearlyCost yearlyCost : result) {
-            if (yearlyCost.getYear() == year) {
+        Calendar periodTo = Calendar.getInstance();
+        periodTo.setTime(from); // need to select the items until current month
+        periodTo.set(Calendar.DATE, periodTo.getActualMaximum(Calendar.DATE)); // need last day of month
+
+        Map<String, Double> mischaClusterCosts =
+                this.costItemRep.findByClusterAndOwnerForPeriod(cluster, CostOwner.MISCHA, periodFrom.getTime(), periodTo.getTime())
+                        .stream().collect(
+                        Collectors.groupingBy(
+                                CostItem::getCreationDateMonthYear, Collectors.summingDouble(CostItem::getAmount)));
+        Map<String, Double> gesaClusterCosts =
+                this.costItemRep.findByClusterAndOwnerForPeriod(cluster, CostOwner.GESA, periodFrom.getTime(), periodTo.getTime())
+                        .stream().collect(
+                        Collectors.groupingBy(
+                                CostItem::getCreationDateMonthYear, Collectors.summingDouble(CostItem::getAmount)));
+
+        List<TimeFrameCostEntry> result = new ArrayList<>();
+        mischaClusterCosts.forEach((k, v) -> result.add(new TimeFrameCostEntry(k, v * -1.0, 0.0)));
+        gesaClusterCosts.forEach((k, v) -> this.updateOrAddGesaMonthlyAmount(k, v * -1.0, result));
+        result.sort(new TimeFrameCostEntryComparator());
+        return result;
+    }
+
+    private void updateOrAddGesaYearlyAmount(String year, Double gesaAmount, List<TimeFrameCostEntry> result) {
+        for (TimeFrameCostEntry yearlyCost : result) {
+            if (yearlyCost.getTimeFrame().equals(year)) {
                 yearlyCost.setGesaAmount(gesaAmount);
                 return;
             }
         }
 
-        result.add(new YearlyCost(year, 0.0, gesaAmount));
+        result.add(new TimeFrameCostEntry(year, 0.0, gesaAmount));
+    }
+
+    private void updateOrAddGesaMonthlyAmount(String monthYear, Double gesaAmount, List<TimeFrameCostEntry> result) {
+        for (TimeFrameCostEntry timeFrameCostEntry : result) {
+            if (timeFrameCostEntry.getTimeFrame().equals(monthYear)) {
+                timeFrameCostEntry.setGesaAmount(gesaAmount);
+                return;
+            }
+        }
+
+        result.add(new TimeFrameCostEntry(monthYear, 0.0, gesaAmount));
     }
 }

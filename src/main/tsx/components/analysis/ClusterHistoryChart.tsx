@@ -1,26 +1,27 @@
 import * as React from 'react';
 import { Chart } from "chart.js";
 import { Typography } from '@material-ui/core';
-import YearlyCost from '../../models/YearlyCost';
+import TimeFrameCostEntry from '../../models/TimeFrameCostEntry';
 
 const ClusterHistoryChart = (props: any) => {
 
-    const getJSONForOwer = function (owner: string, yearlyClusterCosts: YearlyCost[]) {
-        if (yearlyClusterCosts.length === 0) {
+    const getJSONForOwer = function (owner: string, clusterCosts: TimeFrameCostEntry[]) {
+        if (clusterCosts.length === 0) {
             return {};
         }
         let jsonString: string = "{";
-        for (let yearlyCost of yearlyClusterCosts) {
+        for (let costPerTime of clusterCosts) {
             if (owner === "mischa") {
-                jsonString += "\"" + yearlyCost.year.toString() + "\":" + yearlyCost.mischaAmount + ",";
+                jsonString += "\"" + costPerTime.timeFrame + "\":" + costPerTime.mischaAmount + ",";
             }
             else {
-                jsonString += "\"" + yearlyCost.year.toString() + "\":" + yearlyCost.gesaAmount + ",";
+                jsonString += "\"" + costPerTime.timeFrame + "\":" + costPerTime.gesaAmount + ",";
             }
         }
 
         return JSON.parse(jsonString.substring(0, (jsonString.length - 1)) + "}");
     }
+
 
     let chartKick = require("react-chartkick");
     chartKick.default.addAdapter(Chart);
@@ -33,8 +34,8 @@ const ClusterHistoryChart = (props: any) => {
             <chartKick.ColumnChart
                 colors={["#2196f3", "#0174DF"]}
                 stacked={true}
-                data={[{ "name": "Mischa", "data": getJSONForOwer("mischa", props.yearlyClusterCosts) },
-                { "name": "Gesa", "data": getJSONForOwer("gesa", props.yearlyClusterCosts) }]} />
+                data={[{ "name": "Mischa", "data": getJSONForOwer("mischa", props.clusterCosts) },
+                { "name": "Gesa", "data": getJSONForOwer("gesa", props.clusterCosts) }]} />
 
         </React.Fragment>
     );
