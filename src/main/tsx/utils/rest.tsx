@@ -9,6 +9,11 @@ export function getEmbeddedArray(path: string): [] {
         embeddedArray = r.entity._embedded;
     });
 
-     console.log(embeddedArray);
+    console.log(embeddedArray);
     return embeddedArray;
+}
+
+export function getRequest(path: string): rest.ResponsePromise {
+    let client = rest.wrap(mime);
+    return client({ path: path });
 }

@@ -1,59 +1,59 @@
 package de.mischa.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import lombok.Data;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import javax.persistence.*;
 
 @Entity
 @Table(name = "DETAILED_COST_CLUSTER")
+@Data
+@SequenceGenerator(name = "detailed_cluster_id_gen", allocationSize = 1, sequenceName = "ID_SEQUENCE")
 public class DetailedCostCluster {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+    public static final String DAUERAUFTRAG = "Dauerauftrag";
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "detailed_cluster_id_gen")
+    @Column(nullable = false, name = "ID", unique = true)
+    private Long id;
 
-	@Column(nullable = false)
-	private CostCluster cluster;
+    @Column(nullable = false, name = "COST_CLUSTER")
+    @Enumerated(EnumType.STRING)
+    private CostCluster cluster;
 
-	@Column(unique = true, nullable = false)
-	private String name;
-	
-	public DetailedCostCluster()
-	{
-		
-	}
+    private String name;
 
-	public DetailedCostCluster(CostCluster cluster, String name) {
-		super();
-		this.cluster = cluster;
-		this.name = name;
-	}
+    public DetailedCostCluster() {
 
-	public Long getId() {
-		return id;
-	}
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public DetailedCostCluster(CostCluster cluster, String name) {
+        super();
+        this.cluster = cluster;
+        this.name = name;
+    }
 
-	public CostCluster getCluster() {
-		return cluster;
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof DetailedCostCluster)) {
+            return false;
+        }
 
-	public void setCluster(CostCluster cluster) {
-		this.cluster = cluster;
-	}
+        DetailedCostCluster other = (DetailedCostCluster) o;
 
-	public String getName() {
-		return name;
-	}
+        if (this.getId() == null || other.getId() == null) {
+            return false;
+        }
+        EqualsBuilder builder = new EqualsBuilder();
+        builder.append(getId(), other.getId());
+        return builder.isEquals();
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
+    @Override
+    public int hashCode() {
+        HashCodeBuilder builder = new HashCodeBuilder();
+        builder.append(getId());
+        return builder.hashCode();
+    }
 }

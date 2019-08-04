@@ -1,122 +1,111 @@
 package de.mischa.model;
 
-import java.util.Date;
+import lombok.Data;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.Calendar;
+import java.util.Date;
 
 @Entity
 @Table(name = "COST_ITEM")
+@Data
 public class CostItem {
 
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "cost_item_id_gen")
+    @SequenceGenerator(name = "cost_item_id_gen", allocationSize = 1, sequenceName = "ID_SEQUENCE")
+    private Long id;
 
-	@Column
-	private Date creationDate;
+    @Column
+    private Date creationDate;
 
-	@ManyToOne
-	@JoinColumn(name = "RECIPIENT_ID")
-	private CostRecipient recipient;
+    @ManyToOne
+    @JoinColumn(name = "RECIPIENT_ID")
+    private CostRecipient recipient;
 
-	@Column
-	private String reason;
+    @Column
+    private String purpose;
 
-	@Column
-	private Double amount;
+    @Column
+    private Double amount;
 
-	@Column
-	private CostOwner owner;
-	
-	@Column
-	private CostType type;
-	
-	@Column
-	private CostCluster cluster;
-	
-	@ManyToOne
-	@JoinColumn(name = "DETAILED_CLUSTER_ID")
-	private DetailedCostCluster detailedCluster;
+    @Column
+    @Enumerated(EnumType.STRING)
+    private CostOwner owner;
 
-	public Long getId() {
-		return id;
-	}
+    @Column
+    @Enumerated(EnumType.STRING)
+    private CostType type;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    @ManyToOne
+    @JoinColumn(name = "DETAILED_CLUSTER_ID")
+    private DetailedCostCluster detailedCluster;
 
-	public Date getCreationDate() {
-		return creationDate;
-	}
+    @Transient
+    private int clientId;
 
-	public void setCreationDate(Date creationDate) {
-		this.creationDate = creationDate;
-	}
+    public String toString() {
+        return "Cluster: " + this.getDetailedCluster().getCluster() + " Amount: " + this.getAmount() + " Recipient:"
+                + this.getRecipient().getName();
+    }
 
-	public CostRecipient getRecipient() {
-		return recipient;
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof CostItem)) {
+            return false;
+        }
 
-	public void setRecipient(CostRecipient recipient) {
-		this.recipient = recipient;
-	}
+        CostItem other = (CostItem) o;
 
-	public String getReason() {
-		return reason;
-	}
+        if (this.getId() == null || other.getId() == null) {
+            return false;
+        }
+        EqualsBuilder builder = new EqualsBuilder();
+        builder.append(getId(), other.getId());
+        return builder.isEquals();
+    }
 
-	public void setReason(String reason) {
-		this.reason = reason;
-	}
+    public int getCreationDateYear() {
+        if (this.creationDate != null) {
+            Calendar c = Calendar.getInstance();
+            c.setTime(this.creationDate);
+            return c.get(Calendar.YEAR);
+        }
 
-	public Double getAmount() {
-		return amount;
-	}
+        return -1;
+    }
 
-	public void setAmount(Double amount) {
-		this.amount = amount;
-	}
+    public String getCreationDateMonthYear() {
+        if (this.creationDate != null) {
+            Calendar c = Calendar.getInstance();
+            c.setTime(this.creationDate);
 
-	public CostOwner getOwner() {
-		return owner;
-	}
+            return "" + (c.get(Calendar.MONTH) + 1) + "." + c.get(Calendar.YEAR);
+        }
 
-	public void setOwner(CostOwner owner) {
-		this.owner = owner;
-	}
+        return "";
+    }
 
-	public CostType getType() {
-		return type;
-	}
+    @Override
+    public int hashCode() {
+        HashCodeBuilder builder = new HashCodeBuilder();
+        builder.append(getId());
+        return builder.hashCode();
+    }
 
-	public void setType(CostType type) {
-		this.type = type;
-	}
+    public static CostItem copy(CostItem toCopy) {
+        CostItem copy = new CostItem();
+        copy.setAmount(toCopy.getAmount());
+        copy.setPurpose(toCopy.getPurpose());
+        copy.setType(toCopy.getType());
+        copy.setDetailedCluster(toCopy.getDetailedCluster());
+        copy.setRecipient(toCopy.getRecipient());
+        copy.setCreationDate(toCopy.getCreationDate());
+        copy.setOwner(toCopy.getOwner());
 
-	public CostCluster getCluster() {
-		return cluster;
-	}
-
-	public void setCluster(CostCluster cluster) {
-		this.cluster = cluster;
-	}
-
-	public DetailedCostCluster getDetailedCluster() {
-		return detailedCluster;
-	}
-
-	public void setDetailedCluster(DetailedCostCluster detailedCluster) {
-		this.detailedCluster = detailedCluster;
-	}
-	
-	
+        return copy;
+    }
 
 }

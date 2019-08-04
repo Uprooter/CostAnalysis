@@ -1,0 +1,8 @@
+Umsätze persönliches Konto (00);;;Kundennummer: 111 1111111;;;;;;;;;;;;;;
+03.09.2020 - 16.11.2040;;;;;;;;;;;;;;;;;
+Letzter Kontostand;;;;11.111,82;EUR;;;;;;;;;;;;
+Vorgemerkte und noch nicht gebuchte Umsätze sind nicht Bestandteil dieser Übersicht.;;;;;;;;;;;;;;;;;
+Buchungstag;Wert;Umsatzart;Begünstigter / Auftraggeber;Verwendungszweck;IBAN;BIC;Kundenreferenz;Mandatsreferenz ;Gläubiger ID;Fremde Gebühren;Betrag;Abweichender Empfänger;Anzahl der Aufträge;Anzahl der Schecks;Soll;Haben;Währung
+03.09.2020;03.09.2020;test;test;test;test;test;;;;;;;;;-117;;EUR
+03.09.2020;03.09.2020;test;test;test;test;test;test;test;test;;;;;;-9,99;;EUR
+Kontostand;16.11.2020;;;111,29;EUR;;;;;;;;;;;;
