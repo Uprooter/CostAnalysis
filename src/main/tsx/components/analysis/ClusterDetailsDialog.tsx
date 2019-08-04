@@ -4,7 +4,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import CostItemModel from "../../models/CostItemModel";
-import CostItemTable from "../util/CostItemTable";
+import CostItemTableNew from "../util/CostItemTableNew";
 import { Button } from "@material-ui/core";
 
 interface ClusterDetailsDialogProps {
@@ -27,9 +27,8 @@ export default class ClusterDetailsDialog extends React.PureComponent<ClusterDet
                 disableEscapeKeyDown
                 open={this.props.dialogOpen}
                 onClose={() => { console.log("Close") }}>
-                <DialogTitle>Details für Typ {this.props.selectedCluster}</DialogTitle>
                 <DialogContent>
-                    <CostItemTable items={this.props.clusterCosts} getValidationColor={() => { }} handleRowClick={() => { }} />
+                    <CostItemTableNew title={"Details für Typ "+this.props.selectedCluster} items={this.props.clusterCosts} getValidationColor={() => { }} handleRowClick={() => { }} />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => this.props.changeDialogVisibility(false)} color="primary">Schließen</Button>
