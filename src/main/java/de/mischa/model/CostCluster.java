@@ -35,6 +35,8 @@ public enum CostCluster {
 
 	VERPFLEGUNG,
 
-	VERSICHERUNG
+	VERSICHERUNG,
+
+	KIND
 
 }
