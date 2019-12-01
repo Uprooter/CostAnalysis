@@ -13,6 +13,7 @@ export function detailedName(detailedCluster: DetailedCostClusterModel): string 
 }
 
 export function getFromDetailedName(detailedName: string): DetailedCostClusterModel {
+   
     if (detailedName !== undefined) {
         return new DetailedCostClusterModel(detailedName.split("/", 2)[1].trim(), detailedName.split("/", 1)[0].trim());
     }

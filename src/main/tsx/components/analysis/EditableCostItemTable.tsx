@@ -79,7 +79,7 @@ export default class EditableCostItemTable extends React.Component<EditableCostI
         return newCostItem;
     }
 
-    updateValue = (newValue: string, field: string) => {
+    updateValue = (newValue: string, field: string, typeValue?: string) => {
         switch (field) {
             case "type":
                 this.setState({ costItem: Object.assign({}, this.state.costItem, { type: newValue }) });
@@ -92,6 +92,9 @@ export default class EditableCostItemTable extends React.Component<EditableCostI
                 break;
             case "detailedCluster":
                 this.setState({ costItem: Object.assign({}, this.state.costItem, { detailedCluster: getFromDetailedName(newValue) }) });
+                break;
+            case "detailedClusterAndType":
+                this.setState({ costItem: Object.assign({}, this.state.costItem, { detailedCluster: getFromDetailedName(newValue), type: typeValue }) });
                 break;
             default:
                 console.log("Do not know field: " + field);

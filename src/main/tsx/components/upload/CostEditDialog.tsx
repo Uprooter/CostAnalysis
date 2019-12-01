@@ -21,7 +21,7 @@ interface CostEditDialogProps {
     dialogOpen: boolean;
     costItem: CostItemModel;
     changeDialogVisibility: (dialogOpen: boolean) => void;
-    updateValue: (newValue: string, field: string) => void;
+    updateValue: (newValue: string, field: string, typeValue?: string) => void;
     updateCostItem: (changedItem: CostItemModel) => void;
 }
 interface CostEditDialogState {
@@ -75,6 +75,9 @@ export default class CostEditDialog extends React.Component<CostEditDialogProps,
         return typeIsMissing || detailedClusterMissing;
     }
 
+    setCostType(cluster: string, type: string, ): void {
+    }
+
     render() {
         return (
             <Dialog
@@ -90,6 +93,25 @@ export default class CostEditDialog extends React.Component<CostEditDialogProps,
                 <DialogTitle>Details anpassen...</DialogTitle>
                 <DialogContent>
                     <form onSubmit={e => this.handleSumbit(e)}>
+                        <Grid container spacing={16}>
+                            <Grid item>
+                                <FormControl>
+                                    <Button onClick={() => this.props.updateValue("VERPFLEGUNG / Lebensmittel", "detailedClusterAndType", "FLEXIBEL")}>
+                                        Lebensmittel</Button>
+                                    <Button onClick={() => this.props.updateValue("ALLGEMEIN / -", "detailedClusterAndType", "FLEXIBEL")}>Allgemein</Button>
+                                    <Button onClick={() => this.props.updateValue("VERKEHRSMITTEL / Benzin", "detailedClusterAndType", "FLEXIBEL")}>Benzin</Button>
+                                    <Button onClick={() => this.props.updateValue("FREIZEIT / -", "detailedClusterAndType", "FLEXIBEL")}>Freizeit</Button>
+                                </FormControl>
+                            </Grid>
+                            <Grid item>
+                                <FormControl>
+                                    <Button onClick={() => this.props.updateValue("KIND / -", "detailedClusterAndType", "FLEXIBEL")}>Kind</Button>
+                                    <Button onClick={() => this.props.updateValue("HW_MOEBEL / -", "detailedClusterAndType", "FLEXIBEL")}>HW Moebel</Button>
+                                    <Button onClick={() => this.props.updateValue("BEKLEIDUNG / -", "detailedClusterAndType", "FLEXIBEL")}>Bekleidung</Button>
+                                    <Button onClick={() => this.props.updateValue("GESUNDHEIT / -", "detailedClusterAndType", "FLEXIBEL")}>Gesundheit</Button>
+                                </FormControl>
+                            </Grid>
+                        </Grid>
                         <Grid container spacing={16}>
                             <Grid item>
                                 <FormControl>
