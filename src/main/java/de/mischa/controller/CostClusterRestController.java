@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -60,13 +61,21 @@ public class CostClusterRestController {
 
     @RequestMapping("/costsByClusterYearly")
     public List<TimeFrameCostEntry> getYearlyCostsByCluster(@RequestParam(value = "cluster") String clusterName) {
-        return clusterCostService.calculateYearly(CostCluster.valueOf(clusterName));
+        if (clusterName != null && !clusterName.isEmpty()) {
+            return clusterCostService.calculateYearly(CostCluster.valueOf(clusterName));
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     @RequestMapping("/costsByClusterMonthly")
     public List<TimeFrameCostEntry> getMonthlyCostsByCluster(
             @RequestParam(value = "cluster") String clusterName,
             @DateTimeFormat(pattern = "dd.MM.yyyy") Date from) {
-        return clusterCostService.calculateMonthlyLast12From(CostCluster.valueOf(clusterName), from);
+        if (clusterName != null && !clusterName.isEmpty()) {
+            return clusterCostService.calculateMonthlyLast12From(CostCluster.valueOf(clusterName), from);
+        } else {
+            return new ArrayList<>();
+        }
     }
 }
