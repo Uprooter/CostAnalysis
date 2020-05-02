@@ -4,7 +4,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import SearchIcon from '@material-ui/icons/Search';
 import MenuIcon from '@material-ui/icons/Menu';
-import ListIcon from '@material-ui/icons/List';
+import CompareIcon from '@material-ui/icons/Compare';
 import InputBase from '@material-ui/core/InputBase';
 import IconButton from '@material-ui/core/IconButton';
 import Drawer from '@material-ui/core/Drawer';
@@ -13,6 +13,7 @@ import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
+import AssessmentIcon from '@material-ui/icons/Assessment';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import BuildIcon from '@material-ui/icons/Build';
 import { NavigationAction, NavigatioPageUpdateAction } from "../../actions/actions";
@@ -49,12 +50,16 @@ export default class NavigationBar extends React.Component<NavigationProps, {}> 
                 <Drawer open={this.props.navigationOpen} onClose={() => { this.props.onTriggerNavigationBar(false) }}>
                     <List>
                         <ListItem button key={"overview"} onClick={() => { this.goTo(Page.ROOT) }}>
-                            <ListItemIcon><ListIcon /></ListItemIcon>
+                            <ListItemIcon><AssessmentIcon /></ListItemIcon>
                             <ListItemText primary={Page.ROOT.name} />
                         </ListItem>
                         <ListItem button key={"upload"} onClick={() => { this.goTo(Page.UPLOAD) }}>
                             <ListItemIcon><InboxIcon /></ListItemIcon>
                             <ListItemText primary={Page.UPLOAD.name} />
+                        </ListItem>
+                        <ListItem button key={"compare"} onClick={() => { this.goTo(Page.COMPARE) }}>
+                            <ListItemIcon><CompareIcon /></ListItemIcon>
+                            <ListItemText primary={Page.COMPARE.name} />
                         </ListItem>
                     </List>
                     <Divider />

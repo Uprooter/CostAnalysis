@@ -2,7 +2,7 @@ import { connect } from 'react-redux'
 import { State } from '../../../reducers'
 import CostOverviewControl from '../CostOverviewControl'
 import { updateAnalysisDates } from '../../../actions/actions'
-import { getAnalysisFromDate, getAnalysisToDate } from '../../../selectors/costItems'
+import { getAnalysisFromDate, getAnalysisToDate } from '../../../selectors/selectors'
 
 const mapStateToProps = (state: State) => ({
     from: getAnalysisFromDate(state),

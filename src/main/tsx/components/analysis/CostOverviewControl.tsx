@@ -115,7 +115,7 @@ export default class CostOverviewControl extends React.Component<CostOverviewCon
                             shrink: true,
                         }} onChange={e => { this.handleDateChange(new Date(e.target.value), "fromDate") }}
                     />
-                    <TextField id="fromDate" label="Bis" type="date" style={{ margin: 5 }} value={getDashDateString(this.props.to)}
+                    <TextField id="toDate" label="Bis" type="date" style={{ margin: 5 }} value={getDashDateString(this.props.to)}
                         InputLabelProps={{
                             shrink: true,
                         }} onChange={e => { this.handleDateChange(new Date(e.target.value), "toDate") }}

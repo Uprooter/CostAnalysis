@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import { State } from '../reducers'
-import { getDetailedClusters } from '../selectors/detailedClusters'
+import { getDetailedClusters } from '../selectors/selectors'
 import { addDetailedCluster } from '../actions/actions'
 import DetailedClusterAdmin from '../components/admin/DetailedClusterAdmin'
 import { updatePageName } from '../actions/actions'

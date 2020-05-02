@@ -4,6 +4,7 @@ import { Provider } from "react-redux";
 import DetailedClusterAdmin from "./containers/DetailedClusterAdmin";
 import Notfound from "./components/Notfound";
 import Upload from "./containers/Upload";
+import Compare from "./containers/Compare";
 import CostOverview from "./components/analysis/containers/CostOverview";
 import { Route, Switch } from "react-router";
 import { createStore, applyMiddleware, compose } from "redux";
@@ -43,6 +44,7 @@ export class App extends React.Component<{}, {}> {
                         <Switch>
                             <Route exact path={Page.ROOT.pathName} component={CostOverview} />
                             <Route path={Page.UPLOAD.pathName} component={Upload} />
+                            <Route path={Page.COMPARE.pathName} component={Compare} />
                             <Route path={Page.ADMIN_DETAILED_CLUSTERS.pathName} component={DetailedClusterAdmin} />
                             <Route path="/error" component={Notfound} />
                             <Route component={Notfound} />

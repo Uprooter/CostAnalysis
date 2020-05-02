@@ -2,6 +2,7 @@ export default class Page {
 
     static ROOT = new Page("Auswertung", "");
     static UPLOAD = new Page("Hochladen", 'upload');
+    static COMPARE = new Page("Vergleichen", 'compare');
     static ADMIN_DETAILED_CLUSTERS = new Page('Pflege Detail Typen', 'detailedclusters');
 
 

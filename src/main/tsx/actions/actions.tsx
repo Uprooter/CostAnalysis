@@ -11,6 +11,7 @@ export enum ActionTypes {
     UPDATE_AVERAGE_COSTS = "Update Average Costs",
     UPDATE_CLUSTER_COSTS = "Update Cluster Costs",
     UPDATE_ANALYSIS_DATES = "Update Analysis Dates",
+    UPDATE_COMPARE_DATES = "Update Compare Dates",
 }
 
 export interface AddDetailedClusterAction { type: ActionTypes.ADD_DETAILED_CLUSTER, payload: DetailedCostClusterModel }
@@ -20,6 +21,7 @@ export interface NavigatioPageUpdateAction { type: ActionTypes.UPDATE_PAGE_NAME,
 export interface UpdateAverageCostsAction { type: ActionTypes.UPDATE_AVERAGE_COSTS, payload: AverageCostResult }
 export interface UpdateClusterCostsAction { type: ActionTypes.UPDATE_CLUSTER_COSTS, payload: ClusterCost[] }
 export interface UpdateAnalysisDatesAction { type: ActionTypes.UPDATE_ANALYSIS_DATES, payload: { from: Date, to: Date } }
+export interface UpdateCompareDatesAction { type: ActionTypes.UPDATE_COMPARE_DATES, payload: { monthA: Date, monthB: Date } }
 
 
 export function updateAverageCostResult(averageCosts: AverageCostResult): UpdateAverageCostsAction {
@@ -33,6 +35,13 @@ export function updateAnalysisDates(from: Date, to: Date): UpdateAnalysisDatesAc
     return {
         type: ActionTypes.UPDATE_ANALYSIS_DATES,
         payload: { from: from, to: to }
+    }
+}
+
+export function updateCompareDates(from: Date, to: Date): UpdateCompareDatesAction {
+    return {
+        type: ActionTypes.UPDATE_COMPARE_DATES,
+        payload: { monthA: from, monthB: to }
     }
 }
 
@@ -74,4 +83,4 @@ export function updatePageName(newName: string): NavigatioPageUpdateAction {
 
 export type Action = AddDetailedClusterAction | NavigationAction
     | NavigatioPageUpdateAction | AddCostItemsAction
-    | UpdateAverageCostsAction | UpdateClusterCostsAction | UpdateAnalysisDatesAction;
+    | UpdateAverageCostsAction | UpdateClusterCostsAction | UpdateAnalysisDatesAction | UpdateCompareDatesAction;

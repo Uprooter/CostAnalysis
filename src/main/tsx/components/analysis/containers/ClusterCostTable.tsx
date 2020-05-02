@@ -1,7 +1,7 @@
 import { connect } from 'react-redux'
 import { State } from '../../../reducers'
 import ClusterCostTable from '../ClusterCostTable'
-import { getAnalysisFromDate, getAnalysisToDate } from '../../../selectors/costItems'
+import { getAnalysisFromDate, getAnalysisToDate } from '../../../selectors/selectors'
 
 const mapStateToProps = (state: State) => ({
     from: getAnalysisFromDate(state),

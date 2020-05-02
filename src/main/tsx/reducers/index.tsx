@@ -2,6 +2,7 @@ import * as fromDetailedClusters from "./detailedCostCluster";
 import * as averageCosts from "./averageCosts";
 import * as clusterCosts from "./clusterCosts";
 import * as navigationBar from "./navigationBar";
+import * as compare from "./compare";
 import * as navigationPage from "./navigationPage";
 import { combineReducers } from "redux";
 import { connectRouter, RouterState } from 'connected-react-router';
@@ -13,6 +14,7 @@ export interface State {
     navigationPage: navigationPage.State,
     router: RouterState,
     averageCosts: averageCosts.State,
+    compare: compare.State,
     clusterCosts: clusterCosts.State
 }
 
@@ -22,6 +24,7 @@ const reducer = (history: History) => combineReducers<State>({
     navigationBar: navigationBar.reducer,
     navigationPage: navigationPage.reducer,
     averageCosts: averageCosts.reducer,
+    compare: compare.reducer,
     clusterCosts: clusterCosts.reducer,
 })
 
