@@ -15,6 +15,10 @@ export function getDashDateString(date: Date): string {
     return date.toISOString().substring(0, 10);
 }
 
+export function getYearMonthString(date: Date): string {
+    return date.toLocaleString('default', { month: 'long' }) + " - " + date.getFullYear();
+}
+
 export function parseISOString(dateString: string): Date {
     let newDate: Date = new Date();
     newDate.setMilliseconds(Date.parse(dateString));
