@@ -5,6 +5,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -18,8 +19,8 @@ public class CostItem {
     @SequenceGenerator(name = "cost_item_id_gen", allocationSize = 1, sequenceName = "ID_SEQUENCE")
     private Long id;
 
-    @Column
-    private Date creationDate;
+    @Column(name="CREATION_DATE_NEW")
+    private LocalDate creationDate;
 
     @ManyToOne
     @JoinColumn(name = "RECIPIENT_ID")
@@ -69,9 +70,7 @@ public class CostItem {
 
     public int getCreationDateYear() {
         if (this.creationDate != null) {
-            Calendar c = Calendar.getInstance();
-            c.setTime(this.creationDate);
-            return c.get(Calendar.YEAR);
+            return this.creationDate.getYear();
         }
 
         return -1;
@@ -79,10 +78,7 @@ public class CostItem {
 
     public String getCreationDateMonthYear() {
         if (this.creationDate != null) {
-            Calendar c = Calendar.getInstance();
-            c.setTime(this.creationDate);
-
-            return "" + (c.get(Calendar.MONTH) + 1) + "." + c.get(Calendar.YEAR);
+            return "" + this.creationDate.getMonthValue() + "." + creationDate.getYear();
         }
 
         return "";

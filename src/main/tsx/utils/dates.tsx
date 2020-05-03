@@ -1,6 +1,6 @@
 export function getDateString(date: Date): string {
-    let options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-    return date.toLocaleDateString('de-DE', options);
+    let options = { year: 'numeric', month: 'numeric', day: 'numeric' };    
+    return date.toISOString().replace(/(\d{4})\-(\d{2})\-(\d{2}).*/, '$3.$2.$1');
 }
 
 export function getDEDateString(date: Date): string {
@@ -17,6 +17,13 @@ export function getDashDateString(date: Date): string {
 
 export function getYearMonthString(date: Date): string {
     return date.toLocaleString('default', { month: 'long' }) + " - " + date.getFullYear();
+}
+
+export function getDateWithLastDayOfSameMonth(date: Date): Date {
+    let newDate = date;
+    newDate.setMonth(date.getMonth() + 1);
+    newDate.setDate(newDate.getDate() - 1); //subtract a day
+    return newDate;
 }
 
 export function parseISOString(dateString: string): Date {

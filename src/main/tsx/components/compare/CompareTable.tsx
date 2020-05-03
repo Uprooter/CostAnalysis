@@ -1,5 +1,4 @@
 import * as React from "react";
-import TotalTableCell from "../util/TotalTableCell";
 import CompareModel from "../../models/CompareModel";
 import ClusterDetailsDialog from "../analysis/ClusterDetailsDialog";
 import { Table, TableHead, TableRow, TableCell, TableBody, Typography } from '@material-ui/core';
@@ -8,11 +7,10 @@ import { getRequest } from '../../utils/rest';
 import CostItemModel from "../../models/CostItemModel";
 import ListIcon from '@material-ui/icons/List';
 import IconButton from '@material-ui/core/IconButton';
-import { getDateString, getDashDateString, getYearMonthString } from "../../utils/dates";
+import { getDateString, getDateWithLastDayOfSameMonth, getYearMonthString } from "../../utils/dates";
 
 interface CompareTableProps {
     clusterCompareItems: CompareModel[];
-    loadClusterHistory: (cluster: string, month: Date) => void;
     monthA: Date;
     monthB: Date;
 }
@@ -29,15 +27,11 @@ export default class CompareTable extends React.Component<CompareTableProps, Com
         selectedClusterCosts: new Array<CostItemModel>()
     }
 
-    handleRowClick(event: React.MouseEvent<HTMLTableRowElement>, cluster: string) {
-        this.props.loadClusterHistory(cluster);
-    }
-
-    showClusterDetails = (cluster: string) => {
+    showClusterDetails = (cluster: string, date: Date) => {
         this.setState({ selectedCluster: cluster }, () => this.changeDialogVisibility(true));
 
-        getRequest("/clusterCostsByCluster?from=" + getDateString(this.props.from)
-            + "&to=" + getDateString(this.props.to)
+        getRequest("/clusterCostsByCluster?from=" + getDateString(date) //1.month.year
+            + "&to=" + getDateString(getDateWithLastDayOfSameMonth(date)) // last day of month
             + "&clusterName=" + cluster)
             .then(r => {
                 this.updateSelectedClusterCostsWithClientId(r.entity);
@@ -73,21 +67,25 @@ export default class CompareTable extends React.Component<CompareTableProps, Com
 
                 <Table>
                     <TableHead>
-                        <TableRow>
-                            <TableCell style={{ paddingLeft: 10, paddingRight: 10 }}></TableCell>
+                        <TableRow>                            
                             <TableCell>Typ</TableCell>
                             <TableCell>Unterschied</TableCell>
+                            <TableCell style={{ paddingLeft: 10, paddingRight: 10 }}>Details {getYearMonthString(this.props.monthA)}</TableCell>
+                            <TableCell style={{ paddingLeft: 10, paddingRight: 10 }}>Details {getYearMonthString(this.props.monthB)}</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {this.props.clusterCompareItems.map(row => {
                             return (
-                                <TableRow key={row.cluster} hover onClick={event => this.handleRowClick(event, row.cluster)}>
-                                    <TableCell style={{ paddingLeft: 10, paddingRight: 10 }}>
-                                        <IconButton onClick={event => this.showClusterDetails(row.cluster)}><ListIcon /></IconButton>
-                                    </TableCell>
+                                <TableRow key={row.cluster}>                                    
                                     <TableCell>{row.cluster}</TableCell>
                                     <TableCell>{toRoundEuroString(row.change)}</TableCell>
+                                    <TableCell style={{ paddingLeft: 10, paddingRight: 10 }}>
+                                        <IconButton onClick={event => this.showClusterDetails(row.cluster, this.props.monthA)}><ListIcon /></IconButton>
+                                    </TableCell>
+                                    <TableCell style={{ paddingLeft: 10, paddingRight: 10 }}>
+                                        <IconButton onClick={event => this.showClusterDetails(row.cluster, this.props.monthA)}><ListIcon /></IconButton>
+                                    </TableCell>
                                 </TableRow>
                             );
                         })

@@ -19,7 +19,7 @@ public class AverageCostsCalculationService {
     @Autowired
     private CostItemRepository costItemRep;
 
-    public AverageCostModel calculate(Date from, Date to, boolean includeOthers, boolean savingsAreCosts) {
+    public AverageCostModel calculate(LocalDate from, LocalDate to, boolean includeOthers, boolean savingsAreCosts) {
         List<CostItem> relevantItems = this.costItemRep.findRelevant(from, to).stream()
                 .filter(i -> i.getDetailedCluster().getCluster() != CostCluster.UMBUCHUNG).collect(Collectors.toList());
 

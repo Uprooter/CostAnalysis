@@ -61,5 +61,10 @@
                                  referencedColumnNames="id"
                                  referencedTableName="DETAILED_COST_CLUSTER"/>
     </changeSet>
+    <changeSet author="mischa" id="4">
+        <addColumn tableName="COST_ITEM">
+            <column name="CREATION_DATE_NEW" type="TIMESTAMP"/>
+        </addColumn>
+    </changeSet>
 
 </databaseChangeLog>

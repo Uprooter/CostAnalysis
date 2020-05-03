@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,15 +46,15 @@ public class CostClusterRestController {
 
     @RequestMapping("/clusterCosts")
     public List<ClusterCost> getClusterCosts(
-            @RequestParam(value = "from") @DateTimeFormat(pattern = "dd.MM.yyyy") Date from,
-            @RequestParam(value = "to") @DateTimeFormat(pattern = "dd.MM.yyyy") Date to) {
+            @RequestParam(value = "from") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate from,
+            @RequestParam(value = "to") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate to) {
         return clusterCostService.calculate(from, to);
     }
 
     @RequestMapping("/clusterCostsByCluster")
     public List<CostItem> getClusterCosts(
-            @RequestParam(value = "from") @DateTimeFormat(pattern = "dd.MM.yyyy") Date from,
-            @RequestParam(value = "to") @DateTimeFormat(pattern = "dd.MM.yyyy") Date to,
+            @RequestParam(value = "from") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate from,
+            @RequestParam(value = "to") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate to,
             @RequestParam(value = "clusterName") String clusterName) {
         return costItemRepository.findRelevantByCluster(from, to, CostCluster.valueOf(clusterName));
     }
@@ -71,7 +71,7 @@ public class CostClusterRestController {
     @RequestMapping("/costsByClusterMonthly")
     public List<TimeFrameCostEntry> getMonthlyCostsByCluster(
             @RequestParam(value = "cluster") String clusterName,
-            @DateTimeFormat(pattern = "dd.MM.yyyy") Date from) {
+            @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate from) {
         if (clusterName != null && !clusterName.isEmpty()) {
             return clusterCostService.calculateMonthlyLast12From(CostCluster.valueOf(clusterName), from);
         } else {

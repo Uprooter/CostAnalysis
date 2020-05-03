@@ -5,6 +5,7 @@ import de.mischa.repository.CostItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -14,7 +15,7 @@ public class ClusterCostService {
     @Autowired
     private CostItemRepository costItemRep;
 
-    public List<ClusterCost> calculate(Date from, Date to) {
+    public List<ClusterCost> calculate(LocalDate from, LocalDate to) {
 
         List<CostItem> relevantItems = this.costItemRep.findRelevant(from, to);
 
@@ -75,23 +76,18 @@ public class ClusterCostService {
         return result;
     }
 
-    public List<TimeFrameCostEntry> calculateMonthlyLast12From(CostCluster cluster, Date from) {
-        Calendar periodFrom = Calendar.getInstance();
-        periodFrom.setTime(from);
-        periodFrom.add(Calendar.MONTH, -12);
-        periodFrom.set(Calendar.DATE, 1); // need first day of moth
+    public List<TimeFrameCostEntry> calculateMonthlyLast12From(CostCluster cluster, LocalDate from) {
+        LocalDate periodFrom = LocalDate.of(from.getYear(), from.getMonthValue() - 12, 1);
+        LocalDate periodTo = from.withDayOfMonth(from.getMonth().length(from.isLeapYear()));
 
-        Calendar periodTo = Calendar.getInstance();
-        periodTo.setTime(from); // need to select the items until current month
-        periodTo.set(Calendar.DATE, periodTo.getActualMaximum(Calendar.DATE)); // need last day of month
 
         Map<String, Double> mischaClusterCosts =
-                this.costItemRep.findByClusterAndOwnerForPeriod(cluster, CostOwner.MISCHA, periodFrom.getTime(), periodTo.getTime())
+                this.costItemRep.findByClusterAndOwnerForPeriod(cluster, CostOwner.MISCHA, periodFrom, periodTo)
                         .stream().collect(
                         Collectors.groupingBy(
                                 CostItem::getCreationDateMonthYear, Collectors.summingDouble(CostItem::getAmount)));
         Map<String, Double> gesaClusterCosts =
-                this.costItemRep.findByClusterAndOwnerForPeriod(cluster, CostOwner.GESA, periodFrom.getTime(), periodTo.getTime())
+                this.costItemRep.findByClusterAndOwnerForPeriod(cluster, CostOwner.GESA, periodFrom, periodTo)
                         .stream().collect(
                         Collectors.groupingBy(
                                 CostItem::getCreationDateMonthYear, Collectors.summingDouble(CostItem::getAmount)));

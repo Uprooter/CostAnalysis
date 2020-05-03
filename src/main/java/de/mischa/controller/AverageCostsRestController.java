@@ -1,5 +1,6 @@
 package de.mischa.controller;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,15 +13,15 @@ import de.mischa.calc.AverageCostsCalculationService;
 import de.mischa.model.AverageCostModel;
 
 @RestController
-public class AverageCostsRestContoller {
+public class AverageCostsRestController {
 
     @Autowired
     private AverageCostsCalculationService service;
 
     @RequestMapping("/averageCosts")
     public AverageCostModel getAverageCosts(
-            @RequestParam(value = "from") @DateTimeFormat(pattern = "dd.MM.yyyy") Date from, //
-            @RequestParam(value = "to") @DateTimeFormat(pattern = "dd.MM.yyyy") Date to, //
+            @RequestParam(value = "from") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate from, //
+            @RequestParam(value = "to") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate to, //
             @RequestParam(value = "includeOthers") boolean includeOthers,
             @RequestParam(value = "savingsAreCosts") boolean savingsAreCosts
     ) {

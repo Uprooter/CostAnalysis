@@ -38,10 +38,10 @@ export function updateAnalysisDates(from: Date, to: Date): UpdateAnalysisDatesAc
     }
 }
 
-export function updateCompareDates(from: Date, to: Date): UpdateCompareDatesAction {
+export function updateCompareDates(monthA: Date, monthB: Date): UpdateCompareDatesAction {
     return {
         type: ActionTypes.UPDATE_COMPARE_DATES,
-        payload: { monthA: from, monthB: to }
+        payload: { monthA: monthA, monthB: monthB }
     }
 }
 
