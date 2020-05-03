@@ -115,7 +115,7 @@ public class AverageCostsCalculationService {
     Map<String, Double> getMonthlySums(List<CostItem> costTypeItems) {
         Map<String, Double> monthlySums = new HashMap<>();
         for (CostItem item : costTypeItems) {
-            LocalDate localDate = item.getCreationDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate localDate = item.getCreationDate();
             int year = localDate.getYear();
             int month = localDate.getMonthValue();
             String monthYear = month + "" + year;
