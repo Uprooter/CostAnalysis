@@ -67,4 +67,15 @@
         </addColumn>
     </changeSet>
 
+   <changeSet id="5" author="mischa">
+      <sql>CREATE SEQUENCE "ID_SEQUENCE" INCREMENT BY 1 START WITH 1 NOCACHE ORDER NOCYCLE</sql>
+   </changeSet>
+
+   <changeSet id="6" author="mischa">
+      <dropUniqueConstraint tableName="COST_ITEM" constraintName="UNQ_COST_ITEM"/>
+      <addUniqueConstraint columnNames="DETAILED_CLUSTER_ID, RECIPIENT_ID, AMOUNT, CREATION_DATE_NEW, TYPE, PURPOSE"
+                           constraintName="UNQ_COST_ITEM"
+                           tableName="COST_ITEM"/>
+   </changeSet>
+
 </databaseChangeLog>

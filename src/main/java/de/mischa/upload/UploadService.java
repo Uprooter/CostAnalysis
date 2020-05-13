@@ -152,8 +152,8 @@ public class UploadService {
         List<DuplicateCheckResult> foundSimilarItems = new ArrayList<>();
         List<CostItem> allItems = this.itemRep.findAll();
         for (CostItem item : correctedItems) {
-            CostItem equalItem = this.itemService.foundEqual(item, allItems);
-            CostItem verySimilarItem = this.itemService.foundSimilar(item, allItems);
+            CostItem equalItem = this.itemService.findEqual(item, allItems);
+            CostItem verySimilarItem = this.itemService.findSimilar(item, allItems);
 
             if (equalItem != null || verySimilarItem != null) {
                 foundSimilarItems.add(new DuplicateCheckResult(item, equalItem, verySimilarItem));

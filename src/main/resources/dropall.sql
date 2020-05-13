@@ -1,0 +1,6 @@
+drop table COST_ITEM;
+drop table COST_RECIPIENT;
+drop table DETAILED_COST_CLUSTER;
+drop table DATABASECHANGELOG;
+drop table DATABASECHANGELOGLOCK;
+drop sequence ID_SEQUENCE;
