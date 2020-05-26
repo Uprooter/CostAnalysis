@@ -1,24 +1,27 @@
 import * as React from "react";
 import CompareModel from "../../models/CompareModel";
 import ClusterDetailsDialog from "../analysis/ClusterDetailsDialog";
-import { Table, TableHead, TableRow, TableCell, TableBody, Typography } from '@material-ui/core';
-import { toRoundEuroString } from "../../utils/numbers";
-import { getRequest } from '../../utils/rest';
+import {Table, TableBody, TableCell, TableHead, TableRow, Typography} from '@material-ui/core';
+import {toRoundEuroString} from "../../utils/numbers";
+import {getRequest} from '../../utils/rest';
 import CostItemModel from "../../models/CostItemModel";
+import YearMonth from "../../models/YearMonth";
 import ListIcon from '@material-ui/icons/List';
 import IconButton from '@material-ui/core/IconButton';
-import { getDateString, getDateWithLastDayOfSameMonth, getYearMonthString } from "../../utils/dates";
+import {getDateString, getDateWithLastDayOfSameMonth} from "../../utils/dates";
 
 interface CompareTableProps {
     clusterCompareItems: CompareModel[];
-    monthA: Date;
-    monthB: Date;
+    monthA: YearMonth;
+    monthB: YearMonth;
 }
+
 interface CompareTableState {
     dialogOpen: boolean;
     selectedCluster: string;
     selectedClusterCosts: CostItemModel[];
 }
+
 export default class CompareTable extends React.Component<CompareTableProps, CompareTableState> {
 
     state = {
@@ -27,11 +30,13 @@ export default class CompareTable extends React.Component<CompareTableProps, Com
         selectedClusterCosts: new Array<CostItemModel>()
     }
 
-    showClusterDetails = (cluster: string, date: Date) => {
-        this.setState({ selectedCluster: cluster }, () => this.changeDialogVisibility(true));
+    showClusterDetails = (cluster: string, date: YearMonth) => {
+        this.setState({selectedCluster: cluster}, () => this.changeDialogVisibility(true));
 
-        getRequest("/clusterCostsByCluster?from=" + getDateString(date) //1.month.year
-            + "&to=" + getDateString(getDateWithLastDayOfSameMonth(date)) // last day of month
+        let from: Date = new Date(date.year, date.month, 1);
+        let to: Date = getDateWithLastDayOfSameMonth(from);
+        getRequest("/clusterCostsByCluster?from=" + getDateString(from) //1.month.year
+            + "&to=" + getDateString(getDateWithLastDayOfSameMonth(to)) // last day of month
             + "&clusterName=" + cluster)
             .then(r => {
                 this.updateSelectedClusterCostsWithClientId(r.entity);
@@ -45,46 +50,54 @@ export default class CompareTable extends React.Component<CompareTableProps, Com
             item.clientId = item.id;
             costsWithClientId.push(item);
         }
-        this.setState({ selectedClusterCosts: costsWithClientId });
+        this.setState({selectedClusterCosts: costsWithClientId});
     }
 
     changeDialogVisibility = (dialogOpen: boolean) => {
-        this.setState({ dialogOpen: dialogOpen });
+        this.setState({dialogOpen: dialogOpen});
     }
 
     render() {
         return (
             <React.Fragment>
-                <Typography variant="h5" component="h3" style={{ marginBottom: 5 }}>
-                    Vergleich von {getYearMonthString(this.props.monthA)} zu {getYearMonthString(this.props.monthB)}
+                <Typography variant="h5" component="h3" style={{marginBottom: 5}}>
+                    Vergleich von {this.props.monthA.getRestString()} zu {this.props.monthB.getRestString()}
                 </Typography>
 
                 <ClusterDetailsDialog
                     dialogOpen={this.state.dialogOpen}
                     selectedCluster={this.state.selectedCluster}
                     changeDialogVisibility={this.changeDialogVisibility}
-                    clusterCosts={this.state.selectedClusterCosts} />
+                    clusterCosts={this.state.selectedClusterCosts}/>
 
                 <Table>
                     <TableHead>
-                        <TableRow>                            
+                        <TableRow>
                             <TableCell>Typ</TableCell>
                             <TableCell>Unterschied</TableCell>
-                            <TableCell style={{ paddingLeft: 10, paddingRight: 10 }}>Details {getYearMonthString(this.props.monthA)}</TableCell>
-                            <TableCell style={{ paddingLeft: 10, paddingRight: 10 }}>Details {getYearMonthString(this.props.monthB)}</TableCell>
+                            <TableCell style={{
+                                paddingLeft: 10,
+                                paddingRight: 10
+                            }}>Details {this.props.monthA.getRestString()}</TableCell>
+                            <TableCell style={{
+                                paddingLeft: 10,
+                                paddingRight: 10
+                            }}>Details {this.props.monthA.getRestString()}</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {this.props.clusterCompareItems.map(row => {
                             return (
-                                <TableRow key={row.cluster}>                                    
+                                <TableRow key={row.cluster}>
                                     <TableCell>{row.cluster}</TableCell>
                                     <TableCell>{toRoundEuroString(row.change)}</TableCell>
-                                    <TableCell style={{ paddingLeft: 10, paddingRight: 10 }}>
-                                        <IconButton onClick={event => this.showClusterDetails(row.cluster, this.props.monthA)}><ListIcon /></IconButton>
+                                    <TableCell style={{paddingLeft: 10, paddingRight: 10}}>
+                                        <IconButton
+                                            onClick={event => this.showClusterDetails(row.cluster, this.props.monthA)}><ListIcon/></IconButton>
                                     </TableCell>
-                                    <TableCell style={{ paddingLeft: 10, paddingRight: 10 }}>
-                                        <IconButton onClick={event => this.showClusterDetails(row.cluster, this.props.monthA)}><ListIcon /></IconButton>
+                                    <TableCell style={{paddingLeft: 10, paddingRight: 10}}>
+                                        <IconButton
+                                            onClick={event => this.showClusterDetails(row.cluster, this.props.monthA)}><ListIcon/></IconButton>
                                     </TableCell>
                                 </TableRow>
                             );

@@ -1,5 +1,6 @@
 import DetailedCostClusterModel from "../models/DetailedCostClusterModel";
 import CostItemModel from "../models/CostItemModel";
+import YearMonth from "../models/YearMonth";
 import AverageCostResult from "../models/AverageCostResult";
 import ClusterCost from "../models/ClusterCost";
 
@@ -14,14 +15,45 @@ export enum ActionTypes {
     UPDATE_COMPARE_DATES = "Update Compare Dates",
 }
 
-export interface AddDetailedClusterAction { type: ActionTypes.ADD_DETAILED_CLUSTER, payload: DetailedCostClusterModel }
-export interface AddCostItemsAction { type: ActionTypes.ADD_ITEMS, payload: CostItemModel[] }
-export interface NavigationAction { type: ActionTypes.NAVIGATION_OPEN, openStatus: boolean }
-export interface NavigatioPageUpdateAction { type: ActionTypes.UPDATE_PAGE_NAME, newName: string }
-export interface UpdateAverageCostsAction { type: ActionTypes.UPDATE_AVERAGE_COSTS, payload: AverageCostResult }
-export interface UpdateClusterCostsAction { type: ActionTypes.UPDATE_CLUSTER_COSTS, payload: ClusterCost[] }
-export interface UpdateAnalysisDatesAction { type: ActionTypes.UPDATE_ANALYSIS_DATES, payload: { from: Date, to: Date } }
-export interface UpdateCompareDatesAction { type: ActionTypes.UPDATE_COMPARE_DATES, payload: { monthA: Date, monthB: Date } }
+export interface AddDetailedClusterAction {
+    type: ActionTypes.ADD_DETAILED_CLUSTER,
+    payload: DetailedCostClusterModel
+}
+
+export interface AddCostItemsAction {
+    type: ActionTypes.ADD_ITEMS,
+    payload: CostItemModel[]
+}
+
+export interface NavigationAction {
+    type: ActionTypes.NAVIGATION_OPEN,
+    openStatus: boolean
+}
+
+export interface NavigatioPageUpdateAction {
+    type: ActionTypes.UPDATE_PAGE_NAME,
+    newName: string
+}
+
+export interface UpdateAverageCostsAction {
+    type: ActionTypes.UPDATE_AVERAGE_COSTS,
+    payload: AverageCostResult
+}
+
+export interface UpdateClusterCostsAction {
+    type: ActionTypes.UPDATE_CLUSTER_COSTS,
+    payload: ClusterCost[]
+}
+
+export interface UpdateAnalysisDatesAction {
+    type: ActionTypes.UPDATE_ANALYSIS_DATES,
+    payload: { from: Date, to: Date }
+}
+
+export interface UpdateCompareDatesAction {
+    type: ActionTypes.UPDATE_COMPARE_DATES,
+    payload: { monthA: YearMonth, monthB: YearMonth }
+}
 
 
 export function updateAverageCostResult(averageCosts: AverageCostResult): UpdateAverageCostsAction {
@@ -34,14 +66,14 @@ export function updateAverageCostResult(averageCosts: AverageCostResult): Update
 export function updateAnalysisDates(from: Date, to: Date): UpdateAnalysisDatesAction {
     return {
         type: ActionTypes.UPDATE_ANALYSIS_DATES,
-        payload: { from: from, to: to }
+        payload: {from: from, to: to}
     }
 }
 
-export function updateCompareDates(monthA: Date, monthB: Date): UpdateCompareDatesAction {
+export function updateCompareDates(monthA: YearMonth, monthB: YearMonth): UpdateCompareDatesAction {
     return {
         type: ActionTypes.UPDATE_COMPARE_DATES,
-        payload: { monthA: monthA, monthB: monthB }
+        payload: {monthA: monthA, monthB: monthB}
     }
 }
 

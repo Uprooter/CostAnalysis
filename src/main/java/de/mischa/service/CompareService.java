@@ -24,9 +24,15 @@ public class CompareService
       List<ClusterCost> monthACosts = this.clusterCostService.calculate(monthA.atDay(1), monthA.atEndOfMonth());
       List<ClusterCost> monthBCosts = this.clusterCostService.calculate(monthB.atDay(1), monthB.atEndOfMonth());
       Map<String, Double> compareItems = new HashMap<>();
-      monthACosts.forEach(cc -> compareItems.put(cc.getCluster().name(), cc.getTotalAmount()));
-      monthBCosts.forEach(
-            cc -> compareItems.put(cc.getCluster().name(), cc.getTotalAmount() - compareItems.get(cc.getCluster().name())));
+      if (monthACosts != null)
+      {
+         monthACosts.forEach(cc -> compareItems.put(cc.getCluster().name(), cc.getTotalAmount()));
+      }
+      if (monthBCosts != null)
+      {
+         monthBCosts.forEach(
+               cc -> compareItems.put(cc.getCluster().name(), cc.getTotalAmount() - compareItems.get(cc.getCluster().name())));
+      }
       return compareItems;
    }
 }

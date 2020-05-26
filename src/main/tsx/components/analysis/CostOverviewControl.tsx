@@ -1,10 +1,10 @@
 import * as React from "react";
-import { FormControlLabel, Button, Switch, FormGroup, Grid, TextField } from '@material-ui/core';
-import { getDateString, getDashDateString, getOneYearBefore } from "../../utils/dates";
-import { getRequest } from "../../utils/rest";
+import {Button, FormControlLabel, FormGroup, Grid, Switch, TextField} from '@material-ui/core';
+import {getDashDateString, getDateString, getMonths, getYears} from "../../utils/dates";
+import {getRequest} from "../../utils/rest";
 import AverageCostResult from "../../models/AverageCostResult";
 import Month from "../../models/Month";
-import { UpdateAverageCostsAction, UpdateClusterCostsAction, UpdateAnalysisDatesAction } from "../../actions/actions";
+import {UpdateAnalysisDatesAction, UpdateAverageCostsAction, UpdateClusterCostsAction} from "../../actions/actions";
 import ClusterCost from "../../models/ClusterCost";
 
 interface CostOverviewControlProps {
@@ -14,10 +14,12 @@ interface CostOverviewControlProps {
     from: Date;
     to: Date;
 }
+
 interface CostOverviewControlState {
     includeOthers: boolean;
     savingsAreCosts: boolean;
 }
+
 export default class CostOverviewControl extends React.Component<CostOverviewControlProps, CostOverviewControlState> {
 
     state = {
@@ -48,15 +50,6 @@ export default class CostOverviewControl extends React.Component<CostOverviewCon
             });
     }
 
-    getYears(): number[] {
-        let years: number[] = new Array<number>();
-        let currentYear: number = new Date().getFullYear();
-        for (let year = 2014; year <= currentYear; year++) {
-            years.push(year);
-        }
-
-        return years;
-    }
 
     loadAverageCosts = () => {
         getRequest("/averageCosts?from=" + getDateString(this.props.from)
@@ -69,18 +62,17 @@ export default class CostOverviewControl extends React.Component<CostOverviewCon
     }
 
     handleIncludeOthersChange(include: boolean) {
-        this.setState({ includeOthers: include }, () => this.loadAverageCosts());
+        this.setState({includeOthers: include}, () => this.loadAverageCosts());
     }
 
     handleWithSavingsChange(savingsAreCosts: boolean) {
-        this.setState({ savingsAreCosts: savingsAreCosts }, () => this.loadAverageCosts());
+        this.setState({savingsAreCosts: savingsAreCosts}, () => this.loadAverageCosts());
     }
 
     handleDateChange(newDate: Date, dateField: string) {
         if (dateField === "fromDate") {
             this.props.updateAnalysisDates(newDate, this.props.to);
-        }
-        else {
+        } else {
             this.props.updateAnalysisDates(this.props.from, newDate);
         }
     }
@@ -102,62 +94,71 @@ export default class CostOverviewControl extends React.Component<CostOverviewCon
     }
 
     render() {
-        const gridItemStyle = { marginLeft: 10, marginTop: 20 };
-        const years = this.getYears();
-        const months: Month[] = [new Month("Jan", 0), new Month("Feb", 1), new Month("Mär", 2),
-        new Month("Apr", 3), new Month("Mai", 4), new Month("Jun", 5), new Month("Jul", 6),
-        new Month("Aug", 7), new Month("Sep", 8), new Month("Oct", 9), new Month("Nov", 10), new Month("Dec", 11)];
+        const gridItemStyle = {marginLeft: 10, marginTop: 20};
         return (
             <Grid container spacing={16}>
                 <Grid item sm style={gridItemStyle}>
-                    <TextField id="fromDate" label="Von" type="date" style={{ margin: 5 }} value={getDashDateString(this.props.from)}
-                        InputLabelProps={{
-                            shrink: true,
-                        }} onChange={e => { this.handleDateChange(new Date(e.target.value), "fromDate") }}
+                    <TextField id="fromDate" label="Von" type="date" style={{margin: 5}} value={getDashDateString(this.props.from)}
+                               InputLabelProps={{
+                                   shrink: true,
+                               }} onChange={e => {
+                        this.handleDateChange(new Date(e.target.value), "fromDate")
+                    }}
                     />
-                    <TextField id="toDate" label="Bis" type="date" style={{ margin: 5 }} value={getDashDateString(this.props.to)}
-                        InputLabelProps={{
-                            shrink: true,
-                        }} onChange={e => { this.handleDateChange(new Date(e.target.value), "toDate") }}
+                    <TextField id="toDate" label="Bis" type="date" style={{margin: 5}} value={getDashDateString(this.props.to)}
+                               InputLabelProps={{
+                                   shrink: true,
+                               }} onChange={e => {
+                        this.handleDateChange(new Date(e.target.value), "toDate")
+                    }}
                     />
                 </Grid>
                 <Grid item sm style={gridItemStyle}>
                     {
-                        years.map(year => {
+                        getYears().map(year => {
                             return (
-                                <Button variant="outlined" key={year.toString()} onClick={() => { this.updateDateRangeToFullYear(year) }}>
+                                <Button variant="outlined" key={year.toString()} onClick={() => {
+                                    this.updateDateRangeToFullYear(year)
+                                }}>
                                     {year}
                                 </Button>);
                         })
                     }
                 </Grid>
-                <Grid item sm style={gridItemStyle}>                   
-                    {
-                        months.map(month => {
-                            return (
-                                <Button variant="outlined" key={month.number} onClick={() => { this.updateDateRangeToSelectedMonth(month) }}>
-                                    {month.name}
-                                </Button>);
-                        })
-                    }
+                <Grid item sm style={gridItemStyle}>                    {
+                    getMonths().map(month => {
+                        return (
+                            <Button variant="outlined" key={month.number} onClick={() => {
+                                this.updateDateRangeToSelectedMonth(month)
+                            }}>
+                                {month.name}
+                            </Button>);
+                    })
+                }
                 </Grid>
                 <Grid item xs style={gridItemStyle}>
                     <FormGroup row>
                         <FormControlLabel
                             control={
-                                <Switch checked={this.state.includeOthers} onChange={(e, checked) => { this.handleIncludeOthersChange(checked) }} />
+                                <Switch checked={this.state.includeOthers} onChange={(e, checked) => {
+                                    this.handleIncludeOthersChange(checked)
+                                }}/>
                             }
-                            label="mit Sonstiges" />
+                            label="mit Sonstiges"/>
                         <FormControlLabel
                             control={
-                                <Switch checked={this.state.savingsAreCosts} onChange={(e, checked) => { this.handleWithSavingsChange(checked) }} />
+                                <Switch checked={this.state.savingsAreCosts} onChange={(e, checked) => {
+                                    this.handleWithSavingsChange(checked)
+                                }}/>
                             }
-                            label="Spar-Daueraufträge sind Kosten" />
+                            label="Spar-Daueraufträge sind Kosten"/>
                     </FormGroup>
                 </Grid>
 
                 <Grid item sm style={gridItemStyle}>
-                    <Button variant="contained" color="primary" onClick={() => { this.updateCosts() }}>Laden</Button>
+                    <Button variant="contained" color="primary" onClick={() => {
+                        this.updateCosts()
+                    }}>Laden</Button>
                 </Grid>
             </Grid>
         );

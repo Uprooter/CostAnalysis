@@ -1,13 +1,15 @@
-import { Action, ActionTypes } from "../actions/actions";
-import { getOneYearBefore } from "../utils/dates";
+import {Action, ActionTypes} from "../actions/actions";
+import {getOneMonthBefore} from "../utils/dates";
+import YearMonth from "../models/YearMonth";
+
 export interface State {
-    monthA: Date,
-    monthB: Date,
+    monthA: YearMonth,
+    monthB: YearMonth
 }
 
 export const initialState: State = {
-    monthA: getOneYearBefore(new Date()),
-    monthB: new Date(),
+    monthA: new YearMonth(getOneMonthBefore(new Date()).getMonth(), new Date().getFullYear()),
+    monthB: new YearMonth(new Date().getMonth(), new Date().getFullYear())
 }
 
 export function reducer(state: State = initialState, action: Action): State {
