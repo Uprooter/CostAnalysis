@@ -74,6 +74,29 @@ export default class CompareView extends React.Component<CompareViewProps, Compa
                     </FormControl>
                 </Grid>
                 <Grid item sm>
+                    <FormControl>
+                        <InputLabel>Bis: </InputLabel>
+                        <Select
+                            value={this.props.monthB.month}
+                            onChange={this.handleMonthAChange}>
+                            {
+                                getMonths().map(month => {
+                                    return (<MenuItem value={month.number}>{month.name}</MenuItem>);
+                                })
+                            }
+                        </Select>
+                        <Select
+                            value={this.props.monthB.month}
+                            onChange={this.handleMonthAChange}>
+                            {
+                                getYears().map(year => {
+                                    return (<MenuItem value={year}>{year}</MenuItem>);
+                                })
+                            }
+                        </Select>
+                    </FormControl>
+                </Grid>
+                <Grid item sm>
                     <CompareTable monthA={this.props.monthA} monthB={this.props.monthB}
                                   clusterCompareItems={this.state.clusterCompareItems}/>
                 </Grid>

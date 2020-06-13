@@ -2,7 +2,10 @@ package de.mischa.controller;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
+import de.mischa.model.CostItem;
+import de.mischa.repository.CostItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +20,8 @@ public class AverageCostsRestController {
 
     @Autowired
     private AverageCostsCalculationService service;
+    @Autowired
+    private CostItemRepository costItemRepository;
 
     @RequestMapping("/averageCosts")
     public AverageCostModel getAverageCosts(
@@ -25,6 +30,7 @@ public class AverageCostsRestController {
             @RequestParam(value = "includeOthers") boolean includeOthers,
             @RequestParam(value = "savingsAreCosts") boolean savingsAreCosts
     ) {
-        return service.calculate(from, to, includeOthers, savingsAreCosts);
+        List<CostItem> relevantItems = this.costItemRepository.findRelevant(from, to);
+        return service.calculate(relevantItems, includeOthers, savingsAreCosts);
     }
 }
