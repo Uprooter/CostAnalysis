@@ -1,106 +1,71 @@
-import * as React from "react";
-import {FormControl, Grid, InputLabel, MenuItem, Select} from '@material-ui/core';
-import {getMonths, getYearMonth, getYears} from "../../utils/dates";
+import { useState } from "react";
+import { FormControl, Grid, InputLabel, MenuItem, Select } from '@material-ui/core';
+import { getMonths, getYearMonth, getYears, getOneMonthAfter } from "../../utils/dates";
 import CompareTable from "./CompareTable";
 import CompareModel from "../../models/CompareModel";
 import YearMonth from "../../models/YearMonth";
-import {UpdateCompareDatesAction} from "../../actions/actions";
-import {getRequest} from "../../utils/rest"
+import { getRequest } from "../../utils/rest"
+import * as React from "react";
 
-interface CompareViewProps {
-    updateCompareDates: (monthA: YearMonth, monthB: YearMonth) => UpdateCompareDatesAction;
-    monthA: YearMonth;
-    monthB: YearMonth;
-}
+export default function CompareView() {
 
-interface CompareViewState {
-    clusterCompareItems: CompareModel[];
-}
+    const [monthA, setMonthA] = useState<YearMonth>(getYearMonth(new Date()));
+    const [monthB, setMonthB] = useState<YearMonth>(getYearMonth(getOneMonthAfter(new Date())));
+   
 
-export default class CompareView extends React.Component<CompareViewProps, CompareViewState> {
-    state = {
-        clusterCompareItems: new Array<CompareModel>(),
-    }
-
-    handleDateChange(newDate: Date, dateField: string) {
-        console.log(newDate);
-        if (dateField === "monthA") {
-            this.props.updateCompareDates(getYearMonth(newDate), this.props.monthB);
-        } else {
-            this.props.updateCompareDates(this.props.monthA, getYearMonth(newDate));
-        }
-        this.loadClusterCompare();
-    }
-
-    loadClusterCompare = () => {
-        getRequest("/compareClusterCosts?"
-            + "monthA=" + this.props.monthA.getRestString()
-            + "&monthB=" + this.props.monthB.getRestString())
-            .then(r => {
-                this.setState({clusterCompareItems: r.entity});
-            });
-    }
-
-    handleMonthAChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        //setAge(event.target.value);
-    };
-
-    render() {
-        const gridItemStyle = {marginLeft: 10, marginTop: 20};
-        return (
-
-            <Grid container spacing={16}>
-                <Grid item sm>
-                    <FormControl>
-                        <InputLabel>Von: </InputLabel>
-                        <Select
-                            value={this.props.monthA.month}
-                            onChange={this.handleMonthAChange}>
-                            {
-                                getMonths().map(month => {
-                                    return (<MenuItem value={month.number}>{month.name}</MenuItem>);
-                                })
-                            }
-                        </Select>
-                        <Select
-                            value={this.props.monthA.month}
-                            onChange={this.handleMonthAChange}>
-                            {
-                                getYears().map(year => {
-                                    return (<MenuItem value={year}>{year}</MenuItem>);
-                                })
-                            }
-                        </Select>
-                    </FormControl>
-                </Grid>
-                <Grid item sm>
-                    <FormControl>
-                        <InputLabel>Bis: </InputLabel>
-                        <Select
-                            value={this.props.monthB.month}
-                            onChange={this.handleMonthAChange}>
-                            {
-                                getMonths().map(month => {
-                                    return (<MenuItem value={month.number}>{month.name}</MenuItem>);
-                                })
-                            }
-                        </Select>
-                        <Select
-                            value={this.props.monthB.month}
-                            onChange={this.handleMonthAChange}>
-                            {
-                                getYears().map(year => {
-                                    return (<MenuItem value={year}>{year}</MenuItem>);
-                                })
-                            }
-                        </Select>
-                    </FormControl>
-                </Grid>
-                <Grid item sm>
-                    <CompareTable monthA={this.props.monthA} monthB={this.props.monthB}
-                                  clusterCompareItems={this.state.clusterCompareItems}/>
-                </Grid>
+    const gridItemStyle = { marginLeft: 10, marginTop: 20 };
+    return (
+        <Grid container spacing={16}>
+            <Grid item sm>
+                <FormControl>
+                    <InputLabel>Von: </InputLabel>
+                    <Select
+                        value={monthA.month}
+                        onChange={e => { setMonthA(new YearMonth(parseInt(e.target.value), monthA.year)); loadClusterCompare(); }}>
+                        {
+                            getMonths().map(month => {
+                                return (<MenuItem value={month.number}>{month.name}</MenuItem>);
+                            })
+                        }
+                    </Select>
+                    <Select
+                        value={monthA.year}
+                        onChange={e => { setMonthA(new YearMonth(monthA.month, parseInt(e.target.value))); loadClusterCompare() }}>
+                        {
+                            getYears().map(year => {
+                                return (<MenuItem value={year}>{year}</MenuItem>);
+                            })
+                        }
+                    </Select>
+                </FormControl>
             </Grid>
-        )
-    }
+            <Grid item sm>
+                <FormControl>
+                    <InputLabel>Bis: </InputLabel>
+                    <Select
+                        value={monthB.month}
+                        onChange={e => { setMonthB(new YearMonth(parseInt(e.target.value), monthB.year)); loadClusterCompare() }}>
+                        {
+                            getMonths().map(month => {
+                                return (<MenuItem value={month.number}>{month.name}</MenuItem>);
+                            })
+                        }
+                    </Select>
+                    <Select
+                        value={monthB.year}
+                        onChange={e => { setMonthB(new YearMonth(monthB.month, parseInt(e.target.value))); loadClusterCompare() }}>
+                        {
+                            getYears().map(year => {
+                                return (<MenuItem value={year}>{year}</MenuItem>);
+                            })
+                        }
+                    </Select>
+                </FormControl>
+            </Grid>
+            <Grid item sm>
+                <CompareTable monthA={monthA} monthB={monthB} clusterCompareItems={clusterCompareItems} />
+            </Grid>
+        </Grid>
+    )
+
 }

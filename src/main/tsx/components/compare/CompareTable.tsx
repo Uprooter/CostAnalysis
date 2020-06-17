@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useState } from "react";
 import CompareModel from "../../models/CompareModel";
 import ClusterDetailsDialog from "../analysis/ClusterDetailsDialog";
 import {Table, TableBody, TableCell, TableHead, TableRow, Typography} from '@material-ui/core';
@@ -22,7 +23,17 @@ interface CompareTableState {
     selectedClusterCosts: CostItemModel[];
 }
 
-export default class CompareTable extends React.Component<CompareTableProps, CompareTableState> {
+export default function CompareTable() {
+
+    const [dialogOpen, setDialogOpen] = useState<Array<CompareModel>>(new Array<CompareModel>());
+    const [clusterCompareItems, setClusterCompareItems] = useState<Array<CompareModel>>(new Array<CompareModel>());
+
+    const loadClusterCompare = () => {
+        getRequest("/compareClusterCosts?"
+            + "monthA=" + monthA.getRestString()
+            + "&monthB=" + monthB.getRestString())
+            .then(r => { setClusterCompareItems(r.entity); });
+    }
 
     state = {
         dialogOpen: false,
