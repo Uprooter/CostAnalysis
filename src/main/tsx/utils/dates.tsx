@@ -1,6 +1,8 @@
 import YearMonth from "../models/YearMonth";
 import Month from "../models/Month";
 
+export const JAN = "Jan";
+
 export function getDateString(date: Date): string {
     let options = { year: 'numeric', month: 'numeric', day: 'numeric' };
     return date.toISOString().replace(/(\d{4})\-(\d{2})\-(\d{2}).*/, '$3.$2.$1');
@@ -25,7 +27,7 @@ export function getYearMonthString(date: Date): string {
 export function getDateWithLastDayOfSameMonth(date: Date): Date {
     let newDate = date;
     newDate.setMonth(date.getMonth() + 1);
-    newDate.setDate(newDate.getDate() - 1); //subtract a day
+    newDate.setDate(newDate.getDate()); //subtract a day
     return newDate;
 }
 
@@ -47,6 +49,12 @@ export function getOneMonthBefore(date: Date): Date {
     return newDate;
 }
 
+export function getMonthsBefore(date: Date, months: number): Date {
+    let newDate = date;
+    newDate.setMonth(date.getMonth() - months);
+    return newDate;
+}
+
 export function getOneMonthAfter(date: Date): Date {
     let newDate = date;
     newDate.setMonth(date.getMonth() + 1);
@@ -54,13 +62,47 @@ export function getOneMonthAfter(date: Date): Date {
 }
 
 export function getYearMonth(date: Date): YearMonth {
-    return new YearMonth(date.getMonth(), date.getFullYear());
+    return new YearMonth(date.getMonth() + 1, date.getFullYear());
 }
 
+
+export function getMonthFromName(name: string): number {
+    
+    switch (name) {
+        case JAN:
+            return 1;
+        case "Feb":
+            return 2
+        case "Mar":
+            return 3
+        case "Apr":
+            return 4
+        case "Mai":
+            return 5
+        case "Jun":
+            return 6
+        case "Jul":
+            return 7
+        case "Aug":
+            return 8
+        case "Sep":
+            return 9
+        case "Oct":
+            return 10
+        case "Nov":
+            return 11
+        case "Dec":
+            return 12
+        default:
+            break;
+    }
+}
+
+
 export function getMonths(): Month[] {
-    return [new Month("Jan", 0), new Month("Feb", 1), new Month("M�r", 2),
-    new Month("Apr", 3), new Month("Mai", 4), new Month("Jun", 5), new Month("Jul", 6),
-    new Month("Aug", 7), new Month("Sep", 8), new Month("Oct", 9), new Month("Nov", 10), new Month("Dec", 11)];
+    return [new Month(1), new Month(2), new Month(3),
+    new Month(4), new Month(5), new Month(6), new Month(7),
+    new Month(8), new Month(9), new Month(10), new Month(11), new Month(12)];
 }
 
 export function getYears(): number[] {

@@ -1,16 +1,18 @@
+import Month from "./Month";
+
 export default class YearMonth {
-    month: number;
+    month: Month;
     year: number;
 
     constructor(month: number, year: number) {
-        this.month = month;
+        this.month = new Month(month);
         this.year = year;
     }
 
     public getRestString(): string {
-        if (this.month.toString().length === 1) {
-            return "0" + this.month.toString() + "." + this.year;
+        if (this.month.displayNumber.toString().length === 1) {
+            return "0" + this.month.displayNumber.toString() + "." + this.year;
         }
-        return this.month.toString() + "." + this.year;
+        return this.month.displayNumber.toString() + "." + this.year;
     }
 }

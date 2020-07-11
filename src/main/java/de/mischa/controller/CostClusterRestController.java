@@ -14,6 +14,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -53,10 +55,12 @@ public class CostClusterRestController {
 
     @RequestMapping("/clusterCostsByCluster")
     public List<CostItem> getClusterCosts(
-            @RequestParam(value = "from") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate from,
-            @RequestParam(value = "to") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate to,
+            @RequestParam(value = "from") String from,
+            @RequestParam(value = "to") String to,
             @RequestParam(value = "clusterName") String clusterName) {
-        return costItemRepository.findRelevantByCluster(from, to, CostCluster.valueOf(clusterName));
+        LocalDate m1 = LocalDate.parse(from, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        LocalDate m2 = LocalDate.parse(to, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        return costItemRepository.findRelevantByCluster(m1, m2, CostCluster.valueOf(clusterName));
     }
 
     @RequestMapping("/costsByClusterYearly")

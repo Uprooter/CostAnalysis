@@ -31,22 +31,25 @@ const CompareTable: React.FC<Props> = ({ monthA, monthB }) => {
 
     useEffect(() => {
         loadClusterCompare();
-    }, []);
+    }, [monthA, monthB]);
 
     useEffect(() => {
-        setDialogOpen(true)
+        if (selectedCluster) {
+            setDialogOpen(true)
+        }
     }, [selectedCluster]);
 
-    const showClusterDetails = (cluster: string, date: YearMonth) => {
-        setSelectedCluster(cluster);
+    const showClusterDetails = (cluster: string, date: YearMonth) => {   
 
-        let from: Date = new Date(date.year, date.month, 1);
+        let from: Date = new Date(date.year, date.month.number, 1);
         let to: Date = getDateWithLastDayOfSameMonth(from);
-        getRequest("/clusterCostsByCluster?from=" + getDateString(from) //1.month.year
-            + "&to=" + getDateString(getDateWithLastDayOfSameMonth(to)) // last day of month
+        getRequest("/clusterCostsByCluster?from=01." +date.getRestString() //1.month.year
+            + "&to=" + getDateString(to) // last day of month
             + "&clusterName=" + cluster)
             .then(r => {
+                console.log(r)
                 updateSelectedClusterCostsWithClientId(r.entity);
+                setSelectedCluster(cluster);
             });
     }
 
@@ -88,7 +91,7 @@ const CompareTable: React.FC<Props> = ({ monthA, monthB }) => {
                         <TableCell style={{
                             paddingLeft: 10,
                             paddingRight: 10
-                        }}>Details {monthA.getRestString()}</TableCell>
+                        }}>Details {monthB.getRestString()}</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
