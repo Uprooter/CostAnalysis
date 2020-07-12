@@ -46,7 +46,7 @@ public class InitialCostReader {
     private List<InitialCostImportEntry> parseContent(Reader bufferedReader) throws IOException {
         List<InitialCostImportEntry> resultList = new ArrayList<>();
         CSVParser csvParser = new CSVParser(bufferedReader,
-                CSVFormat.DEFAULT.withHeader(COLUMN_NAMES).withDelimiter(';'));
+                CSVFormat.DEFAULT.withHeader(COLUMN_NAMES).withDelimiter(';').withFirstRecordAsHeader());
         csvParser.forEach(r -> this.parse(r, resultList));
         csvParser.close();
         return resultList;

@@ -17,7 +17,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 
@@ -40,18 +39,6 @@ public class AbstractCostImporter {
         return parseContent(bufferedReader);
     }
 
-    public int calculateLinesToSkip(List<String> lines) {
-        int toSkip = 0;
-        for (String line : lines) {
-            StringTokenizer tokenizer = new StringTokenizer(line, ";");
-            if (tokenizer.countTokens() == config.getColumnNames().length) {
-                return toSkip;
-            }
-            toSkip++;
-        }
-
-        return toSkip;
-    }
 
     public List<CostImportEntry> read(InputStream fileStream) throws IOException {
 
@@ -62,14 +49,15 @@ public class AbstractCostImporter {
     private List<CostImportEntry> parseContent(Reader bufferedReader) throws IOException {
         List<CostImportEntry> resultList = new ArrayList<>();
         CSVParser csvParser = new CSVParser(bufferedReader,
-                CSVFormat.DEFAULT.withHeader(this.config.getColumnNames()).withDelimiter(';'));
+                CSVFormat.DEFAULT.withHeader(this.config.getColumnNames()).withDelimiter(';').withFirstRecordAsHeader());
         csvParser.forEach(r -> this.parse(r, resultList));
         csvParser.close();
         return resultList;
     }
 
     private void parse(CSVRecord r, List<CostImportEntry> resultList) {
-        if (r.size() == this.config.getColumnNames().length) {
+        boolean validRecord = r.size() == this.config.getColumnNames().length;
+        if (validRecord) {
             LocalDate date;
             try {
                 date = DateUtils.createDate(r.get(this.config.getDateColumnName()));
@@ -123,8 +111,48 @@ public class AbstractCostImporter {
     }
 
     private List<String> skipLines(List<String> lines) {
-        return lines.subList(this.calculateLinesToSkip(lines), lines.size());
+        int skipLinesAtBeginning = this.calculateLinesToSkipFromBeginning(lines);
+        //Do not want to evaluate the header here -> +1
+        int skipLinesAtEnd = this.calculateLinesToSkipAtEnd(lines.subList(skipLinesAtBeginning + 1, lines.size()));
+        if (skipLinesAtBeginning > 0) {
+            return lines.subList(skipLinesAtBeginning - 1, lines.size() - skipLinesAtEnd);
+        } else {
+            return lines.subList(0, lines.size() - skipLinesAtEnd);
+        }
     }
+
+    public int calculateLinesToSkipFromBeginning(List<String> lines) {
+        int toSkip = 0;
+        for (String line : lines) {
+            String[] tokens = line.split(";", -1);
+            boolean hasExpectedNumberOfValues = tokens.length == config.getColumnNames().length;
+            boolean hasExpectedFirstValue = DateUtils.isDate(tokens[0]);
+            if (!hasExpectedNumberOfValues || !hasExpectedFirstValue) {
+                toSkip++;
+            } else {
+                // Found first valid -> return
+                return toSkip;
+            }
+        }
+
+        return toSkip;
+    }
+
+
+    public int calculateLinesToSkipAtEnd(List<String> lines) {
+        int toSkip = 0;
+        for (String line : lines) {
+            String[] tokens = line.split(";", -1);
+            boolean hasExpectedNumberOfValues = tokens.length == config.getColumnNames().length;
+            boolean hasExpectedFirstValue = DateUtils.isDate(tokens[0]); // has to be a date
+            if (!hasExpectedNumberOfValues || !hasExpectedFirstValue) {
+                toSkip++;
+            }
+        }
+
+        return toSkip;
+    }
+
 
     public CostOwner getCostOwner() {
         return CostOwner.GESA;

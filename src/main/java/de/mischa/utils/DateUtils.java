@@ -18,6 +18,11 @@ public class DateUtils {
         }
     }
 
+    public static boolean isDate(String date) {
+        return createDate(date) != null;
+    }
+
+
     public static LocalDate getOneYearBefore(LocalDate date) {
         return date.minusYears(1).withDayOfMonth(1);
     }

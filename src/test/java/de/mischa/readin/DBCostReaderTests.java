@@ -12,11 +12,11 @@ import org.junit.Test;
 import de.mischa.readin.db.DBCostReader;
 
 public class DBCostReaderTests {
-	@Test
-	public void testImporter() throws FileNotFoundException, IOException {
-		List<CostImportEntry> entries = new DBCostReader().read("src/test/resources/readin/dbExample.csv");
-		Assert.assertThat(entries.size(), is(2));
-		Assert.assertThat(entries.get(0).getAmount(), is(-117.0));
-		Assert.assertThat(entries.get(1).getAmount(), is(-9.99));
-	}
+    @Test
+    public void testImporter() throws IOException {
+        List<CostImportEntry> entries = new DBCostReader().read("src/test/resources/readin/dbExample.csv");
+        Assert.assertThat(entries.size(), is(2));
+        Assert.assertThat(entries.get(0).getAmount(), is(-117.0));
+        Assert.assertThat(entries.get(1).getAmount(), is(-9.99));
+    }
 }
