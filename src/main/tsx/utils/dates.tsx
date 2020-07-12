@@ -2,6 +2,17 @@ import YearMonth from "../models/YearMonth";
 import Month from "../models/Month";
 
 export const JAN = "Jan";
+export const FEB = "Feb";
+export const MAR = "Mar";
+export const APR = "Apr";
+export const MAI = "Mai";
+export const JUN = "Jun";
+export const JUL = "Jul";
+export const AUG = "Aug";
+export const SEP = "Sep";
+export const OCT = "Oct";
+export const NOV = "Nov";
+export const DEC = "Dec";
 
 export function getDateString(date: Date): string {
     let options = { year: 'numeric', month: 'numeric', day: 'numeric' };
@@ -71,27 +82,27 @@ export function getMonthFromName(name: string): number {
     switch (name) {
         case JAN:
             return 1;
-        case "Feb":
+        case FEB:
             return 2
-        case "Mar":
+        case MAR:
             return 3
-        case "Apr":
+        case APR:
             return 4
-        case "Mai":
+        case MAI:
             return 5
-        case "Jun":
+        case JUN:
             return 6
-        case "Jul":
+        case JUL:
             return 7
-        case "Aug":
+        case AUG:
             return 8
-        case "Sep":
+        case SEP:
             return 9
-        case "Oct":
+        case OCT:
             return 10
-        case "Nov":
+        case NOV:
             return 11
-        case "Dec":
+        case DEC:
             return 12
         default:
             break;

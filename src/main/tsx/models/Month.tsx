@@ -1,4 +1,4 @@
-import { JAN } from "../utils/dates";
+import { JAN, FEB, MAR, APR, MAI, JUN, JUL, AUG, SEP, OCT, NOV, DEC } from "../utils/dates";
 
 export default class Month {
     name: string;
@@ -16,27 +16,27 @@ export default class Month {
             case 1:
                 return JAN;
             case 2:
-                return "Feb"
+                return FEB
             case 3:
-                return "Mar"
+                return MAR
             case 4:
-                return "Apr"
+                return APR
             case 5:
-                return "Mai"
+                return MAI
             case 6:
-                return "Jun"
+                return JUN
             case 7:
-                return "Jul"
+                return JUL
             case 8:
-                return "Aug"
+                return AUG
             case 9:
-                return "Sep"
+                return SEP
             case 10:
-                return "Oct"
+                return OCT
             case 11:
-                return "Nov"
+                return NOV
             case 12:
-                return "Dec"
+                return DEC
             default:
                 break;
         }
