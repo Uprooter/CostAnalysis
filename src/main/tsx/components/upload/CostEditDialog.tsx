@@ -109,6 +109,7 @@ export default class CostEditDialog extends React.Component<CostEditDialogProps,
                                     <Button onClick={() => this.props.updateValue("HW_MOEBEL / -", "detailedClusterAndType", "FLEXIBEL")}>HW Moebel</Button>
                                     <Button onClick={() => this.props.updateValue("BEKLEIDUNG / -", "detailedClusterAndType", "FLEXIBEL")}>Bekleidung</Button>
                                     <Button onClick={() => this.props.updateValue("GESUNDHEIT / -", "detailedClusterAndType", "FLEXIBEL")}>Gesundheit</Button>
+                                    <Button onClick={() => this.props.updateValue("GEHALT / -", "detailedClusterAndType", "GEHALT")}>Gehalt</Button>
                                 </FormControl>
                             </Grid>
                         </Grid>

@@ -37,7 +37,7 @@ const CompareTable: React.FC<Props> = ({ monthA, monthB }) => {
         if (selectedCluster) {
             setDialogOpen(true)
         }
-    }, [selectedCluster]);
+    }, [selectedCluster,selectedClusterCosts]);
 
     const showClusterDetails = (cluster: string, date: YearMonth) => {   
 
@@ -83,7 +83,7 @@ const CompareTable: React.FC<Props> = ({ monthA, monthB }) => {
                 <TableHead>
                     <TableRow>
                         <TableCell>Typ</TableCell>
-                        <TableCell>Unterschied</TableCell>
+                        <TableCell>Unterschied (Von-Bis)</TableCell>
                         <TableCell style={{
                             paddingLeft: 10,
                             paddingRight: 10

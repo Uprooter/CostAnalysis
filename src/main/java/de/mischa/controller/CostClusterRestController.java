@@ -4,6 +4,7 @@ import de.mischa.model.*;
 import de.mischa.repository.CostItemRepository;
 import de.mischa.repository.DetailedCostClusterRepository;
 import de.mischa.service.ClusterCostService;
+import de.mischa.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,10 +48,9 @@ public class CostClusterRestController {
     }
 
     @RequestMapping("/clusterCosts")
-    public List<ClusterCost> getClusterCosts(
-            @RequestParam(value = "from") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate from,
-            @RequestParam(value = "to") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate to) {
-        return clusterCostService.calculate(from, to);
+    public List<ClusterCost> getClusterCosts(@RequestParam(value = "from") String from,
+                                             @RequestParam(value = "to") String to) {
+        return clusterCostService.calculate(DateUtils.createDate(from), DateUtils.createDate(to));
     }
 
     @RequestMapping("/clusterCostsByCluster")
@@ -58,8 +58,8 @@ public class CostClusterRestController {
             @RequestParam(value = "from") String from,
             @RequestParam(value = "to") String to,
             @RequestParam(value = "clusterName") String clusterName) {
-        LocalDate m1 = LocalDate.parse(from, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
-        LocalDate m2 = LocalDate.parse(to, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        LocalDate m1 = DateUtils.createDate(from);
+        LocalDate m2 = DateUtils.createDate(to);
         return costItemRepository.findRelevantByCluster(m1, m2, CostCluster.valueOf(clusterName));
     }
 
@@ -73,11 +73,12 @@ public class CostClusterRestController {
     }
 
     @RequestMapping("/costsByClusterMonthly")
-    public List<TimeFrameCostEntry> getMonthlyCostsByCluster(
-            @RequestParam(value = "cluster") String clusterName,
-            @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate from) {
+    public List<TimeFrameCostEntry>
+    getMonthlyCostsByCluster(@RequestParam(value = "cluster") String clusterName, String from) {
+
+        LocalDate m1 = DateUtils.createDate(from);
         if (clusterName != null && !clusterName.isEmpty()) {
-            return clusterCostService.calculateMonthlyLast12From(CostCluster.valueOf(clusterName), from);
+            return clusterCostService.calculateMonthlyLast12From(CostCluster.valueOf(clusterName), m1);
         } else {
             return new ArrayList<>();
         }
