@@ -13,18 +13,18 @@ import java.util.stream.Collectors;
 @Service
 public class AverageCostsCalculationService {
     public AverageCostModel calculate(List<CostItem> relevantItems, boolean includeOthers, boolean savingsAreCosts) {
-        relevantItems.stream()
+        List<CostItem> withoutUmbuchung = relevantItems.stream()
                 .filter(i -> i.getDetailedCluster().getCluster() != CostCluster.UMBUCHUNG).collect(Collectors.toList());
 
         if (!includeOthers) {
             return this.calculateResult(
-                    relevantItems.stream()
+                    withoutUmbuchung.stream()
                             .filter(i -> i.getDetailedCluster().getCluster() != CostCluster.SONSTIGE_AUSGABEN)
                             .filter(i -> i.getDetailedCluster().getCluster() != CostCluster.SONSTIGE_EINNAHMEN)
                             .collect(Collectors.toList()), savingsAreCosts);
         }
 
-        return calculateResult(relevantItems, savingsAreCosts);
+        return calculateResult(withoutUmbuchung, savingsAreCosts);
     }
 
     AverageCostModel calculateResult(List<CostItem> relevantItems, boolean savingsAreCosts) {
