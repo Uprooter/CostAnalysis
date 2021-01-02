@@ -78,7 +78,7 @@ export function getYearMonth(date: Date): YearMonth {
 
 
 export function getMonthFromName(name: string): number {
-    
+
     switch (name) {
         case JAN:
             return 1;

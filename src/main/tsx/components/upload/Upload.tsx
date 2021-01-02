@@ -36,7 +36,6 @@ class Upload extends React.Component<InjectedNotistackProps, UploadState> {
             },
             method: "POST"
         }).then(r => {
-            console.log(r.status);
             let newImportedItems: CostItemModel[] = r.entity;
             let newMappedItems: CostItemModel[] = new Array<CostItemModel>();
             let newUnmappedItems: CostItemModel[] = new Array<CostItemModel>();

@@ -88,7 +88,7 @@ export default class CostItemTableNew extends React.PureComponent<CostItemTableP
                 data={this.props.items.map(item => {
                     return (
                         {
-                            creationDate: getDEDateString(item.creationDate),
+                            creationDate: item.creationDate,
                             recipient: item.recipient.name,
                             amount: item.amount,
                             owner: item.owner,

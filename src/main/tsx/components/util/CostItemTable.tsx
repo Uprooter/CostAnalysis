@@ -33,7 +33,7 @@ export default class CostItemTable extends React.PureComponent<CostItemTableProp
                                 <TableRow style={this.props.getValidationColor(item)}
                                     key={item.clientId} hover
                                     onClick={event => this.props.handleRowClick(event, item.clientId)}>
-                                    <TableCell>{getDEDateString(item.creationDate)}</TableCell>
+                                    <TableCell>{item.creationDate}</TableCell>
                                     <TableCell>{item.recipient.name}</TableCell>
                                     <TableCell>{item.amount + " €"}</TableCell>
                                     <TableCell>{item.owner}</TableCell>

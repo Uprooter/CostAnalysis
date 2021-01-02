@@ -12,6 +12,7 @@ import DetailedCostClusterModel from "../../models/DetailedCostClusterModel";
 import { Select, Button, Grid, TextField } from '@material-ui/core';
 import CostItemModel from "../../models/CostItemModel";
 import { detailedName } from '../../utils/detailedClusters';
+import { getDashDateString, parseISOString } from "../../utils/dates";
 
 interface CostEditDialogProps {
     selections: {
@@ -40,7 +41,6 @@ const CostEditDialog: React.FC<CostEditDialogProps> = ({ selections, dialogOpen,
         clusterError: false
     });
     const [newDetailedCluster, setNewDetailedCluster] = useState<DetailedCostClusterModel>(new DetailedCostClusterModel("", ""));
-
 
     const handleSumbit = (event: React.FormEvent) => {
         if (hasErrors()) {
@@ -170,6 +170,18 @@ const CostEditDialog: React.FC<CostEditDialogProps> = ({ selections, dialogOpen,
                                 <TextField label="Detail" onChange={e => {
                                     setNewDetailedCluster(new DetailedCostClusterModel(e.target.value, newDetailedCluster.cluster));
                                 }}>{newDetailedCluster.name}</TextField>
+                            </FormControl>
+                        </Grid>
+                        <Grid item>
+                            <FormControl>
+                                <TextField id="dialogDate" label="Datum" type="date" style={{ margin: 5 }}
+                                    value={costItem.creationDate}
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }} onChange={e => {
+                                        updateValue(e.target.value, "creationDate")
+                                    }}
+                                />
                             </FormControl>
                         </Grid>
                     </Grid>

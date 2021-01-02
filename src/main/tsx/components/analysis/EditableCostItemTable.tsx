@@ -6,6 +6,7 @@ import { Typography } from '@material-ui/core';
 import CostEditDialog from "../upload/CostEditDialog";
 import { getRequest } from '../../utils/rest';
 import { getFromDetailedName } from '../../utils/detailedClusters';
+import { parseISOString } from "../../utils/dates";
 
 interface EditableCostItemTableProps {
     items: CostItemModel[];
@@ -95,6 +96,9 @@ export default class EditableCostItemTable extends React.Component<EditableCostI
                 break;
             case "detailedClusterAndType":
                 this.setState({ costItem: Object.assign({}, this.state.costItem, { detailedCluster: getFromDetailedName(newValue), type: typeValue }) });
+                break;
+            case "creationDate":
+                this.setState({ costItem: Object.assign({}, this.state.costItem, { creationDate: newValue}) });
                 break;
             default:
                 console.log("Do not know field: " + field);

@@ -18,7 +18,7 @@ export default class CostItemModel {
 
     purpose: string;
 
-    creationDate: Date;
+    creationDate: string;
 
     complete: boolean = true;
 
