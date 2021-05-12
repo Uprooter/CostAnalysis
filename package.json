@@ -33,7 +33,7 @@
     "@types/redux-logger": "^3.0.6",
     "@types/redux-thunk": "^2.1.0",
     "@types/rest": "^1.3.28",
-    "chart.js": "^2.7.3",
+    "chart.js": "^2.9.4",
     "connected-react-router": "^5.0.1",
     "date-fns": "^2.0.0-alpha.21",
     "eslint": "^5.9.0",
